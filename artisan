@@ -1,0 +1,22 @@
+<?php
+
+use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Http\Request;
+
+define('LARAVEL_START', microtime(true));
+
+// Détermine si l'application est en mode maintenance...
+if (file_exists($maintenance = __DIR__.'/storage/framework/maintenance.php')) {
+    require $maintenance;
+}
+
+// Enregistre l'autoloader de Composer...
+require __DIR__.'/vendor/autoload.php';
+
+// On récupère l'instance de l'application
+$app = require_once __DIR__.'/bootstrap/app.php';
+
+// On exécute la commande
+$status = $app->handleCommand(new Symfony\Component\Console\Input\ArgvInput);
+
+exit($status);
