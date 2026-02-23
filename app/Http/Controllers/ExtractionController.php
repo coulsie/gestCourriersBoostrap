@@ -8,6 +8,8 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DynamicQueryExport;
 use Illuminate\Support\Facades\Config;
 use App\Models\ScriptExtraction;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 
 class ExtractionController extends Controller
 {
@@ -116,13 +118,75 @@ class ExtractionController extends Controller
         return back()->with('success', "Script supprimé.");
     }
 
-    public function export(Request $request)
-    {
-        $query = $request->input('code'); // Utilise 'code' pour l'export
-        $connection = $request->input('connection');
+
+
+
+public function export(Request $request)
+{
+    $query = $request->input('query');
+    $connection = $request->input('connection', 'oracle');
+
+    if (empty($query)) {
+        return back()->with('error', 'Aucune requête à exporter.');
+    }
+
+    try {
+        // 1. Compter le nombre de résultats sans tout charger en mémoire
+        // On entoure la requête pour garantir le comptage
+        $count = DB::connection($connection)->table(DB::raw("($query) as sub"))->count();
+
+        if ($count === 0) {
+            return back()->with('info', 'La requête n\'a retourné aucun résultat.');
+        }
+
+        // 2. Choix du format : CSV pour > 1 000 000 lignes
+        if ($count > 1000000) {
+            return $this->exportToCsv($query, $connection);
+        }
+
+        // 3. Export Excel classique pour les volumes modérés
         $results = DB::connection($connection)->select($query);
         $data = collect($results)->map(fn($x) => (array) $x);
 
         return Excel::download(new DynamicQueryExport($data), 'extraction_' . date('Ymd_His') . '.xlsx');
+
+    } catch (\Exception $e) {
+        return back()->with('error', 'Erreur SQL : ' . $e->getMessage());
     }
+}
+
+/**
+ * Gestion de l'export CSV en streaming pour les gros volumes
+ */
+private function exportToCsv($query, $connection)
+{
+    $fileName = 'extraction_' . date('Ymd_His') . '.csv';
+
+    return new StreamedResponse(function () use ($query, $connection) {
+        $handle = fopen('php://output', 'w');
+
+        // UTF-8 BOM pour l'ouverture correcte des accents dans Excel
+        fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
+
+        $firstRow = true;
+
+        // DB::cursor() lit les lignes une par une (mémoire économisée)
+        foreach (DB::connection($connection)->cursor($query) as $row) {
+            $data = (array) $row;
+
+            if ($firstRow) {
+                fputcsv($handle, array_keys($data), ';');
+                $firstRow = false;
+            }
+
+            fputcsv($handle, $data, ';');
+        }
+
+        fclose($handle);
+    }, 200, [
+        'Content-Type' => 'text/csv',
+        'Content-Disposition' => "attachment; filename=\"$fileName\"",
+    ]);
+}
+
 }
