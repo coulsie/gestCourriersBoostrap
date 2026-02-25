@@ -6,46 +6,55 @@
     <div class="card shadow-sm border-0 mb-4 rounded-4">
         <div class="card-body p-4" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);">
             <form action="{{ route('imputations.index') }}" method="GET" class="row g-3 align-items-end">
-                <!-- Recherche -->
-                <div class="col-md-3">
-                    <label class="form-label fw-bold text-dark mb-2 fs-5"><i class="fas fa-search me-1 text-primary"></i> RECHERCHE</label>
-                    <input type="text" name="search" class="form-control border-2 shadow-sm fs-5 py-2" value="{{ request('search') }}" placeholder="Réf. ou objet...">
-                </div>
+               <!-- Recherche (Bleu/Primary) -->
+    <div class="col-md-3">
+        <label class="form-label fw-bold text-primary mb-2 fs-5">
+            <i class="fas fa-search me-1"></i> RECHERCHE
+        </label>
+        <input type="text" name="search" class="form-control border-primary border-2 shadow-sm fs-5 py-2"
+               value="{{ request('search') }}" placeholder="Réf. ou objet...">
+    </div>
 
-                <!-- Niveau -->
-                <div class="col-md-2">
-                    <label class="form-label fw-bold text-dark mb-2 fs-5">NIVEAU</label>
-                    <select name="niveau" class="form-select border-2 shadow-sm fs-5 py-2">
-                        <option value="">Tous</option>
-                        <option value="primaire" {{ request('niveau') == 'primaire' ? 'selected' : '' }}>Primaire</option>
-                        <option value="secondaire" {{ request('niveau') == 'secondaire' ? 'selected' : '' }}>Secondaire</option>
-                        <option value="tertiaire" {{ request('niveau') == 'tertiaire' ? 'selected' : '' }}>Tertiaire</option>
-                    </select>
-                </div>
+    <!-- Niveau (Vert/Success) -->
+    <div class="col-md-2">
+        <label class="form-label fw-bold text-success mb-2 fs-5">
+            <i class="fas fa-layer-group me-1"></i> NIVEAU
+        </label>
+        <select name="niveau" class="form-select border-success border-2 shadow-sm fs-5 py-2">
+            <option value="">Tous</option>
+            <option value="primaire" {{ request('niveau') == 'primaire' ? 'selected' : '' }}>Primaire</option>
+            <option value="secondaire" {{ request('niveau') == 'secondaire' ? 'selected' : '' }}>Secondaire</option>
+            <option value="tertiaire" {{ request('niveau') == 'tertiaire' ? 'selected' : '' }}>Tertiaire</option>
+        </select>
+    </div>
 
-                <!-- Statut -->
-                <div class="col-md-2">
-                    <label class="form-label fw-bold text-dark mb-2 fs-5">STATUT</label>
-                    <select name="statut" class="form-select border-2 shadow-sm fs-5 py-2">
-                        <option value="">Tous les statuts</option>
-                        <option value="en_attente" {{ request('statut') == 'en_attente' ? 'selected' : '' }}>En attente</option>
-                        <option value="en_cours" {{ request('statut') == 'en_cours' ? 'selected' : '' }}>En cours</option>
-                        <option value="termine" {{ request('statut') == 'termine' ? 'selected' : '' }}>Terminé</option>
-                    </select>
-                </div>
+    <!-- Statut (Orange/Warning) -->
+    <div class="col-md-2">
+        <label class="form-label fw-bold text-warning mb-2 fs-5">
+            <i class="fas fa-tasks me-1"></i> STATUT
+        </label>
+        <select name="statut" class="form-select border-warning border-2 shadow-sm fs-5 py-2">
+            <option value="">Tous les statuts</option>
+            <option value="en_attente" {{ request('statut') == 'en_attente' ? 'selected' : '' }}>⏳ En attente</option>
+            <option value="en_cours" {{ request('statut') == 'en_cours' ? 'selected' : '' }}>⚙️ En cours</option>
+            <option value="termine" {{ request('statut') == 'termine' ? 'selected' : '' }}>✅ Terminé</option>
+        </select>
+    </div>
 
-                <!-- Agent -->
-                <div class="col-md-3">
-                    <label class="form-label fw-bold text-dark mb-2 fs-5">AGENT ASSIGNÉ</label>
-                    <select name="agent_id" class="form-select border-2 shadow-sm fs-5 py-2">
-                        <option value="">Tous les agents</option>
-                        @foreach($allAgents as $agent)
-                            <option value="{{ $agent->id }}" {{ request('agent_id') == $agent->id ? 'selected' : '' }}>
-                                {{ strtoupper($agent->last_name) }}  {{$agent->first_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+    <!-- Agent (Info/Bleu clair) -->
+    <div class="col-md-3">
+        <label class="form-label fw-bold text-info mb-2 fs-5">
+            <i class="fas fa-user-tie me-1"></i> AGENT ASSIGNÉ
+        </label>
+        <select name="agent_id" class="form-select border-info border-2 shadow-sm fs-5 py-2">
+            <option value="">Tous les agents</option>
+            @foreach($allAgents as $agent)
+                <option value="{{ $agent->id }}" {{ request('agent_id') == $agent->id ? 'selected' : '' }}>
+                    👤 {{ strtoupper($agent->last_name) }} {{$agent->first_name }}
+                </option>
+            @endforeach
+        </select>
+    </div>
 
                 <!-- Boutons -->
                 <div class="col-md-2 d-flex gap-2">

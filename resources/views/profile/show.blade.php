@@ -2,12 +2,42 @@
 
 @section('content')
 <div class="container-fluid">
+
+            <!-- Bloc d'affichage des messages de succès -->
+            @if (session('status'))
+                <div class="alert alert-success alert-dismissible fade show shadow-sm border-left-success" role="alert">
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <strong>Succès !</strong> {{ session('status') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+
+            <!-- Bloc d'affichage des erreurs de validation (ex: mauvais mot de passe actuel) -->
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show shadow-sm border-left-danger" role="alert">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <strong>Erreur !</strong> Veuillez vérifier les formulaires.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+
+
     <!-- En-tête de page -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Mon Profil Utilisateur</h1>
+
+        <a href="{{ route('home') }}" class="btn btn-secondary shadow-sm font-weight-bold">
+            <i class="fas fa-times mr-1"></i> Fermer et Quitter
+        </a>
+
     </div>
 
     <div class="row">
+
         <!-- Carte de Profil Gauche -->
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4 border-bottom-primary">
