@@ -43,6 +43,17 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property-read \App\Models\Agent|null $agent
+ * @property-read \App\Models\Courrier|null $courrier
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Affectation newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Affectation newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Affectation query()
+ */
+	class Affectation extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property int $id
  * @property string|null $email_professionnel
  * @property string $matricule
@@ -67,10 +78,16 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Absence> $absences
  * @property-read int|null $absences_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Affectation> $affectations
+ * @property-read int|null $affectations_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Direction> $directionsResponsable
  * @property-read int|null $directions_responsable_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Imputation> $imputations
  * @property-read int|null $imputations_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtache
+ * @property-read int|null $notificationtache_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtaches
+ * @property-read int|null $notificationtaches_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Presence> $presences
@@ -292,6 +309,26 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property \App\Enums\PrioriteEnum $priorite
+ * @property \App\Enums\StatutEnum $statut
+ * @property-read \App\Models\Agent|null $agent
+ * @property-read string $priorite_label
+ * @property-read mixed $progression
+ * @property-read string $statut_label
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReponseNotification> $reponseNotification
+ * @property-read int|null $reponse_notification_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReponseNotification> $reponses
+ * @property-read int|null $reponses_count
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NotificationTache newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NotificationTache newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|NotificationTache query()
+ */
+	class NotificationTache extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -407,6 +444,17 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property-read \App\Models\User|null $agent
+ * @property-read \App\Models\NotificationTache|null $notification
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReponseNotification newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReponseNotification newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ReponseNotification query()
+ */
+	class ReponseNotification extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -438,9 +486,11 @@ namespace App\Models{
  * @property array<array-key, mixed>|null $parametres
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $code
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScriptExtraction newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScriptExtraction newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScriptExtraction query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ScriptExtraction whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScriptExtraction whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScriptExtraction whereDescription($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ScriptExtraction whereId($value)
@@ -522,9 +572,16 @@ namespace App\Models{
  * @property string|null $bio
  * @property string|null $profile_picture
  * @property \App\Enums\UserRole $role
+ * @property-read \App\Models\Affectation|null $affectation
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Affectation> $affectations
+ * @property-read int|null $affectations_count
  * @property-read \App\Models\Agent|null $agent
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtache
+ * @property-read int|null $notificationtache_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtaches
+ * @property-read int|null $notificationtaches_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles

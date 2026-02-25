@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+
 
 class ProfileController extends Controller
 {
@@ -82,6 +84,26 @@ class ProfileController extends Controller
         // On retourne la vue située dans resources/views/profil/create.blade.php
         return view('profile.create');
     }
+
+    
+        public function updatePassword(Request $request)
+    {
+        // 1. Validation stricte
+        $request->validate([
+            'current_password' => ['required', 'current_password'], // Vérifie l'ancien MDP
+            'password' => ['required', 'confirmed', 'min:8'],       // Nouveau + Confirmation
+        ]);
+
+        // 2. Mise à jour sécurisée
+        $user = $request->user();
+        $user->update([
+            'password' => Hash::make($request->password),
+            'password_changed_at' => now(), // Assurez-vous que cette colonne existe
+        ]);
+
+        return back()->with('status', 'Votre mot de passe a été mis à jour avec succès !');
+    }
+
 
 }
 

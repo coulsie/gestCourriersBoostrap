@@ -105,6 +105,15 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('typeabsences', TypeAbsenceController::class); // Ajouté pour la cohérence
     });
 
+
+
+    // Utilisez un nom de route différent de 'password.update'
+    Route::post('/user/change-password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])
+        ->name('user.password.custom.update')
+        ->middleware('auth');
+
+    Route::patch('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
     /*
     |--------------------------------------------------------------------------
     | 3. ESPACE MÉTIER (Authentification + Changement de mot de passe forcé)
