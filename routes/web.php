@@ -203,6 +203,8 @@ Route::middleware(['auth'])->group(function () {
                 });
                 Route::resource('imputations', ImputationController::class);
                 Route::post('/reponses/store', [ReponseController::class, 'store'])->name('reponses.store');
+                // Ajoutez cette ligne dans votre fichier de routes
+                Route::post('/reponses/{id}/valider', [ReponseController::class, 'valider'])->name('reponses.valider');
 
                 // --- TACHES & ANNONCES ---
                 Route::resource('annonces', AnnonceController::class);

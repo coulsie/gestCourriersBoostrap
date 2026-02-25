@@ -34,7 +34,7 @@
                                 <h5 class="text-primary fw-bold mb-0 small text-uppercase">
                                     <i class="fas fa-info-circle me-2"></i>{{ __('Informations Générales') }}
                                 </h5>
-                                <div class="d-flex align-items-center bg-light p-2 rounded border shadow-sm">
+                               <div class="d-flex align-items-center bg-light p-2 rounded border shadow-sm">
                                     <div class="form-check form-switch me-3">
                                         <input class="form-check-input" type="checkbox" name="is_confidentiel" id="checkConfid" onclick="togglePassword(this)">
                                         <label class="form-check-label fw-bold small text-danger" for="checkConfid">
@@ -42,8 +42,18 @@
                                         </label>
                                     </div>
                                     <div id="passwordField" style="display:none;">
-                                        <input type="password" name="code_acces" class="form-control form-control-sm border-danger"
-                                            placeholder="Code" style="width: 100px;">
+                                        <div class="d-flex flex-column">
+                                            <input type="password"
+                                                name="code_acces"
+                                                id="code_acces"
+                                                class="form-control form-control-sm border-danger"
+                                                placeholder="Code"
+                                                style="width: 100px;"
+                                                pattern="[0-9]{4,6}"
+                                                inputmode="numeric"
+                                                title="Le code doit contenir entre 4 et 6 chiffres">
+                                            <small class="text-muted mt-1" style="font-size: 0.65rem;">(4 à 6 chiffres)</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -270,5 +280,20 @@ document.getElementById('directionSelect').addEventListener('change', function()
         container.style.borderLeftColor = "#198754"; // Vert
     }
 });
+</script>
+<script>
+function togglePassword(checkbox) {
+    const field = document.getElementById('passwordField');
+    const input = document.getElementById('code_acces');
+
+    if (checkbox.checked) {
+        field.style.display = 'block';
+        input.setAttribute('required', 'required');
+    } else {
+        field.style.display = 'none';
+        input.removeAttribute('required');
+        input.value = ''; // Réinitialise le code si décoché
+    }
+}
 </script>
 @endsection

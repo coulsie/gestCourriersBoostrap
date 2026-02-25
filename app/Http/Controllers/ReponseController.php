@@ -34,51 +34,58 @@ class ReponseController extends Controller
      */
 
 
-        public function store(Request $request)
-    {
-    // TEMPORAIRE : Pour tester si les fichiers arrivent
-        // Si cela affiche "array:0 []", c'est que votre formulaire HTML est mal configuré
+    public function store(Request $request)
+{
+    $request->validate([
+        'imputation_id' => 'required|exists:imputations,id',
+        'contenu' => 'required|string',
+        'pourcentage_avancement' => 'required|integer',
+        'fichiers.*' => 'nullable|file'
+    ]);
 
-
-        $request->validate([
-            'imputation_id' => 'required|exists:imputations,id',
-            'contenu' => 'required|string',
-            'pourcentage_avancement' => 'required|integer',
-            'fichiers.*' => 'nullable|file'
-
-        ]);
-
-                $filePaths = [];
-                if ($request->hasFile('fichiers')) {
-                    foreach ($request->file('fichiers') as $file) {
-                        // Génération d'un nom unique avec timestamp
-                        $fileName = time() . '_' . $file->getClientOriginalName();
-
-                        // Déplacement physique vers public/documents/imputations/annexes
-                        $file->move(public_path('reponses'), $fileName);
-
-                        // On ajoute le nom du fichier au tableau
-                        $filePaths[] = $fileName;
-                    }
-                }
-
-
-        $reponse = new Reponse();
-        $reponse->imputation_id = $request->imputation_id;
-        $reponse->agent_id = auth::user()->agent->id;
-        $reponse->contenu = $request->contenu;
-        $reponse->fichiers_joints = $filePaths;
-        $reponse->date_reponse = now();
-        $reponse->pourcentage_avancement = $request->pourcentage_avancement;
-        $reponse->save(); // Utilisez save() pour mieux déboguer les erreurs SQL
-
-        // Mise à jour de l'imputation parente
-        $imputation = Imputation::find($request->imputation_id);
-        $imputation->statut = ($request->pourcentage_avancement == 100) ? 'termine' : 'en_cours';
-        $imputation->save();
-
-        return redirect()->route('imputations.show', $request->imputation_id)->with('success', 'Enregistré !');
+    $filePaths = [];
+    if ($request->hasFile('fichiers')) {
+        foreach ($request->file('fichiers') as $file) {
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('reponses'), $fileName);
+            $filePaths[] = $fileName;
+        }
     }
+
+    // 1. Enregistrement de la réponse de l'agent actuel
+    $reponse = new Reponse();
+    $reponse->imputation_id = $request->imputation_id;
+    $reponse->agent_id = auth::user()->agent->id;
+    $reponse->contenu = $request->contenu;
+    $reponse->fichiers_joints = $filePaths;
+    $reponse->date_reponse = now();
+    $reponse->pourcentage_avancement = $request->pourcentage_avancement;
+    $reponse->save();
+
+    // 2. Mise à jour de l'imputation parente (celle de l'agent actuel)
+    $imputation = Imputation::findOrFail($request->imputation_id);
+    $imputation->statut = ($request->pourcentage_avancement == 100) ? 'termine' : 'en_cours';
+    $imputation->save();
+
+    // 3. LOGIQUE DE FERMETURE GROUPÉE
+    // Si l'avancement est à 100%, on ferme toutes les autres imputations du même courrier
+    if ($request->pourcentage_avancement == 100) {
+        Imputation::where('courrier_id', $imputation->courrier_id)
+            ->where('id', '!=', $imputation->id) // On exclut l'imputation actuelle déjà traitée
+            ->update([
+                'statut' => 'termine',
+                // Optionnel : on peut ajouter une note dans les instructions
+                // 'instructions' => DB::raw("CONCAT(instructions, ' (Clôturé par finalisation collective)')")
+            ]);
+    }
+
+    return redirect()->route('imputations.show', $request->imputation_id)
+                     ->with('success', 'Réponse enregistrée. ' . ($request->pourcentage_avancement == 100 ? 'Le dossier a été clôturé pour tous les intervenants.' : ''));
+}
+
+
+
+
 
 public function valider(Request $request, $id)
 {
@@ -88,43 +95,45 @@ public function valider(Request $request, $id)
     // 2. Validation du fichier
     $request->validate([
         'document_final' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png|max:819200',
-
     ]);
 
     if ($request->hasFile('document_final')) {
-        $file = $request->file('document_final');
 
-        // 3. Gestion du fichier (Logique public/archives/final)
-        $fileName = time() . '_FINAL_' . $file->getClientOriginalName();
-        $file->move(public_path('archives/final'), $fileName);
+        return DB::transaction(function () use ($request, $reponse) {
+            $file = $request->file('document_final');
 
-        // 4. MISE À JOUR MANUELLE (Plus fiable que update())
-        $reponse->validation = 'acceptee';
-        $reponse->document_final_signe = 'archives/final/' . $fileName;
-        $reponse->date_approbation = now();
+            // 3. Gestion du fichier
+            $fileName = time() . '_FINAL_' . $file->getClientOriginalName();
+            $file->move(public_path('archives/final'), $fileName);
 
-        // On force l'enregistrement dans MariaDB
-        $reponse->save();
+            // 4. Mise à jour de la réponse
+            $reponse->validation = 'acceptee';
+            $reponse->document_final_signe = 'archives/final/' . $fileName;
+            $reponse->date_approbation = now();
+            $reponse->save();
 
-        // 5. Mise à jour de l'Imputation parente
-        if ($reponse->imputation_id) {
-            $imputation = \App\Models\Imputation::find($reponse->imputation_id);
-            if ($imputation) {
-                $imputation->statut = 'termine';
-                $imputation->save();
+            // 5. Mise à jour de l'Imputation parente et clôture de TOUTES les imputations liées
+            if ($reponse->imputation_id) {
+                $imputationSource = \App\Models\Imputation::find($reponse->imputation_id);
 
-                // 6. Mise à jour du Courrier lié
-                if ($imputation->courrier_id) {
-                    $courrier = \App\Models\Courrier::find($imputation->courrier_id);
-                    if ($courrier) {
-                        $courrier->statut = 'archivé';
-                        $courrier->save();
+                if ($imputationSource) {
+                    // On clôture TOUTES les imputations qui concernent le même courrier
+                    \App\Models\Imputation::where('courrier_id', $imputationSource->courrier_id)
+                        ->update(['statut' => 'termine']);
+
+                    // 6. Mise à jour du Courrier lié en "archivé"
+                    if ($imputationSource->courrier_id) {
+                        $courrier = \App\Models\Courrier::find($imputationSource->courrier_id);
+                        if ($courrier) {
+                            $courrier->statut = 'archivé';
+                            $courrier->save();
+                        }
                     }
                 }
             }
-        }
 
-        return back()->with('success', 'Dossier validé, document enregistré et base de données mise à jour !');
+            return back()->with('success', 'Dossier validé. Le courrier a été archivé et clôturé pour l\'ensemble des intervenants.');
+        });
     }
 
     return back()->with('error', 'Échec de la validation : fichier manquant.');
