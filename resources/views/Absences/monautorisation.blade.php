@@ -27,20 +27,41 @@
                         @csrf
 
                         <!-- Bloc Agent : INFO (Bleu) -->
+                        <!-- Bloc Agent : INFO (Bleu) -->
                         <div class="mb-5 p-3 rounded-4 bg-light border-start border-5 border-info shadow-sm">
                             <label class="form-label fw-bold small text-info text-uppercase mb-2">Agent Demandeur</label>
                             <div class="d-flex align-items-center">
-                                <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center shadow" style="width: 50px; height: 50px;">
-                                    <i class="fas fa-user-tie fa-lg"></i>
+                                <div class="flex-shrink-0">
+                                    @if(auth()->user()->agent && auth()->user()->agent->photo)
+                                        <!-- Affichage de la photo de l'agent -->
+
+                                        <img class="img-profile rounded-circle shadow object-fit-cover"
+                                            src="{{ asset('agents_photos/' . auth()->user()->agent->photo) }}?v={{ time() }}"
+                                            style="width: 128px; height: 128px; border: 3px solid #4e73df;">
+                                                @else
+                                        <!-- Icône par défaut si pas de photo -->
+                                        <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center shadow border border-2 border-white"
+                                            style="width: 60px; height: 60px;">
+                                            <i class="fas fa-user-tie fa-2x"></i>
+                                        </div>
+                                    @endif
                                 </div>
                                 <div class="ms-3">
-                                    <div class="fw-black text-dark fs-5" style="letter-spacing: -0.5px;">{{ strtoupper(auth()->user()->name) }}</div>
-                                    <div class="badge bg-white text-info border border-info-subtle shadow-sm">
-                                        Matricule : {{ auth()->user()->agent->matricule ?? 'N/A' }}
+                                    <div class="fw-black text-dark fs-5" style="letter-spacing: -0.5px;">
+                                        {{ auth()->user()->agent->first_name ?? '' }} {{ strtoupper(auth()->user()->agent->last_name ?? auth()->user()->name) }}
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-white text-info border border-info-subtle shadow-sm">
+                                            <i class="fas fa-id-card me-1"></i>Matricule : {{ auth()->user()->agent->matricule ?? 'N/A' }}
+                                        </span>
+                                        <span class="badge bg-info text-white shadow-sm">
+                                            {{ auth()->user()->agent->fonction ?? 'Agent' }}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
 
                         <div class="row g-4">
                             <!-- Bloc Nature : INDIGO -->
