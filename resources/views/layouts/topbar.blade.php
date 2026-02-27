@@ -76,7 +76,7 @@
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     Mon Profil
                 </a>
-                <a class="dropdown-item" href="{{ route('presences.index') }}">
+                <a class="dropdown-item" href="{{ route('presences.monHistorique') }}">
                     <i class="fas fa-calendar-check fa-sm fa-fw mr-2 text-gray-400"></i>
                     Mes Présences
                 </a>
