@@ -38,7 +38,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold small text-dark">MATRICULE *</label>
-                                            <input type="text" name="matricule" class="form-control border-2 border-primary @error('matricule') is-invalid @enderror" style="background-color: #eff6ff;" value="{{ old('matricule') }}" placeholder="Ex: MAT-2026" required>
+                                            <input type="text" name="matricule" class="form-control border-2 border-primary @error('matricule') is-invalid @enderror" style="background-color: #eff6ff;" value="{{ old('matricule') }}" placeholder="Ex: 202606B" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label fw-bold small text-dark">SEXE</label>
