@@ -29,8 +29,8 @@
                     <div class="row d-flex-column justify-content-between align-items-center">
                         <div class="marge-gauche-20">
                             <<div style="text-align: center; padding: 20px;">
-                                <img class="logo" src="{{asset('images/armoirie_ci_fond_transparent.png')}}" 
-                                    alt="Description de l'image" 
+                                <img class="logo" src="{{asset('images/ArmoiriePlus-removebg-preview.png')}}"
+                                    alt="Description de l'image"
                                     style="width: 50%; max-width: 400px; height: auto; display: block; margin: 0 auto;">
                             </div>
                             <hr>
