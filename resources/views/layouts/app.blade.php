@@ -14,8 +14,52 @@
     <!-- Styles -->
     <link href="{{ asset('template/css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('template/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    
+    <style>
+    /* 1. Configuration de la Sidebar et de l'ascenseur */
+    #accordionSidebar {
+        max-height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        position: sticky;
+        top: 0;
+        width: 18rem !important; /* Largeur confortable */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255,255,255,0.2) transparent;
+    }
+
+    /* 2. AUTORISER LE RETOUR À LA LIGNE POUR LES TEXTES LONGS */
+    .sidebar .nav-item .collapse .collapse-inner .collapse-item {
+        white-space: normal !important; /* Permet le retour à la ligne */
+        word-wrap: break-word;        /* Casse les mots si nécessaire */
+        line-height: 1.2;              /* Espace réduit entre les lignes */
+        padding: 0.6rem 0.7rem !important; /* Un peu d'air autour du texte */
+        display: block;                /* Assure que le lien prend toute la largeur */
+        margin-bottom: 2px;
+        font-size: 0.82rem;            /* Taille de police optimale */
+    }
+
+    /* 3. Style de l'ascenseur (Chrome/Safari) */
+    #accordionSidebar::-webkit-scrollbar {
+        width: 5px;
+    }
+    #accordionSidebar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 10px;
+    }
+
+    /* Ajustement de la largeur responsive */
+    @media (min-width: 768px) {
+        .sidebar {
+            width: 18rem !important;
+        }
+    }
+</style>
+
+
     <script src="{{ asset('template/vendor/jquery/jquery.min.js') }}"></script>
 </head>
+
 
 <body id="page-top">
 
@@ -143,11 +187,13 @@
                         </a>
                         <a class="collapse-item" href="{{ route('presences.monHistorique') }}">Mon Historique</a>
                         <a class="collapse-item" href="{{ route('absences.monautorisation') }}">Mes Congés & Permissions</a>
-
+                        
                         {{-- ACCÈS CONTRÔLE ET RH : Admin, RH, Superviseur --}}
                         @hasanyrole('admin|rh|Superviseur')
                             <div class="dropdown-divider"></div>
                             <h6 class="collapse-header">Contrôle & RH :</h6>
+                            <a class="collapse-item" href="{{ route('absences.createListe') }}">Autorisation d'Absence Groupée</a>
+                            <a class="collapse-item" href="{{ route('holidays.index') }}">Enregistrement jours fériés</a>
                             <a class="collapse-item" href="{{ route('presences.index') }}">Enregistrement pointage</a>
                             <a class="collapse-item" href="{{ route('presences.listeFiltree') }}">Liste de présence</a>
                             <a class="collapse-item" href="{{ route('presences.validation-hebdo') }}">Validation hebdo.</a>

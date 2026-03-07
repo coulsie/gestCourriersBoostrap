@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : lun. 02 mars 2026 à 10:58
--- Version du serveur : 11.4.9-MariaDB
--- Version de PHP : 8.3.28
+-- Généré le : sam. 07 mars 2026 à 14:11
+-- Version du serveur : 11.5.2-MariaDB
+-- Version de PHP : 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `cache` (
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
 ('laravel-cache-boost.roster.scan', 'a:2:{s:6:\"roster\";O:21:\"Laravel\\Roster\\Roster\":3:{s:13:\"\0*\0approaches\";O:29:\"Illuminate\\Support\\Collection\":2:{s:8:\"\0*\0items\";a:0:{}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:11:\"\0*\0packages\";O:32:\"Laravel\\Roster\\PackageCollection\":2:{s:8:\"\0*\0items\";a:7:{i:0;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:5:\"^12.0\";s:10:\"\0*\0package\";E:37:\"Laravel\\Roster\\Enums\\Packages:LARAVEL\";s:14:\"\0*\0packageName\";s:17:\"laravel/framework\";s:10:\"\0*\0version\";s:7:\"12.48.1\";s:6:\"\0*\0dev\";b:0;}i:1;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:7:\"v0.3.10\";s:10:\"\0*\0package\";E:37:\"Laravel\\Roster\\Enums\\Packages:PROMPTS\";s:14:\"\0*\0packageName\";s:15:\"laravel/prompts\";s:10:\"\0*\0version\";s:6:\"0.3.10\";s:6:\"\0*\0dev\";b:0;}i:2;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:6:\"v0.5.2\";s:10:\"\0*\0package\";E:33:\"Laravel\\Roster\\Enums\\Packages:MCP\";s:14:\"\0*\0packageName\";s:11:\"laravel/mcp\";s:10:\"\0*\0version\";s:5:\"0.5.2\";s:6:\"\0*\0dev\";b:1;}i:3;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:5:\"^1.24\";s:10:\"\0*\0package\";E:34:\"Laravel\\Roster\\Enums\\Packages:PINT\";s:14:\"\0*\0packageName\";s:12:\"laravel/pint\";s:10:\"\0*\0version\";s:6:\"1.27.0\";s:6:\"\0*\0dev\";b:1;}i:4;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:5:\"^1.41\";s:10:\"\0*\0package\";E:34:\"Laravel\\Roster\\Enums\\Packages:SAIL\";s:14:\"\0*\0packageName\";s:12:\"laravel/sail\";s:10:\"\0*\0version\";s:6:\"1.52.0\";s:6:\"\0*\0dev\";b:1;}i:5;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:1;s:13:\"\0*\0constraint\";s:7:\"^11.5.3\";s:10:\"\0*\0package\";E:37:\"Laravel\\Roster\\Enums\\Packages:PHPUNIT\";s:14:\"\0*\0packageName\";s:15:\"phpunit/phpunit\";s:10:\"\0*\0version\";s:7:\"11.5.48\";s:6:\"\0*\0dev\";b:1;}i:6;O:22:\"Laravel\\Roster\\Package\":6:{s:9:\"\0*\0direct\";b:0;s:13:\"\0*\0constraint\";s:0:\"\";s:10:\"\0*\0package\";E:41:\"Laravel\\Roster\\Enums\\Packages:TAILWINDCSS\";s:14:\"\0*\0packageName\";s:11:\"tailwindcss\";s:10:\"\0*\0version\";s:6:\"4.1.17\";s:6:\"\0*\0dev\";b:1;}}s:28:\"\0*\0escapeWhenCastingToString\";b:0;}s:21:\"\0*\0nodePackageManager\";E:43:\"Laravel\\Roster\\Enums\\NodePackageManager:NPM\";}s:9:\"timestamp\";i:1771234094;}', 1771320494),
-('laravel-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:8:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"creer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:5;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:18:\"supprimer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:17:\"voir-utilisateurs\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:2;i:2;i:4;i:3;i:5;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"manage-users\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:17:\"modifier articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:5;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:18:\"supprimer articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:11:\"gerer-roles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:17:\"acceder-dashboard\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:3;i:2;i:4;i:3;i:5;}}}s:5:\"roles\";a:5:{i:0;a:3:{s:1:\"a\";i:1;s:1:\"b\";s:5:\"admin\";s:1:\"c\";s:3:\"web\";}i:1;a:3:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"utilisateur\";s:1:\"c\";s:3:\"web\";}i:2;a:3:{s:1:\"a\";i:5;s:1:\"b\";s:11:\"Superviseur\";s:1:\"c\";s:3:\"web\";}i:3;a:3:{s:1:\"a\";i:4;s:1:\"b\";s:2:\"rh\";s:1:\"c\";s:3:\"web\";}i:4;a:3:{s:1:\"a\";i:3;s:1:\"b\";s:7:\"editeur\";s:1:\"c\";s:3:\"web\";}}}', 1772528468);
+('laravel-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:8:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"creer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:5;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:18:\"supprimer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:17:\"voir-utilisateurs\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:2;i:2;i:4;i:3;i:5;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"manage-users\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:17:\"modifier articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:5;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:18:\"supprimer articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:11:\"gerer-roles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:17:\"acceder-dashboard\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:3;i:2;i:4;i:3;i:5;}}}s:5:\"roles\";a:5:{i:0;a:3:{s:1:\"a\";i:1;s:1:\"b\";s:5:\"admin\";s:1:\"c\";s:3:\"web\";}i:1;a:3:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"utilisateur\";s:1:\"c\";s:3:\"web\";}i:2;a:3:{s:1:\"a\";i:5;s:1:\"b\";s:11:\"Superviseur\";s:1:\"c\";s:3:\"web\";}i:3;a:3:{s:1:\"a\";i:4;s:1:\"b\";s:2:\"rh\";s:1:\"c\";s:3:\"web\";}i:4;a:3:{s:1:\"a\";i:3;s:1:\"b\";s:7:\"editeur\";s:1:\"c\";s:3:\"web\";}}}', 1772958717);
 
 -- --------------------------------------------------------
 
@@ -388,6 +388,43 @@ CREATE TABLE IF NOT EXISTS `failed_jobs` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `holidays`
+--
+
+DROP TABLE IF EXISTS `holidays`;
+CREATE TABLE IF NOT EXISTS `holidays` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `holiday_date` date NOT NULL,
+  `description` text DEFAULT NULL,
+  `is_recurring` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `holidays_holiday_date_unique` (`holiday_date`)
+) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `holidays`
+--
+
+INSERT INTO `holidays` (`id`, `name`, `holiday_date`, `description`, `is_recurring`, `created_at`, `updated_at`) VALUES
+(1, 'Jour de l’An', '2026-01-01', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
+(2, 'Mahoulid', '2026-04-06', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 09:05:24'),
+(3, 'Fête du Travail', '2026-05-01', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
+(4, 'Ascension', '2026-05-14', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
+(5, 'Lundi de Pentecôte', '2026-05-25', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
+(6, 'Fête Nationale', '2026-08-07', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
+(7, 'Assomption', '2026-08-15', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
+(8, 'Toussaint', '2026-11-01', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
+(9, 'Journée de la paix', '2026-11-15', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
+(10, 'Noël', '2026-12-25', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
+(11, 'Tabaski', '2026-05-30', NULL, 0, '2026-03-07 09:45:12', '2026-03-07 09:45:12'),
+(12, 'Ramadan', '2026-03-20', NULL, 0, '2026-03-07 09:45:41', '2026-03-07 09:45:41');
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `horaires`
 --
 
@@ -524,7 +561,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(191) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `migrations`
@@ -584,7 +621,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (51, '2026_02_11_104137_add_suivi_par_to_imputations_table', 11),
 (52, '2026_02_15_114903_create_scripts_extraction_table', 12),
 (53, '2026_02_16_091115_remove_fields_from_scripts_table', 13),
-(54, '2026_02_16_101450_add_code_to_scripts_table', 14);
+(54, '2026_02_16_101450_add_code_to_scripts_table', 14),
+(55, '2026_03_07_083937_create_holidays_table', 15);
 
 -- --------------------------------------------------------
 
@@ -722,13 +760,13 @@ CREATE TABLE IF NOT EXISTS `presences` (
   `agent_id` bigint(20) UNSIGNED NOT NULL,
   `heure_arrivee` timestamp NOT NULL,
   `heure_depart` timestamp NULL DEFAULT NULL,
-  `statut` enum('Absent','Présent','En Retard','Absence Justifiée') NOT NULL DEFAULT 'Présent',
+  `statut` enum('Absent','Présent','En Retard','Absence Justifiée','Férié') NOT NULL DEFAULT 'Présent',
   `notes` text DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `presences_agent_id_foreign` (`agent_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=474 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=600 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `presences`
@@ -1208,7 +1246,133 @@ INSERT INTO `presences` (`id`, `agent_id`, `heure_arrivee`, `heure_depart`, `sta
 (470, 15, '2026-02-18 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-02-23 09:41:15', '2026-02-23 09:41:15'),
 (471, 15, '2026-02-19 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-02-23 09:41:15', '2026-02-23 09:41:15'),
 (472, 15, '2026-02-20 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-02-23 09:41:15', '2026-02-23 09:41:15'),
-(473, 1, '2026-02-24 07:10:29', '2026-02-24 15:03:58', 'Présent', 'Pointage automatique (Self-service)', '2026-02-24 07:10:29', '2026-02-24 15:03:58');
+(473, 1, '2026-02-24 07:10:29', '2026-02-24 15:03:58', 'Présent', 'Pointage automatique (Self-service)', '2026-02-24 07:10:29', '2026-02-24 15:03:58'),
+(474, 1, '2026-03-02 13:45:51', NULL, 'En Retard', 'Pointage automatique (Self-service)', '2026-03-02 13:45:51', '2026-03-02 13:45:51'),
+(475, 1, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(476, 1, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(477, 1, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(478, 2, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(479, 2, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(480, 2, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(481, 2, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(482, 2, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(483, 3, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(484, 3, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(485, 3, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(486, 3, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(487, 3, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(488, 4, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(489, 4, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(490, 4, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(491, 5, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(492, 5, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(493, 5, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(494, 5, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(495, 5, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(496, 6, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(497, 6, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(498, 6, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(499, 6, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(500, 6, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(501, 7, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(502, 7, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(503, 7, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(504, 7, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(505, 7, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(506, 8, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(507, 8, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(508, 8, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(509, 8, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(510, 8, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(511, 9, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(512, 9, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(513, 9, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(514, 9, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(515, 9, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(516, 10, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(517, 10, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(518, 10, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(519, 10, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(520, 10, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(521, 11, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(522, 11, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(523, 11, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(524, 11, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(525, 11, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(526, 12, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(527, 12, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(528, 12, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(529, 12, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(530, 12, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(531, 13, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(532, 13, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(533, 13, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(534, 13, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(535, 13, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(536, 14, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(537, 14, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(538, 14, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(539, 14, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(540, 14, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(541, 16, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(542, 16, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(543, 16, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(544, 16, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(545, 16, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(546, 17, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(547, 17, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(548, 17, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(549, 17, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(550, 17, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(551, 18, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(552, 18, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(553, 18, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(554, 18, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(555, 18, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(556, 19, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(557, 19, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(558, 19, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(559, 19, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(560, 19, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(561, 20, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(562, 20, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(563, 20, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(564, 20, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(565, 20, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(566, 21, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(567, 21, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(568, 21, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(569, 21, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(570, 21, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(571, 22, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(572, 22, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(573, 22, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(574, 22, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(575, 22, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(576, 23, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(577, 23, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(578, 23, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(579, 23, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(580, 23, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(581, 24, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(582, 24, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(583, 24, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(584, 24, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(585, 24, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(586, 25, '2026-02-23 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(587, 25, '2026-02-24 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(588, 25, '2026-02-25 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(589, 25, '2026-02-26 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(590, 25, '2026-02-27 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-02 13:46:09', '2026-03-02 13:46:09'),
+(591, 4, '2026-02-25 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-02 13:46:42', '2026-03-02 13:46:42'),
+(592, 4, '2026-02-27 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-02 13:46:42', '2026-03-02 13:46:42'),
+(593, 15, '2026-02-23 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-02 13:46:42', '2026-03-02 13:46:42'),
+(594, 15, '2026-02-24 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-02 13:46:42', '2026-03-02 13:46:42'),
+(595, 15, '2026-02-25 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-02 13:46:42', '2026-03-02 13:46:42'),
+(596, 15, '2026-02-26 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-02 13:46:42', '2026-03-02 13:46:42'),
+(597, 15, '2026-02-27 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-02 13:46:42', '2026-03-02 13:46:42'),
+(598, 1, '2026-03-03 10:53:58', NULL, 'En Retard', 'Pointage automatique (Self-service)', '2026-03-03 10:53:58', '2026-03-03 10:53:58'),
+(599, 1, '2026-03-19 09:46:00', NULL, 'Présent', 'Jour férié : Ramadan.', '2026-03-07 09:50:58', '2026-03-07 10:10:58');
 
 -- --------------------------------------------------------
 

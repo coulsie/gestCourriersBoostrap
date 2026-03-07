@@ -32,6 +32,7 @@
                                 <option value="Repos Maladie" {{ old('nom_type') == 'Repos Maladie' ? 'selected' : '' }}>🏥 Repos Maladie</option>
                                 <option value="Mission" {{ old('nom_type') == 'Mission' ? 'selected' : '' }}>💼 Mission</option>
                                 <option value="Permission" {{ old('nom_type') == 'Permission' ? 'selected' : '' }}>📝 Permission</option>
+                                <option value="Séminaire" {{ old('nom_type') == 'Séminaire' ? 'selected' : '' }}>📝 Séminaire</option>
                                 <option value="Autres" {{ old('nom_type') == 'Autres' ? 'selected' : '' }}>✨ Autres</option>
                             </select>
                             @error('nom_type')

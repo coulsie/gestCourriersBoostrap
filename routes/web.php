@@ -8,7 +8,7 @@ use App\Http\Controllers\{
     PresenceController, AbsenceController, TypeAbsenceController,
     EtatAgentsController, NotificationTacheController, AnnonceController,
     ReponseNotificationController, AgentServiceController, ImputationController,
-    StatistiqueController, ReponseController, PostController, RoleController,ExtractionController
+    StatistiqueController, ReponseController, PostController, RoleController,ExtractionController, HolidayController
 };
 use App\Http\Controllers\Auth\PasswordSetupController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -31,6 +31,12 @@ Auth::routes();
 // Mot de passe oublié
 Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
 Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+Route::resource('holidays', HolidayController::class);
+
+Route::get('/absences/admin/create', [AbsenceController::class, 'createListe'])->name('absences.createListe');
+// Ajoutez cette route spécifique AVANT ou APRÈS vos ressources existantes
+Route::post('/absences/store-grouped', [AbsenceController::class, 'storeGrouped'])->name('absences.storeGrouped');
 
 /*
 |--------------------------------------------------------------------------

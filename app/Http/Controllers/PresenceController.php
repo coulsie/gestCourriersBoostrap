@@ -90,67 +90,75 @@ class PresenceController extends Controller
     /**
      * Stocke une nouvelle ressource (présence) dans la base de données.
                             */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'agent_id' => 'required|exists:agents,id',
-            'heure_arrivee' => 'nullable|date',
-        ]);
+public function store(Request $request)
+{
+    $request->validate([
+        'agent_id' => 'required|exists:agents,id',
+        'heure_arrivee' => 'nullable|date',
+    ]);
 
-        // 1. Déterminer l'heure et la date du pointage
-        $heureArrivee = $request->filled('heure_arrivee')
-            ? \Carbon\Carbon::parse($request->heure_arrivee)
-            : \Carbon\Carbon::now();
+    // 1. Déterminer la date
+    $heureArrivee = $request->filled('heure_arrivee')
+        ? \Carbon\Carbon::parse($request->heure_arrivee)
+        : \Carbon\Carbon::now();
 
-        $dateJour = $heureArrivee->toDateString(); // Format YYYY-MM-DD
+    $dateJour = $heureArrivee->toDateString();
 
-        // 2. VÉRIFICATION DE DOUBLON (Nouveau)
-        $dejaPointe = \App\Models\Presence::where('agent_id', $request->agent_id)
-            ->whereDate('heure_arrivee', $dateJour)
-            ->exists();
-
-        if ($dejaPointe) {
-            return redirect()->back()
-                ->withInput()
-                ->with('error', "Attention : Cet agent a déjà effectué son pointage pour la journée du " . $heureArrivee->format('d/m/Y') . ".");
-        }
-
-        // 3. Logique des horaires (votre code existant)
-        $joursFr = [
-            'Monday' => 'Lundi', 'Tuesday' => 'Mardi', 'Wednesday' => 'Mercredi',
-            'Thursday' => 'Jeudi', 'Friday' => 'Vendredi', 'Saturday' => 'Samedi', 'Sunday' => 'Dimanche'
-        ];
-        $jourFr = $joursFr[$heureArrivee->format('l')];
-
-        $horaireFixe = \App\Models\Horaire::where('jour', $jourFr)->first();
-        $statut = 'Présent';
-        $debugNote = "";
-
-        if (!$horaireFixe) {
-            $debugNote = "ERREUR : Aucun horaire configuré pour le jour $jourFr. ";
-        } else {
-            $minArrivee = ($heureArrivee->hour * 60) + $heureArrivee->minute;
-            $debutTheorique = \Carbon\Carbon::parse($horaireFixe->heure_debut);
-            $tolerance = (int)$horaireFixe->tolerance_retard;
-            $minLimite = ($debutTheorique->hour * 60) + $debutTheorique->minute + $tolerance;
-
-            if ($minArrivee > $minLimite) {
-                $statut = 'En Retard';
-            }
-            $debugNote = "Calculé pour $jourFr (Limite: {$minLimite}m, Arrivée: {$minArrivee}m). ";
-        }
-
-        // 4. Création de l'enregistrement
-        \App\Models\Presence::create([
-            'agent_id'      => $request->agent_id,
-            'heure_arrivee' => $heureArrivee,
-            'statut'        => $statut,
-            'notes'         => $debugNote . ($request->notes ?? ''),
-            'heure_depart'  => $request->heure_depart ?: null
-        ]);
-
-        return redirect()->route('presences.index')->with('success', "Pointage enregistré : $statut");
+    // 2. VÉRIFICATION JOUR FÉRIÉ (BLOQUANT)
+    $ferie = \App\Models\Holiday::where('holiday_date', $dateJour)->first();
+    
+    if ($ferie) {
+        return redirect()->route('presences.index')
+            ->with('error', "Enregistrement de présence impossible : le " . $heureArrivee->format('d/m/Y') . " est un jour férié (" . $ferie->name . ").");
     }
+
+    // 3. VÉRIFICATION DE DOUBLON
+    $dejaPointe = \App\Models\Presence::where('agent_id', $request->agent_id)
+        ->whereDate('heure_arrivee', $dateJour)
+        ->exists();
+
+    if ($dejaPointe) {
+        return redirect()->back()
+            ->withInput()
+            ->with('error', "Attention : Cet agent a déjà effectué son pointage pour la journée du " . $heureArrivee->format('d/m/Y') . ".");
+    }
+
+    // 4. Logique des horaires
+    $joursFr = [
+        'Monday' => 'Lundi', 'Tuesday' => 'Mardi', 'Wednesday' => 'Mercredi',
+        'Thursday' => 'Jeudi', 'Friday' => 'Vendredi', 'Saturday' => 'Samedi', 'Sunday' => 'Dimanche'
+    ];
+    $jourFr = $joursFr[$heureArrivee->format('l')];
+
+    $horaireFixe = \App\Models\Horaire::where('jour', $jourFr)->first();
+    $statut = 'Présent';
+    $debugNote = "";
+
+    if (!$horaireFixe) {
+        $debugNote = "ERREUR : Aucun horaire configuré pour le jour $jourFr. ";
+    } else {
+        $minArrivee = ($heureArrivee->hour * 60) + $heureArrivee->minute;
+        $debutTheorique = \Carbon\Carbon::parse($horaireFixe->heure_debut);
+        $tolerance = (int)$horaireFixe->tolerance_retard;
+        $minLimite = ($debutTheorique->hour * 60) + $debutTheorique->minute + $tolerance;
+
+        if ($minArrivee > $minLimite) {
+            $statut = 'En Retard';
+        }
+        $debugNote = "Calculé pour $jourFr (Limite: {$minLimite}m, Arrivée: {$minArrivee}m). ";
+    }
+
+    // 5. Création de l'enregistrement
+    \App\Models\Presence::create([
+        'agent_id'      => $request->agent_id,
+        'heure_arrivee' => $heureArrivee,
+        'statut'        => $statut,
+        'notes'         => $debugNote . ($request->notes ?? ''),
+        'heure_depart'  => $request->heure_depart ?: null
+    ]);
+
+    return redirect()->route('presences.index')->with('success', "Pointage enregistré : $statut");
+}
 
     /**
      * Affiche la ressource (présence) spécifiée.
@@ -226,90 +234,115 @@ public function statsPresences(Request $request)
     $semaine = $request->input('semaine');
     $service_id = $request->input('service_id');
 
+    // --- 1. DÉFINITION DE LA VARIABLE $query (OBLIGATOIRE) ---
     $query = \App\Models\Presence::with(['agent.service'])
         ->whereYear('heure_arrivee', $annee);
 
+    // --- 2. FILTRAGE ---
     if ($mois) $query->whereMonth('heure_arrivee', $mois);
+    
     if ($semaine) $query->whereRaw('WEEK(heure_arrivee, 1) = ?', [$semaine]);
 
-    // Filtrer par service uniquement si un ID est présent
     if ($service_id) {
         $query->whereHas('agent', function($q) use ($service_id) {
             $q->where('service_id', $service_id);
         });
     }
 
+    // --- 3. EXÉCUTION ---
     $presences = $query->orderBy('heure_arrivee', 'desc')->get();
 
+    // --- 4. CALCULS ---
     $statsAgents = $presences->groupBy('agent_id')->map(function ($items) {
         $agent = $items->first()->agent;
         return [
-            'nom' => strtoupper($agent->last_name) . ' ' . ucfirst(strtolower($agent->first_name)),
+            'nom' => strtoupper($agent->last_name ?? '') . ' ' . ucfirst(strtolower($agent->first_name ?? '')),
             'total' => $items->count(),
             'presents' => $items->where('statut', 'Présent')->count(),
             'retards' => $items->where('statut', 'En Retard')->count(),
             'absents' => $items->where('statut', 'Absent')->count(),
             'justifies' => $items->where('statut', 'Absence Justifiée')->count(),
+            'feries' => $items->where('statut', 'Férié')->count(), // Ajouté
         ];
     });
 
-    // Récupération des services (utilisez 'libelle' ou 'name' selon votre table)
     $services = \App\Models\Service::all();
 
     return view('presences.etat', compact('presences', 'statsAgents', 'annee', 'mois', 'semaine', 'services'));
 }
 
 
-            public function agent()
-            {
-                // Laravel cherchera par défaut la colonne agent_id dans la table presences
-                return $this->belongsTo(Agent::class, 'agent_id');
-            }
+    public function agent()
+    {
+        // Laravel cherchera par défaut la colonne agent_id dans la table presences
+        return $this->belongsTo(Agent::class, 'agent_id');
+    }
+
 
 public function stats(Request $request)
 {
     $annee = 2026;
-
-    // Récupération des dates depuis le formulaire de recherche
     $dateDebut = $request->input('date_debut');
     $dateFin = $request->input('date_fin');
 
-    // Query de base avec filtrage optionnel
-    $query = Presence::with('agent')
+    // 1. Initialisation correcte de la variable $query
+    $query = \App\Models\Presence::with('agent')
         ->select(
             DB::raw('DATE(heure_arrivee) as date'),
             DB::raw("COUNT(*) as total"),
             DB::raw("SUM(CASE WHEN statut = 'Présent' THEN 1 ELSE 0 END) as presents"),
             DB::raw("SUM(CASE WHEN statut = 'En Retard' THEN 1 ELSE 0 END) as retards"),
-            DB::raw("SUM(CASE WHEN statut = 'Absent' THEN 1 ELSE 0 END) as absents")
+            DB::raw("SUM(CASE WHEN statut = 'Absent' THEN 1 ELSE 0 END) as absents"),
+            DB::raw("SUM(CASE WHEN statut = 'Férié' THEN 1 ELSE 0 END) as feries") // Ajouté
         )
         ->whereYear('heure_arrivee', $annee);
 
-    // Appliquer le filtre si les dates sont saisies
+    // 2. Application des filtres de date
     if ($dateDebut && $dateFin) {
         $query->whereBetween(DB::raw('DATE(heure_arrivee)'), [$dateDebut, $dateFin]);
     }
 
+    // 3. Exécution de la requête groupée
     $journalier = $query->groupBy('date')
         ->orderBy('date', 'desc')
         ->get();
 
-    // On conserve vos autres stats (hebdo/mensuel) pour la vue
-    $hebdo = Presence::select(DB::raw('WEEK(heure_arrivee) as semaine'), DB::raw("COUNT(*) as total"), DB::raw("SUM(statut = 'Présent') as presents"))
-        ->whereYear('heure_arrivee', $annee)->groupBy('semaine')->get();
+    // 4. Stats Hebdo avec Jours Fériés
+    $hebdo = \App\Models\Presence::select(
+            DB::raw('WEEK(heure_arrivee, 1) as semaine'), 
+            DB::raw("COUNT(*) as total"), 
+            DB::raw("SUM(statut = 'Présent') as presents"),
+            DB::raw("SUM(statut = 'Férié') as feries")
+        )
+        ->whereYear('heure_arrivee', $annee)
+        ->groupBy('semaine')
+        ->get();
 
-    $mensuel = Presence::select(DB::raw('MONTH(heure_arrivee) as mois'), DB::raw("COUNT(*) as total"), DB::raw("SUM(statut = 'Présent') as presents"))
-        ->whereYear('heure_arrivee', $annee)->groupBy('mois')->get();
+    // 5. Stats Mensuelles avec Jours Fériés
+    $mensuel = \App\Models\Presence::select(
+            DB::raw('MONTH(heure_arrivee) as mois'), 
+            DB::raw("COUNT(*) as total"), 
+            DB::raw("SUM(statut = 'Présent') as presents"),
+            DB::raw("SUM(statut = 'Férié') as feries")
+        )
+        ->whereYear('heure_arrivee', $annee)
+        ->groupBy('mois')
+        ->get();
 
     return view('presences.stats', compact('journalier', 'hebdo', 'mensuel', 'annee', 'dateDebut', 'dateFin'));
 }
 
-        // app/Http/Controllers/PresenceController.php
 
-        public function indexValidationHebdo()
+        // app/Http/Controllers/PresenceController.php
+public function indexValidationHebdo()
 {
     $debutSemaine = now()->subWeek()->startOfWeek();
     $finSemaine = now()->subWeek()->endOfWeek()->subDays(2); // Vendredi
+
+    // Récupérer tous les jours fériés de la période en une seule fois (optimisation)
+    $joursFeries = \App\Models\Holiday::whereBetween('holiday_date', [$debutSemaine->toDateString(), $finSemaine->toDateString()])
+        ->pluck('holiday_date')
+        ->toArray();
 
     $agents = Agent::all();
     $absencesDetectees = [];
@@ -319,8 +352,12 @@ public function stats(Request $request)
         while ($currentDate <= $finSemaine) {
             $dateStr = $currentDate->toDateString();
 
-            // CRUCIAL : On ne l'ajoute que si AUCUN enregistrement n'existe dans 'presences'
-            // Cela fera disparaître la ligne dès que vous aurez cliqué sur "Valider"
+            // SI c'est un jour férié, on passe au jour suivant sans rien détecter
+            if (in_array($dateStr, $joursFeries)) {
+                $currentDate->addDay();
+                continue; 
+            }
+
             $dejaValide = Presence::where('agent_id', $agent->id)
                                  ->whereDate('heure_arrivee', $dateStr)
                                  ->exists();
@@ -345,7 +382,6 @@ public function stats(Request $request)
     return view('presences.validation-hebdo', compact('absencesDetectees'));
 }
 
-
 public function storeValidationHebdo(Request $request)
 {
     $absencesInput = $request->input('absences', []);
@@ -355,7 +391,10 @@ public function storeValidationHebdo(Request $request)
             $agentId = $data['agent_id'];
             $dateAbsence = $data['date'];
 
-            // 1. Recherche du justificatif
+            // Sécurité : Ne pas valider si c'est un jour férié
+            $isFerie = \App\Models\Holiday::where('holiday_date', $dateAbsence)->exists();
+            if ($isFerie) continue;
+
             $justificatif = \App\Models\Absence::where('agent_id', $agentId)
                 ->whereDate('date_debut', '<=', $dateAbsence)
                 ->whereDate('date_fin', '>=', $dateAbsence)
@@ -365,7 +404,6 @@ public function storeValidationHebdo(Request $request)
             $note = $justificatif ? "Justifié: " . $justificatif->motif : "Absence hebdomadaire.";
 
             try {
-                // 2. Insertion ou Mise à jour forcée (SQL brut)
                 DB::statement("
                     INSERT INTO presences (agent_id, heure_arrivee, statut, notes, created_at, updated_at)
                     VALUES (?, ?, ?, ?, NOW(), NOW())
@@ -373,43 +411,32 @@ public function storeValidationHebdo(Request $request)
                         statut = VALUES(statut),
                         notes = VALUES(notes),
                         updated_at = NOW()
-                ", [
-                    $agentId,
-                    $dateAbsence . ' 08:00:00',
-                    $statut,
-                    $note
-                ]);
+                ", [$agentId, $dateAbsence . ' 08:00:00', $statut, $note]);
             } catch (\Exception $e) {
-                // Utilisation de la façade Log maintenant importée
                 Log::error("Erreur storeValidationHebdo : " . $e->getMessage());
             }
         }
     }
-
     return redirect()->route('presences.index')->with('success', 'Traitement terminé.');
 }
 
-
-
-
-        public function rapport(Request $request)
+public function rapport(Request $request)
 {
     $debut = $request->debut ?? now()->startOfMonth()->toDateString();
     $fin = $request->fin ?? now()->toDateString();
 
-    // 1. Récupérer les données
     $donnees = Presence::with(['agent', 'Absence.typeAbsence'])
-                ->whereBetween('created_at', [$debut . ' 00:00:00', $fin . ' 23:59:59'])
+                ->whereBetween('heure_arrivee', [$debut . ' 00:00:00', $fin . ' 23:59:59'])
                 ->get();
 
     $total = $donnees->count();
 
-    // 2. Calculer les statistiques (KPIs) avec sécurité si total = 0
     $analyses = [
-        'taux_presence'   => $total > 0 ? round(($donnees->where('statut', 'Présent')->count() / $total) * 100, 1) : 0,
+        'taux_presence'   => $total > 0 ? round(($donnees->whereIn('statut', ['Présent', 'En Retard'])->count() / $total) * 100, 1) : 0,
         'taux_retard'     => $total > 0 ? round(($donnees->where('statut', 'En Retard')->count() / $total) * 100, 1) : 0,
-        'taux_justifie'   => $total > 0 ? round(($donnees->where('statut', 'Absence justifiée')->count() / $total) * 100, 1) : 0,
+        'taux_justifie'   => $total > 0 ? round(($donnees->where('statut', 'Absence Justifiée')->count() / $total) * 100, 1) : 0,
         'taux_injustifie' => $total > 0 ? round(($donnees->where('statut', 'Absent')->count() / $total) * 100, 1) : 0,
+        'taux_ferie'      => $total > 0 ? round(($donnees->where('statut', 'Férié')->count() / $total) * 100, 1) : 0,
     ];
 
     return view('presences.etat_periodique', compact('donnees', 'analyses', 'debut', 'fin'));

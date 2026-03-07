@@ -245,4 +245,84 @@ public function monstore(Request $request)
 }
 
 
+public function createListe()
+{
+    // Tri par nom puis prénom pour faciliter la recherche visuelle
+    $agents = \App\Models\Agent::orderBy('last_name', 'asc')
+                               ->orderBy('first_name', 'asc')
+                               ->get();
+                               
+    $typeAbsences = \App\Models\TypeAbsence::orderBy('nom_type')->get();
+    
+    // Assurez-vous que le nom du fichier correspond (create_admin.blade.php)
+    return view('absences.create_admin', compact('agents', 'typeAbsences'));
+}
+
+
+public function storeGrouped(Request $request)
+{
+    $request->validate([
+        'agent_ids' => 'required|array|min:1',
+        'agent_ids.*' => 'exists:agents,id',
+        'type_absence_id' => 'required|exists:type_absences,id',
+        'date_debut' => 'required|date',
+        'date_fin' => 'required|date|after_or_equal:date_debut',
+        'document_justificatif' => 'nullable|file|mimes:pdf,jpg,png,docx|max:8192',
+    ]);
+
+    return \DB::transaction(function () use ($request) {
+        $fileName = null;
+
+        // --- Gestion du fichier personnalisée ---
+        if ($request->hasFile('document_justificatif')) {
+            $file = $request->file('document_justificatif');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            // Déplacement physique dans public/JustificatifAbsences
+            $file->move(public_path('JustificatifAbsences'), $fileName);
+        }
+
+        $crees = 0;
+        $ignores = 0;
+
+        foreach ($request->agent_ids as $id) {
+            // Vérification de chevauchement
+            $dejaAbsent = \App\Models\Absence::where('agent_id', $id)
+                ->where(function ($query) use ($request) {
+                    $query->whereBetween('date_debut', [$request->date_debut, $request->date_fin])
+                          ->orWhereBetween('date_fin', [$request->date_debut, $request->date_fin])
+                          ->orWhere(function ($q) use ($request) {
+                              $q->where('date_debut', '<=', $request->date_debut)
+                                ->where('date_fin', '>=', $request->date_fin);
+                          });
+                })->exists();
+
+            if ($dejaAbsent) {
+                $ignores++;
+                continue;
+            }
+
+            // Création de l'absence
+            \App\Models\Absence::create([
+                'agent_id' => $id,
+                'type_absence_id' => $request->type_absence_id,
+                'date_debut' => $request->date_debut,
+                'date_fin' => $request->date_fin,
+                'motif' => $request->motif,
+                'document_justificatif' => $fileName, // On stocke uniquement le nom du fichier
+                'status' => 'validé',
+            ]);
+
+            $crees++;
+        }
+
+        $message = "$crees autorisations enregistrées.";
+        if ($ignores > 0) {
+            $message .= " Attention : $ignores agent(s) ignorés (déjà absents sur cette période).";
+        }
+
+        return redirect()->route('absences.index')
+            ->with($ignores > 0 ? 'warning' : 'success', $message);
+    });
+}
+
 }
