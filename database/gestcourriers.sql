@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : sam. 07 mars 2026 à 14:11
+-- Généré le : lun. 09 mars 2026 à 06:55
 -- Version du serveur : 11.5.2-MariaDB
 -- Version de PHP : 8.3.14
 
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `absences` (
   PRIMARY KEY (`id`),
   KEY `absences_agent_id_foreign` (`agent_id`),
   KEY `absences_type_absence_id_foreign` (`type_absence_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `absences`
@@ -52,7 +52,13 @@ INSERT INTO `absences` (`id`, `agent_id`, `type_absence_id`, `date_debut`, `date
 (2, 10, 2, '2026-01-13', '2026-01-15', 1, '1769004466_Document_2025-11-27_121019.pdf', '2026-01-21 13:50:03', '2026-01-21 14:07:46'),
 (8, 4, 2, '2026-02-25', '2026-02-25', 1, '1770720847_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-02-10 10:54:07', '2026-02-10 20:59:46'),
 (7, 4, 4, '2026-02-27', '2026-02-27', 1, '1770720003_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-02-10 09:44:47', '2026-02-10 20:59:49'),
-(9, 1, 2, '2026-02-17', '2026-02-20', 1, '1771839504_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-02-23 09:38:24', '2026-02-23 09:39:19');
+(9, 1, 2, '2026-02-17', '2026-02-20', 1, '1771839504_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-02-23 09:38:24', '2026-02-23 09:39:19'),
+(19, 1, 3, '2026-03-11', '2026-03-16', 0, '1772895225_Note_Service_Objectifs de recettes révisés 2025 N\'GUESSAN.doc.pdf', '2026-03-07 14:53:45', '2026-03-07 14:53:45'),
+(20, 16, 3, '2026-03-11', '2026-03-16', 0, '1772895225_Note_Service_Objectifs de recettes révisés 2025 N\'GUESSAN.doc.pdf', '2026-03-07 14:53:45', '2026-03-07 14:53:45'),
+(16, 5, 3, '2026-03-11', '2026-03-16', 0, '1772895225_Note_Service_Objectifs de recettes révisés 2025 N\'GUESSAN.doc.pdf', '2026-03-07 14:53:45', '2026-03-07 14:53:45'),
+(17, 9, 3, '2026-03-11', '2026-03-16', 0, '1772895225_Note_Service_Objectifs de recettes révisés 2025 N\'GUESSAN.doc.pdf', '2026-03-07 14:53:45', '2026-03-07 14:53:45'),
+(18, 18, 3, '2026-03-11', '2026-03-16', 0, '1772895225_Note_Service_Objectifs de recettes révisés 2025 N\'GUESSAN.doc.pdf', '2026-03-07 14:53:45', '2026-03-07 14:53:45'),
+(21, 22, 3, '2026-03-11', '2026-03-16', 0, '1772895225_Note_Service_Objectifs de recettes révisés 2025 N\'GUESSAN.doc.pdf', '2026-03-07 14:53:45', '2026-03-07 14:53:45');
 
 -- --------------------------------------------------------
 
@@ -1628,14 +1634,14 @@ CREATE TABLE IF NOT EXISTS `sessions` (
 DROP TABLE IF EXISTS `type_absences`;
 CREATE TABLE IF NOT EXISTS `type_absences` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nom_type` enum('Congé','Repos Maladie','Mission','Permission','Autres') NOT NULL DEFAULT 'Congé',
+  `nom_type` enum('Congé','Repos Maladie','Mission','Permission','Autres','Séminaire') NOT NULL DEFAULT 'Congé',
   `code` varchar(10) DEFAULT NULL,
   `description` text DEFAULT NULL,
   `est_paye` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `type_absences`
@@ -1646,7 +1652,8 @@ INSERT INTO `type_absences` (`id`, `nom_type`, `code`, `description`, `est_paye`
 (2, 'Repos Maladie', 'RM', 'Repôt maladie prescrit par un medecin dûment mandaté par la MADGI', 1, '2026-01-21 13:43:07', '2026-01-21 13:43:07'),
 (3, 'Mission', 'M', 'Mission de travail ou de formation', 1, '2026-01-21 13:43:36', '2026-01-21 13:43:36'),
 (4, 'Permission', 'P', 'Autorisation d\'absence validée par un spérieur hiérarchique', 1, '2026-01-21 13:44:42', '2026-01-21 13:44:42'),
-(5, 'Autres', 'Autre', 'Autre type d\'absence', 1, '2026-01-21 13:45:35', '2026-01-21 13:45:35');
+(5, 'Autres', 'Autre', 'Autre type d\'absence', 1, '2026-01-21 13:45:35', '2026-01-21 13:45:35'),
+(7, 'Séminaire', 'SM', 'Séminaire', 1, '2026-03-07 14:59:37', '2026-03-07 14:59:37');
 
 -- --------------------------------------------------------
 
