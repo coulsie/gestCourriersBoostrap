@@ -14,7 +14,7 @@
     <!-- Styles -->
     <link href="{{ asset('template/css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('template/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
-    
+
     <style>
     /* 1. Configuration de la Sidebar et de l'ascenseur */
     #accordionSidebar {
@@ -187,7 +187,7 @@
                         </a>
                         <a class="collapse-item" href="{{ route('presences.monHistorique') }}">Mon Historique</a>
                         <a class="collapse-item" href="{{ route('absences.monautorisation') }}">Mes Congés & Permissions</a>
-                        
+
                         {{-- ACCÈS CONTRÔLE ET RH : Admin, RH, Superviseur --}}
                         @hasanyrole('admin|rh|Superviseur')
                             <div class="dropdown-divider"></div>
@@ -205,7 +205,8 @@
                             <div class="dropdown-divider"></div>
                             <h6 class="collapse-header">Rapports :</h6>
                             <a class="collapse-item" href="{{ route('rapports.presences.periodique') }}">Rapport Périodique</a>
-                            <a class="collapse-item" href="#">Rapport Mensuel</a>
+                            <a class="collapse-item" href="{{ route('rapports.mensuel') }}">Rapport Mensuel</a>
+                           
                         @endhasanyrole
 
                     </div>
@@ -271,8 +272,8 @@
     <script src="{{ asset('template/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('template/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
     <script src="{{ asset('template/js/sb-admin-2.min.js') }}"></script>
-   
-    
+
+
 
 </body>
 </html>

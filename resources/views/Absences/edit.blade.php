@@ -51,15 +51,17 @@
                             {{-- Section Dates (Vert) --}}
                             <div class="col-md-6">
                                 <label for="date_debut" class="form-label fw-bold text-success">Date de début</label>
-                                <input type="date" class="form-control border-success @error('date_debut') is-invalid @enderror" 
-                                       id="date_debut" name="date_debut" value="{{ old('date_debut', $absence->date_debut) }}" required>
+                                <input type="date" class="form-control border-success @error('date_debut') is-invalid @enderror"
+                                    id="date_debut" name="date_debut"
+                                    value="{{ old('date_debut', is_string($absence->date_debut) ? $absence->date_debut : $absence->date_debut?->format('Y-m-d')) }}" required>
                                 @error('date_debut') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="col-md-6">
                                 <label for="date_fin" class="form-label fw-bold text-success">Date de fin</label>
-                                <input type="date" class="form-control border-success @error('date_fin') is-invalid @enderror" 
-                                       id="date_fin" name="date_fin" value="{{ old('date_fin', $absence->date_fin) }}" required>
+                                <input type="date" class="form-control border-success @error('date_fin') is-invalid @enderror"
+                                    id="date_fin" name="date_fin"
+                                    value="{{ old('date_fin', is_string($absence->date_fin) ? $absence->date_fin : $absence->date_fin?->format('Y-m-d')) }}" required>
                                 @error('date_fin') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
 
@@ -69,26 +71,38 @@
                                     Document Justificatif (Scan PDF/Image)
                                 </label>
                                 <input type="file" name="document_justificatif" class="form-control border-warning @error('document_justificatif') is-invalid @enderror">
-                                
+
                                 @if($absence->document_justificatif)
-                                    <div class="mt-2 p-2 border rounded bg-white d-flex justify-content-between align-items-center">
-                                        <small class="text-muted"><i class="fas fa-file-pdf me-2"></i>Document actuel présent</small>
-                                        <a href="{{ asset('storage/' . $absence->document_justificatif) }}" target="_blank" class="btn btn-xs btn-outline-info py-0">Visualiser</a>
+                                    <div class="mt-2 p-2 border border-warning rounded bg-white d-flex justify-content-between align-items-center shadow-sm">
+                                        <div class="text-warning small fw-bold">
+                                            <i class="fas fa-file-pdf me-2"></i>Fichier : {{ $absence->document_justificatif }}
+                                        </div>
+                                        {{-- Utilisation du dossier correct défini dans votre index --}}
+                                        <a href="{{ asset('JustificatifAbsences/' . $absence->document_justificatif) }}"
+                                        target="_blank" class="btn btn-sm btn-warning text-white">
+                                        <i class="fas fa-eye me-1"></i>Visualiser le document actuel
+                                        </a>
                                     </div>
                                 @endif
+
                                 @error('document_justificatif') <div class="text-danger small">{{ $message }}</div> @enderror
                             </div>
 
                             {{-- Section Approbation (Switch Coloré) --}}
                             <div class="col-12 mt-3">
-                                <div class="form-check form-switch p-3 border rounded shadow-sm {{ $absence->approuvee ? 'bg-success-subtle' : 'bg-white' }}">
+                                <div class="form-check form-switch p-3 border rounded shadow-sm {{ $absence->approuvee == 1 ? 'bg-success-subtle' : ($absence->approuvee == 2 ? 'bg-danger-subtle' : 'bg-white') }}">
                                     <input type="checkbox" class="form-check-input ms-0 me-3" id="approuvee" name="approuvee" value="1"
-                                        {{ old('approuvee', $absence->approuvee) ? 'checked' : '' }}>
+                                        {{ old('approuvee', $absence->approuvee) == 1 ? 'checked' : '' }}>
                                     <label class="form-check-label fw-bold" for="approuvee">
-                                        Absence Approuvée par la Direction
+                                        @if($absence->approuvee == 2)
+                                            <span class="text-danger">Cette autorisation d'absence est actuellement REJETÉE</span>
+                                        @else
+                                            Absence Approuvée par la Direction
+                                        @endif
                                     </label>
                                 </div>
                             </div>
+
                         </div>
 
                         <div class="d-flex justify-content-between mt-5 border-top pt-3">

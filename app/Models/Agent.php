@@ -52,6 +52,8 @@ class Agent extends Model
         return $this->belongsTo(Service::class);
     }
 
+
+
     /**
      * Définit la relation : un Agent appartient à un seul User (pour la connexion).
      * C'est une relation optionnelle (nullable) vers le modèle User par défaut de Laravel.

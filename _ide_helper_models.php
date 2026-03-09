@@ -236,6 +236,30 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
+ * @property string $name
+ * @property \Illuminate\Support\Carbon $holiday_date
+ * @property string|null $description
+ * @property bool $is_recurring
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday ofYear($year)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday whereHolidayDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday whereIsRecurring($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Holiday whereUpdatedAt($value)
+ */
+	class Holiday extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
  * @property string $jour
  * @property \Illuminate\Support\Carbon $heure_debut
  * @property \Illuminate\Support\Carbon $heure_fin

@@ -34,6 +34,7 @@ class Absence extends Model
         'Approuvee' => 'boolean', // Convertit 0/1 ou false/true en booléen PHP
     ];
 
+    
     // --- Relations Eloquent ---
 
     /**

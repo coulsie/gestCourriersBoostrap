@@ -3,13 +3,12 @@
 use Illuminate\Support\Facades\{Auth, Route};
 use App\Http\Controllers\{
     HomeController, AdminController, UserController, ProfileController,
-    AgentController, CourrierController, AffectationController,
-    CourrierAffectationController, DirectionController, ServiceController,
-    PresenceController, AbsenceController, TypeAbsenceController,
-    EtatAgentsController, NotificationTacheController, AnnonceController,
-    ReponseNotificationController, AgentServiceController, ImputationController,
-    StatistiqueController, ReponseController, PostController, RoleController,ExtractionController, HolidayController
+    AgentController, CourrierController,
+    DirectionController, ServiceController,PresenceController, AbsenceController, TypeAbsenceController,
+    AnnonceController, AgentServiceController, ImputationController,
+    StatistiqueController, ReponseController, PostController, RoleController,ExtractionController, HolidayController, RapportController
 };
+
 use App\Http\Controllers\Auth\PasswordSetupController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Models\ScriptExtraction;
@@ -37,6 +36,14 @@ Route::resource('holidays', HolidayController::class);
 Route::get('/absences/admin/create', [AbsenceController::class, 'createListe'])->name('absences.createListe');
 // Ajoutez cette route spécifique AVANT ou APRÈS vos ressources existantes
 Route::post('/absences/store-grouped', [AbsenceController::class, 'storeGrouped'])->name('absences.storeGrouped');
+
+// Route pour la vue mensuelle
+Route::get('/rapport-mensuel', [RapportController::class, 'mensuel'])->name('rapports.mensuel');
+
+// Route pour l'export PDF
+Route::get('/rapports/export-pdf/{agent_id}/{periode}', [RapportController::class, 'exportPDF'])->name('rapports.export.pdf');
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -160,6 +167,9 @@ Route::middleware(['auth'])->group(function () {
             Route::get('/liste-filtree', [PresenceController::class, 'listeFiltree'])->name('listeFiltree');
             Route::get('/etat', [PresenceController::class, 'etat'])->name('etat'); // Ajouté selon votre sidebar
         });
+
+
+
 
 
 

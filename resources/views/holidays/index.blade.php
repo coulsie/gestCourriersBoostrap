@@ -1,35 +1,51 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid py-4">
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Gestion des Jours Fériés</h1>
-        <a href="{{ route('holidays.create') }}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-plus fa-sm text-white-50"></i> Ajouter un jour
+        <h1 class="h3 mb-0 text-gray-800 fw-bold">
+            <i class="fas fa-calendar-alt text-primary me-2"></i>Gestion des Jours Fériés
+        </h1>
+        <a href="{{ route('holidays.create') }}" class="btn btn-sm btn-primary shadow-sm px-3">
+            <i class="fas fa-plus-circle fa-sm text-white-50 me-1"></i> Ajouter un jour
         </a>
     </div>
 
     <div class="row">
         <!-- Formulaire d'ajout rapide -->
         <div class="col-xl-4 col-lg-5">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Nouveau Jour Férié</h6>
+            <div class="card shadow mb-4 border-left-primary">
+                <div class="card-header py-3 bg-white">
+                    <h6 class="m-0 font-weight-bold text-primary italic">
+                        <i class="fas fa-plus me-1"></i> Nouveau Jour Férié
+                    </h6>
                 </div>
                 <div class="card-body">
                     <form action="{{ route('holidays.store') }}" method="POST">
                         @csrf
-                        <div class="form-group">
-                            <label>Désignation</label>
-                            <input type="text" name="name" class="form-control" placeholder="ex: Noël" required>
+                        <div class="form-group mb-3">
+                            <label class="font-weight-bold text-dark small text-uppercase">Désignation</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light border-right-0"><i class="fas fa-tag text-muted"></i></span>
+                                </div>
+                                <input type="text" name="name" class="form-control border-left-0" placeholder="ex: Noël" required>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Date</label>
-                            <input type="date" name="holiday_date" class="form-control" required>
+                        <div class="form-group mb-4">
+                            <label class="font-weight-bold text-dark small text-uppercase">Date du jour chômé</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light border-right-0"><i class="fas fa-calendar-day text-muted"></i></span>
+                                </div>
+                                <input type="date" name="holiday_date" class="form-control border-left-0" required>
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block">Enregistrer</button>
+                        <button type="submit" class="btn btn-primary btn-block shadow font-weight-bold py-2">
+                            <i class="fas fa-save me-1"></i> ENREGISTRER
+                        </button>
                     </form>
                 </div>
             </div>
@@ -37,36 +53,47 @@
 
         <!-- Liste des jours -->
         <div class="col-xl-8 col-lg-7">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Liste des dates chômées</h6>
+            <div class="card shadow mb-4 border-top-info">
+                <div class="card-header py-3 bg-white d-flex align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-info text-uppercase small">
+                        <i class="fas fa-list me-1"></i> Dates chômées enregistrées
+                    </h6>
+                    <span class="badge badge-info shadow-sm px-3">{{ $holidays->count() }} Jours</span>
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0"> <!-- P-0 pour que la table touche les bords -->
                     <div class="table-responsive">
-                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                            <thead class="bg-light">
+                        <table class="table table-hover mb-0" id="dataTable" width="100%" cellspacing="0">
+                            <thead class="bg-light text-dark">
                                 <tr>
-                                    <th>Nom</th>
-                                    <th>Date</th>
-                                    <th class="text-right">Actions</th>
+                                    <th class="border-0 px-4">Désignation</th>
+                                    <th class="border-0 text-center">Date</th>
+                                    <th class="border-0 text-right px-4">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($holidays as $holiday)
                                 <tr>
-                                    <td><strong>{{ $holiday->name }}</strong></td>
-                                    <td>
-                                        <span class="badge badge-info shadow-sm p-2">
+                                    <td class="align-middle px-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="icon-circle bg-light-primary mr-3 text-primary text-center" style="width: 35px; height: 35px; border-radius: 50%; line-height: 35px;">
+                                                <i class="fas fa-umbrella-beach"></i>
+                                            </div>
+                                            <span class="font-weight-bold text-dark">{{ strtoupper($holiday->name) }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="align-middle text-center">
+                                        <span class="badge badge-soft-info p-2 px-3 border" style="font-size: 0.9rem;">
+                                            <i class="far fa-calendar-alt me-1"></i>
                                             {{ $holiday->holiday_date->format('d/m/Y') }}
                                         </span>
                                     </td>
-                                    <td class="text-right">
-                                        <a href="{{ route('holidays.edit', $holiday) }}" class="btn btn-sm btn-warning btn-circle">
+                                    <td class="align-middle text-right px-4">
+                                        <a href="{{ route('holidays.edit', $holiday) }}" class="btn btn-sm btn-outline-warning border-0" title="Modifier">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <form action="{{ route('holidays.destroy', $holiday) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ?')">
+                                        <form action="{{ route('holidays.destroy', $holiday) }}" method="POST" class="d-inline" onsubmit="return confirm('Confirmer la suppression ?')">
                                             @csrf @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-danger btn-circle">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Supprimer">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
@@ -81,4 +108,14 @@
         </div>
     </div>
 </div>
+
+<style>
+    .border-left-primary { border-left: .25rem solid #4e73df!important; }
+    .border-top-info { border-top: .25rem solid #36b9cc!important; }
+    .bg-light-primary { background-color: #f0f2f9; }
+    .badge-soft-info { background-color: #e3f2fd; color: #0d47a1; border-color: #bbdefb !important; }
+    .table-hover tbody tr:hover { background-color: #f8f9fc; }
+    .italic { font-style: italic; }
+    .btn-circle { border-radius: 50%; width: 35px; height: 35px; padding: 0; }
+</style>
 @endsection

@@ -83,16 +83,22 @@
                                             <div class="small fw-bold">{{ \Carbon\Carbon::parse($absence->date_debut)->translatedFormat('d M Y') }}</div>
                                             <div class="text-muted small">au {{ \Carbon\Carbon::parse($absence->date_fin)->translatedFormat('d M Y') }}</div>
                                         </td>
-                                        <td class="text-center">
-                                            @if ($absence->approuvee)
-                                                {{-- Blanc sur Vert --}}
+
+                                            <<td class="text-center">
+                                            @if ($absence->approuvee == 1)
+                                                {{-- Cas 1 : Approuvé --}}
                                                 <span class="badge bg-success text-white px-3 py-2 shadow-sm">
                                                     <i class="fas fa-check-circle me-1"></i> OUI
                                                 </span>
-                                            @else
-                                                {{-- BLANC SUR ROUGE --}}
-                                                <span class="badge bg-danger text-white px-3 py-2 shadow-sm" style="letter-spacing: 0.5px;">
+                                            @elseif ($absence->approuvee == 2)
+                                                {{-- Cas 2 : Rejeté (votre valeur 2) --}}
+                                                <span class="badge bg-danger text-white px-3 py-2 shadow-sm">
                                                     <i class="fas fa-times-circle me-1"></i> NON
+                                                </span>
+                                            @else
+                                                {{-- Cas 0 ou autre : En attente --}}
+                                                <span class="badge bg-warning text-dark px-3 py-2 shadow-sm">
+                                                    <i class="fas fa-clock me-1"></i> EN ATTENTE
                                                 </span>
                                             @endif
                                         </td>
@@ -135,5 +141,21 @@
     .badge { font-weight: 600; letter-spacing: 0.3px; }
     .bg-primary-subtle { background-color: #e7f0ff !important; }
     .bg-info-subtle { background-color: #e0f7fa !important; }
+
+    /* Effet de ligne selon le statut */
+tr.table-danger-light { background-color: #fff5f5; }
+tr.table-success-light { background-color: #f6fff6; }
+
+/* Style pour les avatars et icônes */
+.avatar-sm {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+}
+
+.italic { font-style: italic; }
+.bg-info-subtle { background-color: #e1f5fe !important; color: #01579b !important; }
 </style>
 @endsection
