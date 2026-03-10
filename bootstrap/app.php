@@ -32,9 +32,27 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
-    })
-    ->withExceptions(function (Exceptions $exceptions) {
-        //
-    })
-    ->create();
+
+        })
+        ->withExceptions(function (Exceptions $exceptions) {
+            //
+        })
+        ->create();
+
+    return Application::configure(basePath: dirname(__DIR__))
+        ->withRouting(
+            web: __DIR__.'/../routes/web.php',
+            commands: __DIR__.'/../routes/console.php',
+            health: '/up',
+        )
+        ->withMiddleware(function (Middleware $middleware) {
+            //
+        })
+        ->withExceptions(function (Exceptions $exceptions) {
+            //
+        })
+        ->withProviders([
+            \App\Providers\EventServiceProvider::class, // <-- AJOUTEZ CETTE LIGNE
+        ])
+        ->create();
 

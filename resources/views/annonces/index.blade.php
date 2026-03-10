@@ -40,51 +40,53 @@
                     </thead>
                     <tbody>
                         @foreach($annonces as $annonce)
-                        <tr>
-                            <td class="font-weight-bold text-dark">{{ $annonce->titre }}</td>
-                            <td>
-                                {{-- Couleurs dynamiques selon le type --}}
-                                @php
-                                    $badgeColor = [
-                                        'urgent' => 'danger',
-                                        'information' => 'info',
-                                        'evenement' => 'success',
-                                        'avertissement' => 'warning'
-                                    ][$annonce->type] ?? 'secondary';
-                                @endphp
-                                <span class="badge badge-{{ $badgeColor }} text-uppercase p-2">
-                                    {{ $annonce->type }}
-                                </span>
-                            </td>
-                            <td>
-                                @if($annonce->is_active)
-                                    <span class="text-success"><i class="fas fa-check-circle"></i> Actif</span>
-                                @else
-                                    <span class="text-muted"><i class="fas fa-times-circle"></i> Inactif</span>
-                                @endif
-                            </td>
-                            <td>{{ $annonce->expires_at ? \Carbon\Carbon::parse($annonce->expires_at)->format('d/m/Y') : 'Permanent' }}</td>
-                            <td>{{ $annonce->created_at->format('d/m/Y') }}</td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group">
-                                    <!-- Bouton Modifier -->
-                                    <a href="{{ route('annonces.edit', $annonce->id) }}" class="btn btn-warning btn-sm" title="Modifier">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
+                            {{-- Vérification de l'expiration : n'affiche que si non expiré --}}
+                            @if(!$annonce->expires_at || \Carbon\Carbon::parse($annonce->expires_at)->isFuture() || \Carbon\Carbon::parse($annonce->expires_at)->isToday())
+                            <tr>
+                                <td class="font-weight-bold text-dark">{{ $annonce->titre }}</td>
+                                <td>
+                                    {{-- Couleurs dynamiques selon le type --}}
+                                    @php
+                                        $badgeColor = [
+                                            'urgent' => 'danger',
+                                            'information' => 'info',
+                                            'evenement' => 'success',
+                                            'avertissement' => 'warning'
+                                        ][$annonce->type] ?? 'secondary';
+                                    @endphp
+                                    <span class="badge badge-{{ $badgeColor }} text-uppercase p-2">
+                                        {{ $annonce->type }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($annonce->is_active)
+                                        <span class="text-success"><i class="fas fa-check-circle"></i> Actif</span>
+                                    @else
+                                        <span class="text-muted"><i class="fas fa-times-circle"></i> Inactif</span>
+                                    @endif
+                                </td>
+                                <td>{{ $annonce->expires_at ? \Carbon\Carbon::parse($annonce->expires_at)->format('d/m/Y') : 'Permanent' }}</td>
+                                <td>{{ $annonce->created_at->format('d/m/Y') }}</td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('annonces.edit', $annonce->id) }}" class="btn btn-warning btn-sm" title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
 
-                                    <!-- Bouton Supprimer -->
-                                    <form action="{{ route('annonces.destroy', $annonce->id) }}" method="POST" onsubmit="return confirm('Confirmer la suppression ?');" style="display:inline-block; margin-left: 5px;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" title="Supprimer">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
+                                        <form action="{{ route('annonces.destroy', $annonce->id) }}" method="POST" onsubmit="return confirm('Confirmer la suppression ?');" style="display:inline-block; margin-left: 5px;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" title="Supprimer">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endif
                         @endforeach
                     </tbody>
+
                 </table>
             </div>
         </div>

@@ -43,6 +43,9 @@ Route::get('/rapport-mensuel', [RapportController::class, 'mensuel'])->name('rap
 // Route pour l'export PDF
 Route::get('/rapports/export-pdf/{agent_id}/{periode}', [RapportController::class, 'exportPDF'])->name('rapports.export.pdf');
 
+Route::get('/administration/journal-logs', [App\Http\Controllers\RapportController::class, 'journalLogs'])
+    ->name('admin.logs')
+    ->middleware(['auth', 'role:admin|Superviseur']); // Sécurisez l'accès
 
 
 /*

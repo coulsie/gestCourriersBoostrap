@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Courrier extends Model
 {
-   use HasFactory;
+    use \App\Traits\Auditable; // Active la traçabilité automatique
+    use HasFactory;
 
     /**
      * The table associated with the model.
@@ -79,7 +80,7 @@ class Courrier extends Model
      * Get the affectations for the courrier.
      */
 
-    
+
 
     public function imputation() {
         return $this->belongsTo(Imputation::class);

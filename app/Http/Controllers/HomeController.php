@@ -25,21 +25,25 @@ class HomeController extends Controller
      */
 
 
-    public function index()
+ public function index()
 {
     // 1. Calculs de base
     $nombreAgents = DB::table('agents')->count();
-    $nombreAnnonces = Annonce::count();
+
+    // MODIFICATION ICI : On compte uniquement les annonces actives et non expirées
+    $nombreAnnonces = Annonce::where('is_active', true)
+        ->where(function($q) {
+            $q->whereNull('expires_at')->orWhere('expires_at', '>=', now()->startOfDay());
+        })->count();
+
     $totalTaches = DB::table('imputations')->count();
 
-    // 2. Imputations (anciennement notifications) sans réponse
-    // Note : On utilise la table 'reponses' car 'imputations' y est liée
+    // 2. Imputations sans réponse
     $notifsSansReponse = DB::table('imputations')
         ->leftJoin('reponses', 'imputations.id', '=', 'reponses.imputation_id')
         ->whereNull('reponses.imputation_id')
         ->count();
 
-    // 3. Imputations sans réponse (Doublon technique du point 2, conservé pour votre logique)
     $imputationsSansReponse = $notifsSansReponse;
 
     // 4. COURRIERS NON IMPUTÉS
@@ -53,8 +57,15 @@ class HomeController extends Controller
         ? ($notifsSansReponse / $totalTaches) * 100
         : 0;
 
-    // 6. Récupération des annonces récentes
-    $recentAnnonces = Annonce::latest()->take(5)->get();
+    // 6. RÉCUPÉRATION DES ANNONCES RECENTES (FILTRE D'EXPIRATION AJOUTÉ)
+    $recentAnnonces = Annonce::where('is_active', true)
+        ->where(function($query) {
+            $query->whereNull('expires_at') // Annonces permanentes
+                  ->orWhere('expires_at', '>=', now()->startOfDay()); // Non expirées
+        })
+        ->latest()
+        ->take(5)
+        ->get();
 
     // 7. Envoi à la vue
     return view('dashboard', compact(

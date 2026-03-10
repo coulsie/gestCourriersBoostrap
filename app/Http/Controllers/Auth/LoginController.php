@@ -35,7 +35,15 @@ class LoginController extends Controller
      * Create a new controller instance.
      *
      * @return void
+     *
      */
+    // Dans EventServiceProvider.php
+    protected $listen = [
+        \Illuminate\Auth\Events\Login::class => [
+            \App\Listeners\LogSuccessfulLogin::class,
+        ],
+    ];
+
     public function __construct()
     {
         $this->middleware('guest')->except('logout');

@@ -11,15 +11,27 @@ class AnnonceController extends Controller
    /**
      * Affiche la liste des annonces (pour l'administration)
      */
-        public function index()
+            public function index()
         {
-        // On récupère les annonces actives
-            $recentAnnonces = Annonce::active()->take(5)->get();
-            $annonces = Annonce::orderBy('created_at', 'desc')->get();
+            // 1. Récupérer les annonces récentes actives et non expirées
+            $recentAnnonces = Annonce::active()
+                ->where(function($query) {
+                    $query->whereNull('expires_at')
+                        ->orWhere('expires_at', '>=', now());
+                })
+                ->take(5)
+                ->get();
+
+            // 2. Récupérer TOUTES les annonces non expirées (pour le tableau)
+            $annonces = Annonce::where(function($query) {
+                    $query->whereNull('expires_at') // Annonces sans date d'expiration
+                        ->orWhere('expires_at', '>=', now()); // Annonces dont la date est future ou aujourd'hui
+                })
+                ->orderBy('created_at', 'desc')
+                ->get();
 
             return view('annonces.index', compact('recentAnnonces', 'annonces'));
         }
-
 
         /**
          * Affiche le formulaire de création
@@ -98,7 +110,7 @@ class AnnonceController extends Controller
         'titre'      => 'required|string|max:191',
         'contenu'    => 'required|string',
         'type'       => 'required|in:urgent,information,evenement,avertissement',
-        'is_active'  => 'nullable', 
+        'is_active'  => 'nullable',
         'expires_at' => 'nullable|date',
     ]);
 
@@ -106,7 +118,7 @@ class AnnonceController extends Controller
     $annonce = Annonce::findOrFail($id);
 
     // 3. Traitement des données avant mise à jour
-    
+
     // Gestion du statut actif (booléen propre)
     $validatedData['is_active'] = $request->has('is_active');
 
