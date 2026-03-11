@@ -1,6 +1,9 @@
+
+
+
 <div class="modal fade" id="modalLog{{ $log->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content border-top border-4 border-dark shadow-lg">
+        <div class="modal-content">
             <div class="modal-header bg-light">
                 <h5 class="modal-title fw-bold text-dark">
                     <i class="fas fa-history me-2"></i>Détails de l'Action #{{ $log->id }}

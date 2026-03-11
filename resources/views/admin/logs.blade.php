@@ -26,7 +26,7 @@
                             <i class="fas fa-broom me-2"></i> Vider le journal
                         </button>
                     </form>
-                
+
             </div>
 
         </div>
@@ -96,9 +96,13 @@
 
                                 <td class="text-center">
                                     {{-- Bouton Voir --}}
-                                    <button type="button" class="btn btn-sm btn-outline-dark shadow-sm" data-bs-toggle="modal" data-bs-target="#modalLog{{ $log->id }}">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+
+
+<button type="button" class="btn btn-sm btn-outline-dark shadow-sm"
+        onclick="var myModal = new bootstrap.Modal(document.getElementById('modalLog{{ $log->id }}')); myModal.show();">
+    <i class="fas fa-eye"></i>
+</button>
+
 
                                     {{-- Bouton Supprimer --}}
                                     <form action="{{ route('admin.logs.destroy', $log->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ce log définitivement ?')">
@@ -111,44 +115,65 @@
                                 </td>
 
                             </tr>
+                             @include('admin.partials.modal_log', ['log' => $log])
                         @endforeach
                     </tbody>
                 </table>
             </div>
 
             {{-- On place les modals ICI, hors de la table mais dans le card-body --}}
-            @foreach($logs as $log)
-                @include('admin.partials.modal_log', ['log' => $log])
-            @endforeach
 
-            <div class="mt-3">
+
+                       <div class="mt-3">
                 {{ $logs->links() }}
             </div>
         </div>
     </div>
 </div>
+
+{{-- BOUCLE DE MODALS BIEN À PART --}}
+@foreach($logs as $log)
+    @include('admin.partials.modal_log', ['log' => $log])
+@endforeach
+
 @endsection
 
-{{-- CORRECT : Lien complet vers le JS de Bootstrap --}}
-
-{{-- 1. Le script Bootstrap complet --}}
+{{-- LIEN BOOTSTRAP ENFIN COMPLET ET CORRECT --}}
 <script src="https://cdn.jsdelivr.net"></script>
 
-{{-- 2. Le script d'activation automatique --}}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // On cherche tous les boutons qui ont data-bs-toggle="modal"
-        var modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
 
-        modalButtons.forEach(function (button) {
-            button.addEventListener('click', function () {
-                var targetId = this.getAttribute('data-bs-target');
-                var modalElement = document.querySelector(targetId);
-                if (modalElement) {
-                    var modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-                }
-            });
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Gestion de l'ouverture pour CHAQUE bouton "œil"
+    document.querySelectorAll('[data-bs-toggle="modal"]').forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('data-bs-target');
+            const modalEl = document.querySelector(targetId);
+            if (modalEl) {
+                // On utilise getOrCreateInstance pour garantir l'unicité par ID de log
+                const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+                modal.show();
+            }
         });
     });
+
+    // Gestion de la fermeture pour TOUS les boutons fermer
+    document.addEventListener('click', function (e) {
+        if (e.target.closest('[data-bs-dismiss="modal"]')) {
+            const modalEl = e.target.closest('.modal');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+
+                // Nettoyage forcé du fond noir
+                setTimeout(() => {
+                    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                    document.body.classList.remove('modal-open');
+                    document.body.style = "";
+                }, 150);
+            }
+        }
+    });
+});
 </script>
