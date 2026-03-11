@@ -44,6 +44,7 @@ class User extends Authenticatable
         'bio',
         'profile_picture',
         'must_change_password',
+        'signature_path', // ... ajoutez-la ici
 
     ];
 
@@ -57,6 +58,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    
 
     /**
      * Get the attributes that should be cast.

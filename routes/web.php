@@ -57,6 +57,10 @@ Route::delete('/admin/logs-clear', [App\Http\Controllers\AuditLogController::cla
 
 Route::get('/admin/logs', [AuditLogController::class, 'journalLogs'])->name('admin.logs.index');
 
+
+Route::get('/profile/signature', [ProfileController::class, 'editSignature'])->name('profile.signature.edit');
+Route::post('/profile/signature', [ProfileController::class, 'updateSignature'])->name('profile.signature.update');
+
 /*
 |--------------------------------------------------------------------------
 | 2. ESPACE SÉCURISÉ (Authentification requise)

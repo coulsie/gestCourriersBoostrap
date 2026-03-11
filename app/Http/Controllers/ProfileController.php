@@ -85,7 +85,7 @@ class ProfileController extends Controller
         return view('profile.create');
     }
 
-    
+
         public function updatePassword(Request $request)
     {
         // 1. Validation stricte
@@ -102,6 +102,50 @@ class ProfileController extends Controller
         ]);
 
         return back()->with('status', 'Votre mot de passe a été mis à jour avec succès !');
+    }
+
+     
+public function updateSignature(Request $request)
+{
+    $request->validate(['signature_data' => 'required']);
+
+    $user = \Illuminate\Support\Facades\Auth::user();
+
+    // 1. Récupération et nettoyage du Base64
+    $data = $request->signature_data;
+    $image = str_replace('data:image/png;base64,', '', $data);
+    $image = str_replace(' ', '+', $image);
+
+    // 2. Gestion du stockage (Comme pour la photo agent)
+    $fileName = 'sig_' . $user->id . '_' . time() . '.png';
+    $destinationPath = public_path('signatures');
+
+    // Créer le dossier s'il n'existe pas
+    if (!file_exists($destinationPath)) {
+        mkdir($destinationPath, 0777, true);
+    }
+
+    // On enregistre le fichier directement dans public/signatures
+    file_put_contents($destinationPath . '/' . $fileName, base64_decode($image));
+
+    // 3. Mise à jour de la colonne signature_path (On ne stocke que le nom du fichier)
+    $user->update([
+        'signature_path' => $fileName
+    ]);
+
+    return back()->with('success', 'Votre signature a été enregistrée dans le dossier public.');
+}
+
+
+    /**
+     * Affiche la vue pour capturer la signature.
+     */
+    public function editSignature()
+    {
+        // On récupère l'utilisateur connecté pour passer ses infos à la vue
+        $user = auth::user();
+
+        return view('profile.signature', compact('user'));
     }
 
 
