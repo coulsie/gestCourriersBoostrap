@@ -6,7 +6,7 @@ use App\Http\Controllers\{
     AgentController, CourrierController,
     DirectionController, ServiceController,PresenceController, AbsenceController, TypeAbsenceController,
     AnnonceController, AgentServiceController, ImputationController,
-    StatistiqueController, ReponseController, PostController, RoleController,ExtractionController, HolidayController, RapportController
+    StatistiqueController, ReponseController, PostController, RoleController,ExtractionController, HolidayController, RapportController,AuditLogController
 };
 
 use App\Http\Controllers\Auth\PasswordSetupController;
@@ -43,9 +43,17 @@ Route::get('/rapport-mensuel', [RapportController::class, 'mensuel'])->name('rap
 // Route pour l'export PDF
 Route::get('/rapports/export-pdf/{agent_id}/{periode}', [RapportController::class, 'exportPDF'])->name('rapports.export.pdf');
 
-Route::get('/administration/journal-logs', [App\Http\Controllers\RapportController::class, 'journalLogs'])
+Route::get('/administration/journal-logs', [AuditLogController::class, 'journalLogs'])
     ->name('admin.logs')
     ->middleware(['auth', 'role:admin|Superviseur']); // Sécurisez l'accès
+
+// Route pour la suppression individuelle
+Route::delete('/admin/logs/{id}', [AuditLogController::class, 'destroy'])->name('admin.logs.destroy');
+
+// Route pour la suppression individuelle (AJAX)
+Route::delete('/admin/logs/{id}/ajax', [AuditLogController::class, 'destroy'])->name('admin.logs.destroy.ajax');
+// Route pour vider tout le journal
+Route::delete('/admin/logs-clear', [App\Http\Controllers\AuditLogController::class, 'clearAll'])->name('admin.logs.clear');
 
 
 /*
@@ -158,6 +166,19 @@ Route::middleware(['auth'])->group(function () {
             Route::match(['get', 'post'], '/par-service', [AgentServiceController::class, 'listeParService'])->name('par.service');
             Route::match(['get', 'post'], '/par-service/recherche', [AgentServiceController::class, 'recherche'])->name('par.service.recherche');
         });
+
+                // Si vous utilisez une route ressource (recommandé)
+        Route::resource('agents', AgentController::class);
+
+        // OU si vous déclarez manuellement
+        Route::get('/agents/create', [AgentController::class, 'create'])->name('agents.create');
+        Route::post('/agents', [AgentController::class, 'store'])->name('agents.store');
+        Route::get('/agents/{agent}/edit', [AgentController::class, 'edit'])->name('agents.edit');
+        Route::put('/agents/{agent}', [AgentController::class, 'update'])->name('agents.update');
+        Route::delete('/agents/{agent}', [AgentController::class, 'destroy'])->name('agents.destroy');
+
+        // Note : Si vous utilisez Route::resource, les routes ci-dessus sont générées automatiquement
+
         Route::resource('agents', AgentController::class)->except(['create', 'store']);
         Route::resource('agents', AgentController::class);
 

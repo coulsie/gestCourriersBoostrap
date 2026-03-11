@@ -55,10 +55,14 @@
                             @endforeach
                         </div>
                     </div>
+                    
                     <div class="card-footer bg-primary text-white d-flex justify-content-between align-items-center py-2">
-                        <small class="font-weight-bold">Total sélectionné :</small>
-                        <span class="badge badge-light px-3 py-2 text-primary" id="count-selected">0</span>
+                        <small class="fw-bold text-uppercase">Total sélectionné :</small>
+                        <span class="badge bg-light text-primary px-3 py-2 shadow-sm" id="count-selected" style="min-width: 40px; font-size: 0.9rem;">
+                            0
+                        </span>
                     </div>
+
                 </div>
             </div>
 
@@ -136,40 +140,52 @@
 
 <script>
 $(document).ready(function() {
-    // 1. Tout cocher / Décocher
-    $('#checkAll').change(function() {
+    // 1. Fonction de mise à jour du compteur
+    function updateCounter() {
+        let count = $('.agent-checkbox:checked').length;
+        $('#count-selected').text(count);
+
+        // Changement visuel du badge quand count > 0
+        if(count > 0) {
+            $('#count-selected')
+                .removeClass('bg-light text-primary')
+                .addClass('bg-warning text-dark fw-bold');
+        } else {
+            $('#count-selected')
+                .removeClass('bg-warning text-dark fw-bold')
+                .addClass('bg-light text-primary');
+        }
+    }
+
+    // 2. Tout cocher / Décocher
+    $('#checkAll').on('change', function() {
         $('.agent-checkbox').prop('checked', $(this).prop('checked'));
         updateCounter();
     });
 
-    // 2. Mise à jour du compteur
-    $('.agent-checkbox').change(function() {
+    // 3. Changement individuel
+    $(document).on('change', '.agent-checkbox', function() {
         updateCounter();
+        // Décocher "Tout cocher" si une case est décochée manuellement
+        if(!$(this).prop('checked')) {
+            $('#checkAll').prop('checked', false);
+        }
     });
 
-    function updateCounter() {
-        let count = $('.agent-checkbox:checked').length;
-        $('#count-selected').text(count);
-        if(count > 0) {
-            $('#count-selected').removeClass('badge-light').addClass('badge-white font-weight-bold');
-        } else {
-            $('#count-selected').addClass('badge-light').removeClass('badge-white');
-        }
-    }
-
-    // 3. Recherche dynamique
+    // 4. Recherche dynamique
     $("#searchAgent").on("keyup", function() {
         var value = $(this).val().toLowerCase();
-        $("#agentList label").filter(function() {
+        $(".agent-item").filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
         });
     });
 
-    // 4. Affichage du nom de fichier
+    // 5. Affichage du nom de fichier
     $(".custom-file-input").on("change", function() {
         var fileName = $(this).val().split("\\").pop();
         $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
     });
 });
+
 </script>
 @endsection

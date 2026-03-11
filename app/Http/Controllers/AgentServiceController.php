@@ -63,7 +63,9 @@ class AgentServiceController extends Controller
             }
 
             // 5. Exécution et pagination
-            $agents = $query->orderBy('last_name', 'asc')->paginate(15);
+            // Remplacez paginate(15) par get()
+            $agents = $query->orderBy('last_name', 'asc')->get();
+
 
             // 6. Informations pour la vue
             $serviceSelectionne = Service::find($request->service_id);

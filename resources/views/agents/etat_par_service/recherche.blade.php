@@ -30,44 +30,48 @@
     </div>
 
     <!-- Zone de Recherche et Filtres -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <form action="{{ route('agents.par.service') }}" method="POST" class="row g-3">
-                @csrf
-                <div class="col-md-5">
-                    <label class="form-label fw-bold"><i class="fas fa-sitemap text-primary me-2"></i>Service</label>
-                    <select name="service_id" class="form-select border-2 shadow-none" onchange="this.form.submit()">
-                        <option value="">Tous les services</option>
-                        @foreach($services as $service)
-                            <option value="{{ $service->id }}" {{ request('service_id') == $service->id ? 'selected' : '' }}>
-                                {{ $service->name }} ({{ $service->code }})
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+   <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body p-4">
+        {{-- Utilisation de GET pour que la recherche soit mémorisée dans l'URL --}}
+        <form action="{{ route('agents.par.service') }}" method="GET" class="row g-3">
+            {{-- Pas de @csrf en méthode GET pour garder une URL propre --}}
 
-                <div class="col-md-5">
-                    <label class="form-label fw-bold"><i class="fas fa-user text-primary me-2"></i>Recherche rapide</label>
-                    <div class="input-group">
-                        <input type="text" id="tableSearch" class="form-control border-2 shadow-none"
-                               placeholder="Tapez un nom, un matricule ou un grade...">
-                        <span class="input-group-text bg-white border-2 border-start-0 text-muted">
-                            <i class="fas fa-keyboard"></i>
-                        </span>
-                    </div>
-                </div>
+            <div class="col-md-5">
+                <label class="form-label fw-bold"><i class="fas fa-sitemap text-primary me-2"></i>Service</label>
+                {{-- On garde le search s'il existe lors du changement de service --}}
+                <select name="service_id" class="form-select border-2 shadow-none" onchange="this.form.submit()">
+                    <option value="">Tous les services</option>
+                    @foreach($services as $service)
+                        <option value="{{ $service->id }}" {{ request('service_id') == $service->id ? 'selected' : '' }}>
+                            {{ $service->name }} ({{ $service->code }})
+                        </option>
+                    @endforeach
+                </select>
+                {{-- Champ caché pour conserver la recherche texte lors du changement de service via le select --}}
+                @if(request('search'))
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                @endif
+            </div>
 
-                <div class="col-md-2 d-grid">
-                    <label class="form-label invisible">Action</label>
-                    <button type="submit" class="btn btn-primary fw-bold shadow-sm">
-                        <i class="fas fa-sync-alt"></i> Filtrer
-                    </button>
+            <div class="col-md-5">
+                <label class="form-label fw-bold"><i class="fas fa-user text-primary me-2"></i>Recherche rapide</label>
+                <div class="input-group">
+                    {{-- L'attribut name='search' permet au contrôleur de recevoir le '410' --}}
+                    <input type="text" name="search" id="tableSearch" class="form-control border-2 shadow-none"
+                         placeholder="Tapez un nom, un matricule..." value="{{ request('search') }}" autocomplete="off">
+                    <span class="input-group-text bg-white border-2 border-start-0 text-muted">
+                        <i class="fas fa-keyboard"></i>
+                    </span>
                 </div>
-            </form>
-        </div>
+            </div>
+
+            
+        </form>
     </div>
+</div>
 
     <!-- Résultats -->
+        <!-- Résultats -->
     <div class="card border-0 shadow-lg overflow-hidden">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0" id="agentsTable">
@@ -98,25 +102,21 @@
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-center">
-    {{-- Couleur dynamique selon le statut --}}
-                                        @php
-                                            $color = match($agent->status) {
-                                                'Chef de service' => 'success',
-                                                'Sous-directeur' => 'warning', // On retire text-dark ici
-                                                'Conseiller Technique'=> 'warning',
-                                                'Directeur'=> 'Danger',
-                                                default => 'info',            // On retire text-dark ici
-                                            };
-                                        @endphp
-
-                                        {{-- Ajout de la classe text-white pour forcer la couleur blanche --}}
-                                        <span class="badge bg-{{ $color }} text-white rounded-pill">
-                                            {{ $agent->status }}
-                                        </span>
-                                </td>
                             <td>
-                                <div class="small"><i class="fas fa-envelope text-muted me-2"></i>{{ $agent->email_professionnel }}</div>
+                                @php
+                                    $color = match(strtolower($agent->status)) {
+                                        'chef de service' => 'success',
+                                        'sous-directeur' => 'warning',
+                                        'directeur' => 'danger',
+                                        default => 'info',
+                                    };
+                                @endphp
+                                <span class="badge bg-{{ $color }} text-white rounded-pill">
+                                    {{ $agent->status }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="small"><i class="fas fa-envelope text-muted me-2"></i>{{ $log->user->email ?? $agent->email_professionnel }}</div>
                                 <div class="small mt-1"><i class="fas fa-phone text-muted me-2"></i>{{ $agent->phone_number }}</div>
                             </td>
                             <td class="text-end pe-4">
@@ -126,32 +126,56 @@
                     @empty
                         <tr>
                             <td colspan="5" class="text-center py-5">
-                                <img src="illustrations.popsy.co" style="width: 150px;" class="mb-3">
-                                <p class="text-muted fs-5">Aucun agent ne correspond à votre recherche.</p>
+                                <p class="text-muted fs-5">Aucun agent ne correspond à votre recherche pour "{{ request('search') }}".</p>
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
+
+        {{-- Pagination --}}
+
+        @if($agents instanceof \Illuminate\Pagination\LengthAwarePaginator && $agents->hasPages())
+            <div class="card-footer bg-white py-3 border-top">
+                {{-- ... votre code de pagination ... --}}
+            </div>
+        @endif
     </div>
+
 </div>
 
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('tableSearch');
-    const tableRows = document.querySelectorAll('#agentsTable tbody tr');
+    const tableRows = document.querySelectorAll('#agentsTable tbody tr:not(.no-result)');
 
-    searchInput.addEventListener('keyup', function() {
-        const query = searchInput.value.toLowerCase();
+    searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+
+        // Si le champ est vide, on réaffiche tout sur la page
+        if (query === "") {
+            tableRows.forEach(row => row.style.display = '');
+            return;
+        }
 
         tableRows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            row.style.display = text.includes(query) ? '' : 'none';
+            // Ciblage précis des colonnes Matricule (1) et Identité (2)
+            const matricule = row.querySelector('td:nth-child(1)')?.textContent.toLowerCase().trim() || '';
+            const identite = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase().trim() || '';
+
+            if (matricule.includes(query) || identite.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
         });
     });
 });
+
+
 </script>
+
 
 @endsection

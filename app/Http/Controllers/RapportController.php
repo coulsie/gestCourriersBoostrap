@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Auth;
+
 
 
 class RapportController extends Controller
@@ -95,23 +95,6 @@ class RapportController extends Controller
         return $pdf->download("Rapport_{$agent->last_name}_{$periode}.pdf");
     }
 
-
-    public function journalLogs()
-    {
-        // Utilisation du helper auth() - Plus simple
-        if (!auth::user()->hasAnyRole(['admin', 'Superviseur'])) {
-            abort(403, "Action non autorisée.");
-        }
-
-        $logs = \App\Models\AuditLog::with('user')
-            ->latest()
-            ->paginate(15);
-
-        return view('admin.logs', compact('logs'));
-    }
-
-
-    
 
 
 
