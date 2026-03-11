@@ -55,6 +55,7 @@ Route::delete('/admin/logs/{id}/ajax', [AuditLogController::class, 'destroy'])->
 // Route pour vider tout le journal
 Route::delete('/admin/logs-clear', [App\Http\Controllers\AuditLogController::class, 'clearAll'])->name('admin.logs.clear');
 
+Route::get('/admin/logs', [AuditLogController::class, 'journalLogs'])->name('admin.logs.index');
 
 /*
 |--------------------------------------------------------------------------

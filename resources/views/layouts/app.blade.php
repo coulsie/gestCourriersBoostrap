@@ -58,6 +58,7 @@
 
 
     <script src="{{ asset('template/vendor/jquery/jquery.min.js') }}"></script>
+
 </head>
 
 
@@ -89,188 +90,221 @@
             <hr class="sidebar-divider">
             <!-- SECTION ADMINISTRATION -->
            <!-- SECTION ADMINISTRATION : Réservée aux Admins -->
-            @hasanyrole('admin|Superviseur|utilisateur')
-                <hr class="sidebar-divider">
-                <div class="sidebar-heading text-warning fw-bold">Administration & Consultation</div>
+<!-- SECTION ADMINISTRATION : Réservée aux Admins (ORANGE ÉLECTRIQUE) -->
+@hasanyrole('admin|Superviseur|utilisateur')
+    <hr class="sidebar-divider" style="border-top: 2px solid #ff9f43; opacity: 0.2;">
+    <div class="sidebar-heading fw-bold" style="color: #ff9f43; letter-spacing: 1px;">
+        <i class="fas fa-tools me-1"></i> ADMINISTRATION & CONSULTATION
+    </div>
 
-                <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAdmin" aria-expanded="true">
-                        <i class="fas fa-fw fa-shield-alt text-warning"></i>
-                        <span class="text-warning fw-bold">CONTRÔLE & RH</span>
+    <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAdmin" aria-expanded="true">
+            <i class="fas fa-fw fa-shield-alt" style="color: #ff9f43;"></i>
+            <span style="color: #ff9f43; font-weight: 800;">CONTRÔLE & RH</span>
+        </a>
+        <div id="collapseAdmin" class="collapse" data-parent="#accordionSidebar">
+            <!-- Menu avec Bordure Ambre épaisse et Ombre Néon -->
+            <div class="bg-white py-2 collapse-inner rounded shadow-lg" style="border-left: 5px solid #ff9f43; border-right: 1px solid #fff3e0;">
+
+                {{-- BLOC RÉSERVÉ UNIQUEMENT AUX ADMINS / SUPERVISEURS --}}
+                @hasanyrole('admin|Superviseur')
+                    <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #ee5253;">
+                        <i class="fas fa-user-shield me-1"></i> GESTION SYSTÈME
+                    </h6>
+                    <a class="collapse-item fw-bold text-dark transition-hover" href="{{ route('users.index') }}">
+                        <i class="fas fa-users-cog me-2" style="color: #ff9f43;"></i> Liste Utilisateurs
                     </a>
-                    <div id="collapseAdmin" class="collapse" data-parent="#accordionSidebar">
-                        <!-- Contour complet (border) + Bordure gauche épaisse (border-left-4) -->
-                        <div class="bg-white py-2 collapse-inner rounded border border-warning border-left-4 shadow-lg">
+                    <a class="collapse-item fw-bold text-dark" href="{{ route('admin.logs.index') }}">
+                        <i class="fas fa-fingerprint me-2" style="color: #ff9f43;"></i> Journal Événements
+                    </a>
+                    <a class="collapse-item fw-bold text-dark" href="{{ route('roles.index') }}">
+                        <i class="fas fa-user-lock me-2" style="color: #ff9f43;"></i> Gestion des Rôles
+                    </a>
 
-                            {{-- BLOC RÉSERVÉ UNIQUEMENT AUX ADMINS / SUPERVISEURS --}}
-                            @hasanyrole('admin|Superviseur')
-                                <h6 class="collapse-header text-orange fw-bold border-bottom pb-1 mx-2">
-                                    <i class="fas fa-user-shield me-1"></i> GESTION SYSTÈME
-                                </h6>
-                                <a class="collapse-item fw-bold text-dark hover-warning" href="{{ route('users.index') }}">
-                                    <i class="fas fa-users-cog text-warning me-1"></i> Liste Utilisateurs
-                                </a>
-                                <a class="collapse-item fw-bold text-dark hover-warning" href="{{ route('admin.logs') }}">
-                                    <i class="fas fa-user-tag text-warning me-1"></i> Gestion des Evenements
-                                </a>
-                                <a class="collapse-item fw-bold text-dark hover-warning" href="{{ route('roles.index') }}">
-                                    <i class="fas fa-user-tag text-warning me-1"></i> Gestion des Rôles
-                                </a>
-                                <a class="collapse-item fw-bold text-danger bg-danger-light" href="{{ route('admin.coffre-fort') }}">
-                                    <i class="fas fa-vault me-1"></i> COFFRE FORT
-                                </a>
-                                <a class="collapse-item text-secondary" href="{{ route('agents.nouveau') }}">Nouveau Compte</a>
-                                <a class="collapse-item text-secondary" href="{{ route('agents.index') }}">Ressources Humaines</a>
-                                <a class="collapse-item text-secondary" href="{{ route('extraction.index') }}">Extraction de données</a>
-                            @endhasanyrole
+                    {{-- BOUTON COFFRE FORT (CRIMSON ÉCLATANT) --}}
+                    <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 my-2 d-flex align-items-center justify-content-center"
+                       href="{{ route('admin.coffre-fort') }}" style="background-color: #ee5253; height: 35px;">
+                        <i class="fas fa-vault me-2"></i> COFFRE FORT
+                    </a>
 
-                            {{-- BLOC ACCESSIBLE AUSSI À L'UTILISATEUR --}}
-                            <div class="dropdown-divider border-top-warning"></div>
-                            <h6 class="collapse-header text-primary fw-bold border-bottom pb-1 mx-2">
-                                <i class="fas fa-search me-1"></i> CONSULTATION
-                            </h6>
-                            <a class="collapse-item fw-bold text-primary" href="{{ route('agents.par.service') }}">
-                                <i class="fas fa-building me-1"></i> Agents par Service
-                            </a>
-
-                            @hasanyrole('admin|Superviseur')
-                                <a class="collapse-item text-secondary" href="{{ route('agents.par.service.recherche') }}">Recherche Agents</a>
-                                <div class="dropdown-divider"></div>
-                                <h6 class="collapse-header text-warning fw-bold border-bottom pb-1 mx-2">
-                                    <i class="fas fa-chart-line me-1"></i> ANALYSES
-                                </h6>
-                                <a class="collapse-item fw-bold text-warning" href="{{ route('statistiques.dashboard') }}">
-                                    <i class="fas fa-tachometer-alt me-1"></i> Dashboard Stats
-                                </a>
-                                <a class="collapse-item text-secondary" href="{{ route('typeabsences.index') }}">Paramétrage Absence</a>
-                            @endhasanyrole
-                        </div>
+                    <div class="px-3 py-1">
+                        <a class="collapse-item fw-bold small text-indigo p-0" href="{{ route('agents.nouveau') }}"><i class="fas fa-plus-circle me-1"></i> Nouveau Compte</a>
+                        <a class="collapse-item fw-bold small text-success p-0" href="{{ route('agents.index') }}"><i class="fas fa-user-tie me-1"></i> Ressources Humaines</a>
+                        <a class="collapse-item fw-bold small text-secondary p-0" href="{{ route('extraction.index') }}"><i class="fas fa-download me-1"></i> Extraction</a>
                     </div>
-                </li>
-            @endhasanyrole
+                @endhasanyrole
+
+                {{-- BLOC CONSULTATION : INDIGO --}}
+                <div class="dropdown-divider" style="border-top: 2px solid #ff9f43; opacity: 0.15;"></div>
+                <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #6c5ce7;">
+                    <i class="fas fa-search me-1"></i> CONSULTATION
+                </h6>
+                <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mb-1" href="{{ route('agents.par.service') }}" style="background-color: #6c5ce7;">
+                    <i class="fas fa-building me-2"></i> Agents par Service
+                </a>
+
+                @hasanyrole('admin|Superviseur')
+                    <a class="collapse-item fw-bold text-indigo" href="{{ route('agents.par.service.recherche') }}">
+                        <i class="fas fa-user-search me-2"></i> Recherche Agents
+                    </a>
+
+                    {{-- ANALYSES : AMBRE FONCÉ --}}
+                    <div class="dropdown-divider" style="border-top: 2px solid #ff9f43; opacity: 0.15;"></div>
+                    <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #e67e22;">
+                        <i class="fas fa-chart-line me-1"></i> ANALYSES
+                    </h6>
+                    <a class="collapse-item fw-bold" style="color: #e67e22;" href="{{ route('statistiques.dashboard') }}">
+                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard Stats
+                    </a>
+                    <a class="collapse-item fw-bold text-muted" href="{{ route('typeabsences.index') }}">
+                        <i class="fas fa-cog me-2"></i> Paramétrage Absence
+                    </a>
+                @endhasanyrole
+            </div>
+        </div>
+    </li>
+@endhasanyrole
+
 
             <hr class="sidebar-divider">
 
-                    <!-- SECTION COURRIERS : OPÉRATIONS (BLEU INFO ÉCLATANT) -->
-            <div class="sidebar-heading text-info fw-bold">OPÉRATIONS</div>
+                 <!-- SECTION COURRIERS : OPÉRATIONS (CYAN ÉCLATANT) -->
+<div class="sidebar-heading text-cyan fw-bolder" style="color: #00e5ff !important; letter-spacing: 1px;">
+    <i class="fas fa-rocket me-1"></i> OPÉRATIONS
+</div>
 
-            <li class="nav-item {{ request()->routeIs('courriers.*', 'imputations.*') ? 'active' : '' }}">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCourriers" aria-expanded="true">
-                    <i class="fas fa-fw fa-envelope-open-text text-info"></i>
-                    <span class="text-info fw-bold">GESTION COURRIERS</span>
+<li class="nav-item {{ request()->routeIs('courriers.*', 'imputations.*') ? 'active' : '' }}">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCourriers" aria-expanded="true">
+        <i class="fas fa-fw fa-envelope-open-text" style="color: #00e5ff;"></i>
+        <span style="color: #00e5ff; font-weight: 800;">GESTION COURRIERS</span>
+    </a>
+    <div id="collapseCourriers" class="collapse {{ request()->routeIs('courriers.*', 'imputations.*') ? 'show' : '' }}" data-parent="#accordionSidebar">
+        <!-- Menu avec Bordure dégradée (via CSS inline) et ombre néon -->
+        <div class="bg-white py-2 collapse-inner rounded shadow-lg" style="border-left: 5px solid #00e5ff; border-right: 1px solid #00e5ff;">
+
+            {{-- ACTIONS DE GESTION : VIOLET / ROSE ÉCLATANT --}}
+            @hasanyrole('admin|editeur|rh|Superviseur')
+                <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #d63384;">
+                    <i class="fas fa-tools me-1"></i> TRAITEMENT
+                </h6>
+                <a class="collapse-item fw-bold text-dark mb-1 transition-hover" href="{{ route('courriers.index') }}">
+                    <i class="fas fa-list-ul me-2" style="color: #6610f2;"></i> Enregistrement
                 </a>
-                <div id="collapseCourriers" class="collapse {{ request()->routeIs('courriers.*', 'imputations.*') ? 'show' : '' }}" data-parent="#accordionSidebar">
-                    <!-- Contour complet INFO + Bordure gauche épaisse (4px) + Ombre intense -->
-                    <div class="bg-white py-2 collapse-inner rounded border border-info border-left-4 shadow-lg">
-
-                        {{-- ACTIONS DE GESTION --}}
-                        @hasanyrole('admin|editeur|rh|Superviseur')
-                            <h6 class="collapse-header text-info fw-bold border-bottom pb-1 mx-2 mb-2">
-                                <i class="fas fa-edit me-1"></i> TRAITEMENT
-                            </h6>
-                            <a class="collapse-item fw-bold text-dark" href="{{ route('courriers.index') }}">
-                                <i class="fas fa-list-ul text-info me-1"></i> Enregistrement
-                            </a>
-                            <a class="collapse-item fw-bold text-success bg-success-light" href="{{ route('courriers.create') }}">
-                                <i class="fas fa-plus-circle me-1"></i> Créer un courrier
-                            </a>
-                            <a class="collapse-item text-secondary" href="{{ route('courriers.archives') }}">
-                                <i class="fas fa-archive me-1"></i> Archives
-                            </a>
-                            <a class="collapse-item text-secondary" href="{{ route('imputations.index') }}">
-                                <i class="fas fa-share-square me-1"></i> Toutes les Imputations
-                            </a>
-                        @endhasanyrole
-
-                        {{-- ACTIONS UTILISATEUR & CONSULTATION --}}
-                        <div class="dropdown-divider border-top-info"></div>
-                        <h6 class="collapse-header text-primary fw-bold border-bottom pb-1 mx-2 mb-2">
-                            <i class="fas fa-user-circle me-1"></i> MON ESPACE
-                        </h6>
-                        <a class="collapse-item fw-bold text-primary" href="{{ route('imputations.mes_imputations') }}">
-                            <i class="fas fa-thumbtack text-primary me-1"></i> Mes imputations
-                        </a>
-                        <a class="collapse-item text-secondary" href="{{ route('courriers.RechercheAffichage') }}">
-                            <i class="fas fa-search me-1"></i> Recherche avancée
-                        </a>
-
-                        {{-- STATISTIQUES --}}
-                        @hasanyrole('admin|Superviseur|rh')
-                            <div class="dropdown-divider border-top-info"></div>
-                            <h6 class="collapse-header text-info fw-bold border-bottom pb-1 mx-2 mb-2">
-                                <i class="fas fa-chart-pie me-1"></i> ANALYSES
-                            </h6>
-                            <a class="collapse-item fw-bold text-info" href="{{ route('statistiques.index') }}">
-                                <i class="fas fa-chart-bar me-1"></i> Statistiques
-                            </a>
-                            <a class="collapse-item fw-bold text-info" href="{{ route('statistiques.dashboard') }}">
-                                <i class="fas fa-laptop-code me-1"></i> Dashboard Imputations
-                            </a>
-                        @endhasanyrole
-                    </div>
-                </div>
-            </li>
-
-            <!-- NOUVELLE SECTION : GESTION DES PRÉSENCES (VERT SUCCESS ÉCLATANT) -->
-            <li class="nav-item {{ request()->routeIs('presences.*', 'absences.*', 'typeabsences.*') ? 'active' : '' }}">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePresences" aria-expanded="true">
-                    <i class="fas fa-fw fa-user-check text-success"></i>
-                    <span class="text-success fw-bold">GESTION PRÉSENCES</span>
+                <a class="collapse-item fw-bold text-white bg-success rounded mx-2 mb-1 shadow-sm" href="{{ route('courriers.create') }}">
+                    <i class="fas fa-plus-circle me-1"></i> Créer un courrier
                 </a>
-                <div id="collapsePresences" class="collapse {{ request()->routeIs('presences.*', 'absences.*', 'typeabsences.*') ? 'show' : '' }}" data-parent="#accordionSidebar">
-                    <!-- Contour complet SUCCESS + Bordure gauche épaisse (4px) + Ombre portée -->
-                    <div class="bg-white py-2 collapse-inner rounded border border-success border-left-4 shadow-lg">
+                <a class="collapse-item fw-bold" style="color: #fd7e14;" href="{{ route('courriers.archives') }}">
+                    <i class="fas fa-archive me-2"></i> Archives
+                </a>
+                <a class="collapse-item fw-bold text-info" href="{{ route('imputations.index') }}">
+                    <i class="fas fa-share-square me-2"></i> Toutes Imputations
+                </a>
+            @endhasanyrole
 
-                        {{-- ACCÈS PERSONNEL --}}
-                        <h6 class="collapse-header text-success fw-bold border-bottom pb-1 mx-2 mb-2">
-                            <i class="fas fa-user me-1"></i> MON ESPACE
-                        </h6>
-                        <a class="collapse-item fw-bold text-primary bg-light" href="{{ route('presences.monPointage') }}">
-                            <i class="fas fa-fingerprint text-success me-1"></i> Marquer Présence
-                        </a>
-                        <a class="collapse-item text-dark fw-bold" href="{{ route('presences.monHistorique') }}">
-                            <i class="fas fa-history text-success me-1"></i> Mon Historique
-                        </a>
-                        <a class="collapse-item text-dark fw-bold" href="{{ route('absences.monautorisation') }}">
-                            <i class="fas fa-calendar-check text-success me-1"></i> Congés & Permissions
-                        </a>
+            {{-- ACTIONS UTILISATEUR : INDIGO ÉCLATANT --}}
+            <div class="dropdown-divider" style="border-top: 2px solid #00e5ff; opacity: 0.2;"></div>
+            <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #6f42c1;">
+                <i class="fas fa-fingerprint me-1"></i> MON ESPACE
+            </h6>
+            <a class="collapse-item fw-bold text-indigo" href="{{ route('imputations.mes_imputations') }}" style="background-color: #f8f0ff;">
+                <i class="fas fa-thumbtack me-2"></i> Mes imputations
+            </a>
+            <a class="collapse-item fw-bold text-primary" href="{{ route('courriers.RechercheAffichage') }}">
+                <i class="fas fa-search-plus me-2"></i> Recherche avancée
+            </a>
 
-                        {{-- ACCÈS CONTRÔLE ET RH --}}
-                        @hasanyrole('admin|rh|Superviseur')
-                            <div class="dropdown-divider border-top-success"></div>
-                            <h6 class="collapse-header text-success fw-bold border-bottom pb-1 mx-2 mb-2">
-                                <i class="fas fa-user-shield me-1"></i> CONTRÔLE & RH
-                            </h6>
-                            <a class="collapse-item text-secondary fw-bold" href="{{ route('absences.createListe') }}">Autorisation d'Absence Groupée</a>
-                            <a class="collapse-item text-secondary fw-bold" href="{{ route('holidays.index') }}">Jours fériés</a>
-                            <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.index') }}">Enregistrement pointage</a>
-                            <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.listeFiltree') }}">Liste de présence</a>
-                            <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.validation-hebdo') }}">Validation hebdo.</a>
+            {{-- STATISTIQUES : ORANGE / AMBRE --}}
+            @hasanyrole('admin|Superviseur|rh')
+                <div class="dropdown-divider" style="border-top: 2px solid #00e5ff; opacity: 0.2;"></div>
+                <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #fd7e14;">
+                    <i class="fas fa-chart-line me-1"></i> ANALYSES
+                </h6>
+                <a class="collapse-item fw-bold" style="color: #20c997;" href="{{ route('statistiques.index') }}">
+                    <i class="fas fa-chart-bar me-2"></i> Statistiques
+                </a>
+                <a class="collapse-item fw-bold" style="color: #0dcaf0;" href="{{ route('statistiques.dashboard') }}">
+                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard Global
+                </a>
+            @endhasanyrole
+        </div>
+    </div>
+</li>
 
-                            <a class="collapse-item fw-bold text-dark" href="{{ route('presences.etat') }}">
-                                <i class="fas fa-clipboard-list text-success me-1"></i> État des Présences
-                            </a>
-                            <a class="collapse-item text-secondary fw-bold" href="{{ route('typeabsences.index') }}">Type Autorisations d'Absence</a>
-                            <a class="collapse-item text-secondary fw-bold" href="{{ route('absences.index') }}">Liste Autorisations d'Absence</a>
-                            <a class="collapse-item fw-bold text-warning" href="{{ route('absences.validation_liste') }}">
-                                <i class="fas fa-tasks me-1"></i> Validation Autorisation d'Absence
-                            </a>
 
-                            <div class="dropdown-divider border-top-success"></div>
-                            <h6 class="collapse-header text-success fw-bold border-bottom pb-1 mx-2 mb-2">
-                                <i class="fas fa-file-alt me-1"></i> RAPPORTS
-                            </h6>
-                            <a class="collapse-item fw-bold text-dark" href="{{ route('rapports.presences.periodique') }}">
-                                <i class="fas fa-file-medical-alt text-success me-1"></i> Rapport Périodique
-                            </a>
-                            <a class="collapse-item fw-bold text-dark" href="{{ route('rapports.mensuel') }}">
-                                <i class="fas fa-file-invoice text-success me-1"></i> Rapport Mensuel
-                            </a>
-                        @endhasanyrole
-                    </div>
-                </div>
-            </li>
+          <!-- NOUVELLE SECTION : GESTION DES PRÉSENCES (VERT EMERAUDE ÉCLATANT) -->
+<li class="nav-item {{ request()->routeIs('presences.*', 'absences.*', 'typeabsences.*') ? 'active' : '' }}">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePresences" aria-expanded="true">
+        <i class="fas fa-fw fa-user-check" style="color: #2ed573;"></i>
+        <span style="color: #2ed573; font-weight: 800;">GESTION PRÉSENCES</span>
+    </a>
+    <div id="collapsePresences" class="collapse {{ request()->routeIs('presences.*', 'absences.*', 'typeabsences.*') ? 'show' : '' }}" data-parent="#accordionSidebar">
+        <!-- Menu avec Bordure Épaisse Emeraude et Ombre Douce -->
+        <div class="bg-white py-2 collapse-inner rounded shadow-lg" style="border-left: 5px solid #2ed573; border-right: 1px solid #e1f5fe;">
 
+            {{-- ACCÈS PERSONNEL : VERT MENTHE --}}
+            <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #1abc9c;">
+                <i class="fas fa-user-tag me-1"></i> MON ESPACE
+            </h6>
+            <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mb-1" href="{{ route('presences.monPointage') }}" style="background: linear-gradient(45deg, #2ed573, #7bed9f);">
+                <i class="fas fa-fingerprint me-2"></i> Marquer Présence
+            </a>
+            <a class="collapse-item text-dark fw-bold transition-hover" href="{{ route('presences.monHistorique') }}">
+                <i class="fas fa-history me-2" style="color: #2ed573;"></i> Mon Historique
+            </a>
+            <a class="collapse-item text-dark fw-bold" href="{{ route('absences.monautorisation') }}">
+                <i class="fas fa-calendar-check me-2" style="color: #ffa502;"></i> Congés & Permissions
+            </a>
+
+            {{-- ACCÈS CONTRÔLE ET RH : AMBRE & VERT SOMBRE --}}
+            @hasanyrole('admin|rh|Superviseur')
+                <div class="dropdown-divider" style="border-top: 2px solid #2ed573; opacity: 0.15;"></div>
+                <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #2f3542;">
+                    <i class="fas fa-user-shield me-1"></i> CONTRÔLE & RH
+                </h6>
+                <a class="collapse-item text-secondary fw-bold" href="{{ route('absences.createListe') }}">
+                    <i class="fas fa-users-cog me-2"></i>Absence Groupée
+                </a>
+                <a class="collapse-item text-secondary fw-bold" href="{{ route('holidays.index') }}">
+                    <i class="fas fa-umbrella-beach me-2"></i>Jours fériés
+                </a>
+                <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.index') }}">
+                    <i class="fas fa-stopwatch me-2"></i>Enregistrement pointage
+                </a>
+                <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.listeFiltree') }}">
+                    <i class="fas fa-stream me-2"></i>Liste de présence
+                </a>
+                <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.validation-hebdo') }}">
+                    <i class="fas fa-check-double me-2"></i>Validation hebdo.
+                </a>
+
+                <a class="collapse-item fw-bold text-dark bg-light-success rounded mx-2 my-1" href="{{ route('presences.etat') }}">
+                    <i class="fas fa-clipboard-list me-2" style="color: #2ed573;"></i> État des Présences
+                </a>
+
+                <div class="dropdown-divider" style="border-top: 1px dashed #2ed573; opacity: 0.2;"></div>
+
+                <a class="collapse-item text-muted fw-bold small" href="{{ route('typeabsences.index') }}">Types d'Autorisations</a>
+                <a class="collapse-item text-muted fw-bold small" href="{{ route('absences.index') }}">Liste des Demandes</a>
+
+                <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mt-1" href="{{ route('absences.validation_liste') }}" style="background-color: #ffa502;">
+                    <i class="fas fa-tasks me-2"></i> Validation Absences
+                </a>
+
+                {{-- RAPPORTS : BLEU NUIT --}}
+                <div class="dropdown-divider" style="border-top: 2px solid #2ed573; opacity: 0.15;"></div>
+                <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #1e3799;">
+                    <i class="fas fa-file-signature me-1"></i> RAPPORTS
+                </h6>
+                <a class="collapse-item fw-bold text-dark" href="{{ route('rapports.presences.periodique') }}">
+                    <i class="fas fa-file-medical-alt me-2" style="color: #1e3799;"></i> Rapport Périodique
+                </a>
+                <a class="collapse-item fw-bold text-dark" href="{{ route('rapports.mensuel') }}">
+                    <i class="fas fa-file-invoice me-2" style="color: #1e3799;"></i> Rapport Mensuel
+                </a>
+            @endhasanyrole
+        </div>
+    </div>
+</li>
 
 
 
