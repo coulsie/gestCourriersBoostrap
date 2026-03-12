@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : mer. 11 mars 2026 à 07:33
+-- Généré le : jeu. 12 mars 2026 à 08:41
 -- Version du serveur : 11.4.9-MariaDB
 -- Version de PHP : 8.3.28
 
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `absences` (
   PRIMARY KEY (`id`),
   KEY `absences_agent_id_foreign` (`agent_id`),
   KEY `absences_type_absence_id_foreign` (`type_absence_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `absences`
@@ -64,10 +64,11 @@ INSERT INTO `absences` (`id`, `agent_id`, `type_absence_id`, `date_debut`, `date
 (24, 5, 7, '2026-03-20', '2026-04-02', 1, '1773044970_Compte débiteur 02-03-2026 13.56.pdf', '2026-03-09 08:29:30', '2026-03-09 08:29:49'),
 (25, 20, 7, '2026-03-20', '2026-04-02', 1, '1773044970_Compte débiteur 02-03-2026 13.56.pdf', '2026-03-09 08:29:30', '2026-03-09 08:29:50'),
 (26, 1, 7, '2026-03-20', '2026-04-02', 2, '1773044970_Compte débiteur 02-03-2026 13.56.pdf', '2026-03-09 08:29:30', '2026-03-09 09:39:44'),
-(27, 23, 7, '2026-03-20', '2026-03-22', 0, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-09 16:47:10'),
-(28, 25, 7, '2026-03-20', '2026-03-22', 0, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-09 16:47:10'),
-(29, 9, 7, '2026-03-20', '2026-03-22', 0, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-09 16:47:10'),
-(30, 18, 7, '2026-03-20', '2026-03-22', 0, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-09 16:47:10');
+(27, 23, 7, '2026-03-20', '2026-03-22', 2, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-11 10:15:31'),
+(28, 25, 7, '2026-03-20', '2026-03-22', 2, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-11 10:15:33'),
+(29, 9, 7, '2026-03-20', '2026-03-22', 1, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-11 10:15:35'),
+(30, 18, 7, '2026-03-20', '2026-03-22', 1, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-11 10:15:34'),
+(31, 20, 7, '2026-03-10', '2026-03-15', 1, '1773223805_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-11 10:10:05', '2026-03-11 10:10:33');
 
 -- --------------------------------------------------------
 
@@ -233,23 +234,38 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   `old_values` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`old_values`)),
   `new_values` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`new_values`)),
   `url` varchar(255) DEFAULT NULL,
+  `method` varchar(10) DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
   `user_agent` varchar(255) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `audit_logs_user_id_foreign` (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `audit_logs`
 --
 
-INSERT INTO `audit_logs` (`id`, `user_id`, `event`, `auditable_type`, `auditable_id`, `old_values`, `new_values`, `url`, `ip_address`, `user_agent`, `created_at`, `updated_at`) VALUES
-(1, 3, 'Connexion réussie', 'Système', 3, NULL, '{\"email\":\"yacouba.coulibaly@dgi.gouv.ci\"}', 'http://127.0.0.1:8000/login', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 08:12:12', '2026-03-10 08:12:12'),
-(2, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 12:34:54', '2026-03-10 12:34:54'),
-(3, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 14:55:58', '2026-03-10 14:55:58'),
-(4, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-11 07:22:59', '2026-03-11 07:22:59');
+INSERT INTO `audit_logs` (`id`, `user_id`, `event`, `auditable_type`, `auditable_id`, `old_values`, `new_values`, `url`, `method`, `ip_address`, `user_agent`, `created_at`, `updated_at`) VALUES
+(21, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 07:00:23', '2026-03-12 07:00:23'),
+(19, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 06:51:04', '2026-03-12 06:51:04'),
+(20, 6, 'Connexion réussie', 'Système', 6, NULL, '\"{\\\"email\\\":\\\"andoume@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 06:58:26', '2026-03-12 06:58:26'),
+(17, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-11 13:44:28', '2026-03-11 13:44:28'),
+(15, 9, 'Connexion réussie', 'Système', 9, NULL, '\"{\\\"email\\\":\\\"iadico@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-11 12:28:17', '2026-03-11 12:28:17'),
+(16, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-11 12:32:43', '2026-03-11 12:32:43'),
+(18, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-11 14:51:49', '2026-03-11 14:51:49'),
+(22, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"sig_3_1773241249.png\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1773302370.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 07:59:30', '2026-03-12 07:59:30'),
+(23, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1773302370.png\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1773302727.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 08:05:27', '2026-03-12 08:05:27'),
+(24, 3, 'Upload signature scannée', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1773302727.png\\\"}\"', '\"{\\\"path\\\":\\\"scan_3_1773302869.JPG\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 08:07:49', '2026-03-12 08:07:49'),
+(25, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"scan_3_1773302869.JPG\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1773303055.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 08:10:55', '2026-03-12 08:10:55'),
+(26, 3, 'Upload signature scannée', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1773303055.png\\\"}\"', '\"{\\\"path\\\":\\\"scan_3_1773303520.JPG\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 08:18:40', '2026-03-12 08:18:40'),
+(27, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"scan_3_1773303520.JPG\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1773303537.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 08:18:57', '2026-03-12 08:18:57'),
+(28, 3, 'Upload signature scannée', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1773303537.png\\\"}\"', '\"{\\\"path\\\":\\\"scan_3_1773304257.JPG\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 08:30:57', '2026-03-12 08:30:57'),
+(29, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"scan_3_1773304257.JPG\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1773304269.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 08:31:09', '2026-03-12 08:31:09'),
+(30, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1773304269.png\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1773304827.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 08:40:27', '2026-03-12 08:40:27'),
+(31, 3, 'Upload signature scannée', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1773304827.png\\\"}\"', '\"{\\\"path\\\":\\\"scan_3_1773304837.jpg\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 08:40:37', '2026-03-12 08:40:37'),
+(32, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"scan_3_1773304837.jpg\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1773304855.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 08:40:55', '2026-03-12 08:40:55');
 
 -- --------------------------------------------------------
 
@@ -264,6 +280,13 @@ CREATE TABLE IF NOT EXISTS `cache` (
   `expiration` int(11) NOT NULL,
   PRIMARY KEY (`key`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `cache`
+--
+
+INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
+('laravel-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:8:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"creer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:5;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:18:\"supprimer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:17:\"voir-utilisateurs\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:2;i:2;i:4;i:3;i:5;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"manage-users\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:17:\"modifier articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:5;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:18:\"supprimer articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:11:\"gerer-roles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:17:\"acceder-dashboard\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:3;i:2;i:4;i:3;i:5;}}}s:5:\"roles\";a:5:{i:0;a:3:{s:1:\"a\";i:1;s:1:\"b\";s:5:\"admin\";s:1:\"c\";s:3:\"web\";}i:1;a:3:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"utilisateur\";s:1:\"c\";s:3:\"web\";}i:2;a:3:{s:1:\"a\";i:5;s:1:\"b\";s:11:\"Superviseur\";s:1:\"c\";s:3:\"web\";}i:3;a:3:{s:1:\"a\";i:4;s:1:\"b\";s:2:\"rh\";s:1:\"c\";s:3:\"web\";}i:4;a:3:{s:1:\"a\";i:3;s:1:\"b\";s:7:\"editeur\";s:1:\"c\";s:3:\"web\";}}}', 1773307538);
 
 -- --------------------------------------------------------
 
@@ -444,7 +467,7 @@ CREATE TABLE IF NOT EXISTS `holidays` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `holidays_holiday_date_unique` (`holiday_date`)
-) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `holidays`
@@ -462,7 +485,8 @@ INSERT INTO `holidays` (`id`, `name`, `holiday_date`, `description`, `is_recurri
 (9, 'Journée de la paix', '2026-11-15', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
 (10, 'Noël', '2026-12-25', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
 (11, 'Tabaski', '2026-05-30', NULL, 0, '2026-03-07 09:45:12', '2026-03-07 09:45:12'),
-(12, 'Ramadan', '2026-03-20', NULL, 0, '2026-03-07 09:45:41', '2026-03-07 09:45:41');
+(12, 'Ramadan', '2026-03-20', NULL, 0, '2026-03-07 09:45:41', '2026-03-07 09:45:41'),
+(13, 'Nuit du Destin', '2026-03-17', NULL, 0, '2026-03-11 10:11:40', '2026-03-11 10:11:40');
 
 -- --------------------------------------------------------
 
@@ -603,7 +627,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(191) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=59 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `migrations`
@@ -665,7 +689,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (53, '2026_02_16_091115_remove_fields_from_scripts_table', 13),
 (54, '2026_02_16_101450_add_code_to_scripts_table', 14),
 (55, '2026_03_07_083937_create_holidays_table', 15),
-(56, '2026_03_10_071800_create_audit_logs_table', 16);
+(56, '2026_03_10_071800_create_audit_logs_table', 16),
+(57, '2026_03_11_140457_add_signature_to_users_table', 17),
+(58, '2026_03_12_072529_add_navigation_details_to_audit_logs_table', 18);
 
 -- --------------------------------------------------------
 
@@ -809,7 +835,7 @@ CREATE TABLE IF NOT EXISTS `presences` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `presences_agent_id_foreign` (`agent_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=724 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=727 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `presences`
@@ -1539,7 +1565,10 @@ INSERT INTO `presences` (`id`, `agent_id`, `heure_arrivee`, `heure_depart`, `sta
 (720, 15, '2026-03-03 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-09 10:54:09', '2026-03-09 10:54:09'),
 (721, 15, '2026-03-04 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-09 10:54:09', '2026-03-09 10:54:09'),
 (722, 15, '2026-03-05 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-09 10:54:09', '2026-03-09 10:54:09'),
-(723, 15, '2026-03-06 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-09 10:54:09', '2026-03-09 10:54:09');
+(723, 15, '2026-03-06 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-09 10:54:09', '2026-03-09 10:54:09'),
+(724, 2, '2026-03-11 09:26:54', NULL, 'En Retard', 'Pointage automatique (Self-service)', '2026-03-11 09:26:54', '2026-03-11 09:26:54'),
+(725, 1, '2026-03-11 09:33:51', NULL, 'En Retard', 'Pointage automatique (Self-service)', '2026-03-11 09:33:51', '2026-03-11 09:33:51'),
+(726, 1, '2026-03-12 06:54:58', NULL, 'Présent', 'Pointage automatique (Self-service)', '2026-03-12 06:54:58', '2026-03-12 06:54:58');
 
 -- --------------------------------------------------------
 
@@ -1663,7 +1692,7 @@ CREATE TABLE IF NOT EXISTS `role_user` (
   PRIMARY KEY (`id`),
   KEY `role_user_user_id_foreign` (`user_id`),
   KEY `role_user_role_id_foreign` (`role_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `role_user`
@@ -1692,7 +1721,9 @@ INSERT INTO `role_user` (`id`, `user_id`, `role_id`) VALUES
 (20, 18, 2),
 (24, 23, 2),
 (25, 24, 2),
-(26, 25, 3);
+(26, 25, 3),
+(27, 4, 3),
+(28, 4, 4);
 
 -- --------------------------------------------------------
 
@@ -1710,14 +1741,15 @@ CREATE TABLE IF NOT EXISTS `scripts_extraction` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `code` longtext DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `scripts_extraction`
 --
 
 INSERT INTO `scripts_extraction` (`id`, `nom`, `description`, `parametres`, `created_at`, `updated_at`, `code`) VALUES
-(3, 'Liste des agents', NULL, '\"{\\\"connection_type\\\":\\\"mariadb\\\",\\\"ora_host\\\":null,\\\"ora_db\\\":null,\\\"ora_user\\\":null,\\\"ora_pass\\\":null,\\\"ora_as\\\":\\\"NORMAL\\\"}\"', '2026-02-16 10:33:18', '2026-02-16 10:33:18', 'select * from agents');
+(3, 'Liste des agents', NULL, '\"{\\\"connection_type\\\":\\\"mariadb\\\",\\\"ora_host\\\":null,\\\"ora_db\\\":null,\\\"ora_user\\\":null,\\\"ora_pass\\\":null,\\\"ora_as\\\":\\\"NORMAL\\\"}\"', '2026-02-16 10:33:18', '2026-02-16 10:33:18', 'select * from agents'),
+(5, 'iste des imputations', NULL, '\"{\\\"connection_type\\\":\\\"mariadb\\\",\\\"ora_host\\\":null,\\\"ora_db\\\":null,\\\"ora_user\\\":null,\\\"ora_pass\\\":null,\\\"ora_as\\\":\\\"NORMAL\\\"}\"', '2026-03-11 10:22:24', '2026-03-11 10:22:24', 'select * from imputations');
 
 -- --------------------------------------------------------
 
@@ -1851,6 +1883,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `updated_at` timestamp NULL DEFAULT NULL,
   `bio` text DEFAULT NULL,
   `profile_picture` varchar(191) DEFAULT NULL,
+  `signature_path` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
 ) ENGINE=MyISAM AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1859,30 +1892,30 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- Déchargement des données de la table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `must_change_password`, `password_changed_at`, `remember_token`, `created_at`, `updated_at`, `bio`, `profile_picture`) VALUES
-(1, 'Admin Test', 'admin@example.com', NULL, '$2y$12$wAf0LxbRALNrwYQY33KXUeAoOYNIKiI243FdTKLXuaD2/XAiL9LrW', 0, NULL, NULL, '2026-01-20 09:37:00', '2026-01-20 10:44:26', NULL, NULL),
-(2, 'Utilisateur Test', 'test@example.com', NULL, '$2y$12$7sPkZYqEOdlX17Wh1A6Iw.Y4Nz6LdMMkPR96o3dqBEfzZePhkdWhK', 0, NULL, NULL, '2026-01-20 09:37:00', '2026-01-20 10:44:26', NULL, NULL),
-(3, 'Sié Yacouba COULIBALY', 'yacouba.coulibaly@dgi.gouv.ci', NULL, '$2y$12$5JvBOSgSBwZIJ4lRY9CPAOUqi1/iSALW2nTfDGTaFUQmbDWYTlz2u', 0, '2026-02-25 12:41:54', NULL, '2026-01-20 13:25:02', '2026-02-25 12:41:54', NULL, 'photos_agents/Km5CbkPx8Rry9FPxsIf9Tu3gi9JOqhDVlXxOtuBP.jpg'),
-(4, 'Nafata KONE', 'nafie410@dgi.gouv.ci', NULL, '$2y$12$hTpL1VWQPCrAArzS5PZnCO7HY93GBkh1IWS77d15.Us6y1h4PCD8O', 0, NULL, NULL, '2026-01-20 13:46:32', '2026-02-25 13:50:01', NULL, NULL),
-(5, 'Rosine Générosa Epse Dje OUSSOU', 'roussou@dgi.gouv.ci', NULL, '$2y$12$6levTuTb0vIp1M1nBq/oROhQkRMA0T.OpNdr8GOByOjJy.X9YpvMW', 1, NULL, NULL, '2026-01-20 13:48:59', '2026-01-22 12:31:18', NULL, NULL),
-(6, 'Arlette N\'DOUME', 'andoume@dgi.gouv.ci', NULL, '$2y$12$UptzFnNTF5sgio1UqRK6Ne8.yG7QxbhjxLqmpy9hIoJRKQahDNwmS', 0, NULL, NULL, '2026-01-21 10:43:13', '2026-01-28 11:49:34', NULL, NULL),
-(9, 'Innocent ADICO', 'iadico@dgi.gouv.ci', NULL, '$2y$12$dCDgWWMz.kvecxIjncNv0eGBT2eXI55l21HCwN.X4Ih3KxbXyfBTG', 0, NULL, NULL, '2026-01-21 11:50:04', '2026-01-22 15:15:21', NULL, NULL),
-(10, 'Moctar Michel Djépa KEITA', 'michelkeita@dgi.gouv.ci', NULL, '$2y$12$GVJZkuOfiwTdDE.A6946U.6coCnMxYZPHLh.MyfdwfSb3I7eYIBsq', 1, NULL, NULL, '2026-01-21 11:56:29', '2026-01-28 14:20:16', NULL, NULL),
-(11, 'Assi Roger OKPEKON', 'asokpekon@dgi.gouv.ci', NULL, '$2y$12$p4VhIUU7bg6ju1tusqWJneMBfeAbl/nTIKgM.hr832AVQhg7wwVw6', 0, NULL, NULL, '2026-01-21 11:59:18', '2026-01-29 11:08:51', NULL, NULL),
-(12, 'Née Brou Amenan M. KOUADIO', 'kbrou04@dgi.gouv.ci', NULL, '$2y$12$NRt7n8PnxT41./IvAD.GFetDLPqFXcBveV4WdaA10D4DnMtLI/DDm', 1, NULL, NULL, '2026-01-21 12:02:21', '2026-01-21 12:02:21', NULL, NULL),
-(13, 'Maïmouna BALLO', 'mballo@dgi.gouv.ci', NULL, '$2y$12$5pVS9RokI.yFE9sskgIEAe/F8Q3gKgMSitn.geE4Dw00M3epkVr6q', 1, NULL, NULL, '2026-01-21 12:37:32', '2026-01-21 12:37:32', NULL, NULL),
-(14, 'Akpa Leonard DJEDJEMEL', 'adjedjemel@dgi.gouv.ci', NULL, '$2y$12$FqeyBSfjG8plbvr45sVr/ubyh35lheTKUoTnOyd6L8OYLr4oBix42', 1, NULL, NULL, '2026-01-21 12:47:16', '2026-01-21 12:47:16', NULL, NULL),
-(15, 'Mamadou TRAORE', 'mtraore@dgi.gouv.ci', NULL, '$2y$12$pVJ6NdgPnmRntLHilLZLWO0xUKd.pLRjWt7Wyot1SBnpId5lk.9aK', 1, NULL, NULL, '2026-01-21 12:51:08', '2026-01-21 12:51:08', NULL, NULL),
-(16, 'Tiekoura HORO', 'thoro@dgi.gouv.ci', NULL, '$2y$12$rQi.ZoaRTZbTK5FEXZYGveMzs3NSe3hSVZTHZtUeV/yug.TSZ8QDW', 1, NULL, NULL, '2026-01-22 08:10:12', '2026-01-22 08:10:12', NULL, NULL),
-(17, 'Brou Tchoumou Serge N\'GUESSAN', 'bnguessan04@dgi.gouv.ci', NULL, '$2y$12$9D9YWt7NlAZQf0btLeAXhOdcKWoeYhVhLkb8MPYWYjgVrWkBTQYP6', 0, NULL, NULL, '2026-01-22 08:27:00', '2026-01-28 11:42:15', NULL, NULL),
-(18, 'Mathurin BEZI', 'mbezi@dgi.gouv.ci', NULL, '$2y$12$BcDeMiB4WI51vVEVNPX/V.Vzjn6pMP2VoM/C96VfJynLvk91c19zO', 1, NULL, NULL, '2026-01-22 08:41:51', '2026-01-22 08:41:51', NULL, NULL),
-(19, 'Bi Suy Robert TOUBOUI', 'rtouboui@dgi.gouv.ci', NULL, '$2y$12$dVhNjgRnLUf95A8qOX1w9uF7c8DtE6VXGVBaEIaxXAf1ovSoQTVQu', 1, NULL, NULL, '2026-01-23 10:25:21', '2026-01-23 10:25:21', NULL, NULL),
-(20, 'Mamadou Lamine COULIBALY', 'mamadoulcoul@dgi.gouv.ci', NULL, '$2y$12$Lfz7QtoJfaRONcHbgo2Qg.3k3fJ2rlVTyFVr7bVCCBG.roawC3qDG', 1, NULL, NULL, '2026-01-23 10:29:57', '2026-01-23 10:29:57', NULL, NULL),
-(21, 'Née Keita Aramata Anne Elise KEDI', 'akeita@dgi.gouv.ci', NULL, '$2y$12$6vph6Z9CtWbD2RBrrtViFOccxOP4LxXoXpcxp4XkqOWH303Oisp4m', 1, NULL, NULL, '2026-01-27 07:57:48', '2026-01-27 07:57:48', NULL, NULL),
-(22, 'Konan Christian René KOFFI', 'christiankonankoffi@dgi.gouv.ci', NULL, '$2y$12$iklZZEklhAlFRdc1RcWRkelt6/2BOWWYuzezk4kFgTlmEnAEqUNcO', 1, NULL, NULL, '2026-01-27 08:14:10', '2026-01-27 08:14:10', NULL, NULL),
-(23, 'M\'bo Erasthène ALEXANDRE', 'erasthene16ja17@dgi.gouv.ci', NULL, '$2y$12$pyiztyHvVrjRiKOwbPCUhekN8qw1kx4sIHaS0pCk4svXJ341adPAe', 1, NULL, NULL, '2026-01-27 14:44:26', '2026-01-27 14:44:26', NULL, NULL),
-(24, 'Yao Ulrich N\'GUESSAN', 'unguessan@dgi.gouv.ci', NULL, '$2y$12$lJSHTiuKgIu3qAgodGZxtuUEDaJg.XJDY4IEMfTb6S6YWS63hTney', 0, NULL, NULL, '2026-01-29 09:39:36', '2026-01-29 09:41:54', NULL, NULL),
-(25, 'Riviere Michel ANGELS', 'riviere@dgi.gouv.ci', NULL, '$2y$12$CJIeLWEevNfHUbeLzo90VORztEzsMu9HmaFpaPC0fDhMAgMGgJbiC', 0, NULL, NULL, '2026-02-27 19:33:26', '2026-02-27 19:38:25', NULL, NULL);
+INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `must_change_password`, `password_changed_at`, `remember_token`, `created_at`, `updated_at`, `bio`, `profile_picture`, `signature_path`) VALUES
+(1, 'Admin Test', 'admin@example.com', NULL, '$2y$12$wAf0LxbRALNrwYQY33KXUeAoOYNIKiI243FdTKLXuaD2/XAiL9LrW', 0, NULL, NULL, '2026-01-20 09:37:00', '2026-01-20 10:44:26', NULL, NULL, NULL),
+(2, 'Utilisateur Test', 'test@example.com', NULL, '$2y$12$7sPkZYqEOdlX17Wh1A6Iw.Y4Nz6LdMMkPR96o3dqBEfzZePhkdWhK', 0, NULL, NULL, '2026-01-20 09:37:00', '2026-01-20 10:44:26', NULL, NULL, NULL),
+(3, 'Sié Yacouba COULIBALY', 'yacouba.coulibaly@dgi.gouv.ci', NULL, '$2y$12$5JvBOSgSBwZIJ4lRY9CPAOUqi1/iSALW2nTfDGTaFUQmbDWYTlz2u', 0, '2026-02-25 12:41:54', NULL, '2026-01-20 13:25:02', '2026-03-12 08:40:55', NULL, 'photos_agents/Km5CbkPx8Rry9FPxsIf9Tu3gi9JOqhDVlXxOtuBP.jpg', 'pad_3_1773304855.png'),
+(4, 'Nafata KONE', 'nafie410@dgi.gouv.ci', NULL, '$2y$12$SeJ9qwQwxWogSSNTO8hdSevf3HLZzNoiovKKNiSAbaH3Zfuf958Ha', 0, NULL, NULL, '2026-01-20 13:46:32', '2026-03-11 09:26:40', NULL, NULL, NULL),
+(5, 'Rosine Générosa Epse Dje OUSSOU', 'roussou@dgi.gouv.ci', NULL, '$2y$12$6levTuTb0vIp1M1nBq/oROhQkRMA0T.OpNdr8GOByOjJy.X9YpvMW', 1, NULL, NULL, '2026-01-20 13:48:59', '2026-01-22 12:31:18', NULL, NULL, NULL),
+(6, 'Arlette N\'DOUME', 'andoume@dgi.gouv.ci', NULL, '$2y$12$UptzFnNTF5sgio1UqRK6Ne8.yG7QxbhjxLqmpy9hIoJRKQahDNwmS', 0, NULL, NULL, '2026-01-21 10:43:13', '2026-03-12 06:58:44', NULL, NULL, 'sig_6_1773298724.png'),
+(9, 'Innocent ADICO', 'iadico@dgi.gouv.ci', NULL, '$2y$12$dCDgWWMz.kvecxIjncNv0eGBT2eXI55l21HCwN.X4Ih3KxbXyfBTG', 0, NULL, NULL, '2026-01-21 11:50:04', '2026-01-22 15:15:21', NULL, NULL, NULL),
+(10, 'Moctar Michel Djépa KEITA', 'michelkeita@dgi.gouv.ci', NULL, '$2y$12$GVJZkuOfiwTdDE.A6946U.6coCnMxYZPHLh.MyfdwfSb3I7eYIBsq', 1, NULL, NULL, '2026-01-21 11:56:29', '2026-01-28 14:20:16', NULL, NULL, NULL),
+(11, 'Assi Roger OKPEKON', 'asokpekon@dgi.gouv.ci', NULL, '$2y$12$p4VhIUU7bg6ju1tusqWJneMBfeAbl/nTIKgM.hr832AVQhg7wwVw6', 0, NULL, NULL, '2026-01-21 11:59:18', '2026-01-29 11:08:51', NULL, NULL, NULL),
+(12, 'Née Brou Amenan M. KOUADIO', 'kbrou04@dgi.gouv.ci', NULL, '$2y$12$NRt7n8PnxT41./IvAD.GFetDLPqFXcBveV4WdaA10D4DnMtLI/DDm', 1, NULL, NULL, '2026-01-21 12:02:21', '2026-01-21 12:02:21', NULL, NULL, NULL),
+(13, 'Maïmouna BALLO', 'mballo@dgi.gouv.ci', NULL, '$2y$12$5pVS9RokI.yFE9sskgIEAe/F8Q3gKgMSitn.geE4Dw00M3epkVr6q', 1, NULL, NULL, '2026-01-21 12:37:32', '2026-01-21 12:37:32', NULL, NULL, NULL),
+(14, 'Akpa Leonard DJEDJEMEL', 'adjedjemel@dgi.gouv.ci', NULL, '$2y$12$FqeyBSfjG8plbvr45sVr/ubyh35lheTKUoTnOyd6L8OYLr4oBix42', 1, NULL, NULL, '2026-01-21 12:47:16', '2026-01-21 12:47:16', NULL, NULL, NULL),
+(15, 'Mamadou TRAORE', 'mtraore@dgi.gouv.ci', NULL, '$2y$12$pVJ6NdgPnmRntLHilLZLWO0xUKd.pLRjWt7Wyot1SBnpId5lk.9aK', 1, NULL, NULL, '2026-01-21 12:51:08', '2026-01-21 12:51:08', NULL, NULL, NULL),
+(16, 'Tiekoura HORO', 'thoro@dgi.gouv.ci', NULL, '$2y$12$pYdqqmYFCTeZxXKoG.LHeeqPkhLpSvAkM9xltNYRoeIrUOCEDT6Je', 1, NULL, NULL, '2026-01-22 08:10:12', '2026-03-11 10:17:56', NULL, NULL, NULL),
+(17, 'Brou Tchoumou Serge N\'GUESSAN', 'bnguessan04@dgi.gouv.ci', NULL, '$2y$12$9D9YWt7NlAZQf0btLeAXhOdcKWoeYhVhLkb8MPYWYjgVrWkBTQYP6', 0, NULL, NULL, '2026-01-22 08:27:00', '2026-01-28 11:42:15', NULL, NULL, NULL),
+(18, 'Mathurin BEZI', 'mbezi@dgi.gouv.ci', NULL, '$2y$12$BcDeMiB4WI51vVEVNPX/V.Vzjn6pMP2VoM/C96VfJynLvk91c19zO', 1, NULL, NULL, '2026-01-22 08:41:51', '2026-01-22 08:41:51', NULL, NULL, NULL),
+(19, 'Bi Suy Robert TOUBOUI', 'rtouboui@dgi.gouv.ci', NULL, '$2y$12$dVhNjgRnLUf95A8qOX1w9uF7c8DtE6VXGVBaEIaxXAf1ovSoQTVQu', 1, NULL, NULL, '2026-01-23 10:25:21', '2026-01-23 10:25:21', NULL, NULL, NULL),
+(20, 'Mamadou Lamine COULIBALY', 'mamadoulcoul@dgi.gouv.ci', NULL, '$2y$12$Lfz7QtoJfaRONcHbgo2Qg.3k3fJ2rlVTyFVr7bVCCBG.roawC3qDG', 1, NULL, NULL, '2026-01-23 10:29:57', '2026-01-23 10:29:57', NULL, NULL, NULL),
+(21, 'Née Keita Aramata Anne Elise KEDI', 'akeita@dgi.gouv.ci', NULL, '$2y$12$6vph6Z9CtWbD2RBrrtViFOccxOP4LxXoXpcxp4XkqOWH303Oisp4m', 1, NULL, NULL, '2026-01-27 07:57:48', '2026-01-27 07:57:48', NULL, NULL, NULL),
+(22, 'Konan Christian René KOFFI', 'christiankonankoffi@dgi.gouv.ci', NULL, '$2y$12$iklZZEklhAlFRdc1RcWRkelt6/2BOWWYuzezk4kFgTlmEnAEqUNcO', 1, NULL, NULL, '2026-01-27 08:14:10', '2026-01-27 08:14:10', NULL, NULL, NULL),
+(23, 'M\'bo Erasthène ALEXANDRE', 'erasthene16ja17@dgi.gouv.ci', NULL, '$2y$12$pyiztyHvVrjRiKOwbPCUhekN8qw1kx4sIHaS0pCk4svXJ341adPAe', 1, NULL, NULL, '2026-01-27 14:44:26', '2026-01-27 14:44:26', NULL, NULL, NULL),
+(24, 'Yao Ulrich N\'GUESSAN', 'unguessan@dgi.gouv.ci', NULL, '$2y$12$lJSHTiuKgIu3qAgodGZxtuUEDaJg.XJDY4IEMfTb6S6YWS63hTney', 0, NULL, NULL, '2026-01-29 09:39:36', '2026-01-29 09:41:54', NULL, NULL, NULL),
+(25, 'Riviere Michel ANGELS', 'riviere@dgi.gouv.ci', NULL, '$2y$12$CJIeLWEevNfHUbeLzo90VORztEzsMu9HmaFpaPC0fDhMAgMGgJbiC', 0, NULL, NULL, '2026-02-27 19:33:26', '2026-02-27 19:38:25', NULL, NULL, NULL);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
