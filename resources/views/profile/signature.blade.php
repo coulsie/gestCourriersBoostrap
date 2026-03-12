@@ -88,9 +88,10 @@
                         </div>
 
                         <div class="d-flex justify-content-center gap-2 flex-wrap mt-5">
-                            <a href="javascript:history.back()" class="btn btn-danger px-4 shadow-sm">
+                            <a href="/" class="btn btn-danger px-4 shadow-sm">
                                 <i class="fas fa-times me-1"></i> Fermer
                             </a>
+
 
                             <button type="submit" id="save" class="btn btn-success px-5 fw-bold shadow">
                                 <i class="fas fa-save me-1"></i> Enregistrer la signature
