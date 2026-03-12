@@ -5,8 +5,9 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card border-0 shadow-lg">
-                <div class="card-header bg-primary text-white fw-bold">
-                    <i class="fas fa-pen-nib me-2"></i> MA SIGNATURE NUMÉRIQUE
+                <div class="card-header bg-primary text-white fw-bold d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-pen-nib me-2"></i> MA SIGNATURE NUMÉRIQUE</span>
+                    <a href="javascript:history.back()" class="btn-close btn-close-white" aria-label="Close"></a>
                 </div>
                 <div class="card-body text-center">
 
@@ -15,10 +16,9 @@
                         <div class="mb-4">
                             <h6 class="text-muted small text-uppercase fw-bold">Signature actuelle :</h6>
                             <img src="{{ asset('signatures/' . auth()->user()->signature_path) }}"
-     class="border rounded p-2 bg-light" style="max-height: 100px;">
+                                 class="border rounded p-2 bg-light" style="max-height: 100px;">
                         </div>
                     @endif
-
 
                     <form action="{{ route('profile.signature.update') }}" method="POST" id="signature-form">
                         @csrf
@@ -29,10 +29,19 @@
 
                         <input type="hidden" name="signature_data" id="signature_data">
 
-                        <div class="d-flex justify-content-center gap-2">
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            {{-- Bouton Fermer / Retour --}}
+                           <a href="javascript:history.back()" class="btn btn-danger px-4">
+                                <i class="fas fa-times me-1"></i> Fermer
+                            </a>
+
+
+                            {{-- Bouton Effacer --}}
                             <button type="button" id="clear" class="btn btn-outline-danger px-4">
                                 <i class="fas fa-eraser me-1"></i> Effacer
                             </button>
+
+                            {{-- Bouton Enregistrer --}}
                             <button type="submit" id="save" class="btn btn-success px-5 fw-bold">
                                 <i class="fas fa-save me-1"></i> Enregistrer la signature
                             </button>
@@ -44,19 +53,14 @@
     </div>
 </div>
 
-
-
-{{-- Charge le fichier que vous venez de créer localement --}}
 <script src="{{ asset('js/signature_pad.js') }}"></script>
-
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const canvas = document.getElementById('signature-pad');
 
-    // Initialisation avec vérification
     if (typeof SignaturePad === 'undefined') {
-        alert("Erreur : La bibliothèque de signature n'est pas chargée. Vérifiez votre connexion internet.");
+        alert("Erreur : La bibliothèque de signature n'est pas chargée.");
         return;
     }
 
@@ -65,32 +69,28 @@ document.addEventListener('DOMContentLoaded', function () {
         penColor: 'rgb(0, 0, 0)'
     });
 
-    // FONCTION VITALE : Ajuster la taille interne du canvas au démarrage
     function resizeCanvas() {
         const ratio = Math.max(window.devicePixelRatio || 1, 1);
         canvas.width = canvas.offsetWidth * ratio;
         canvas.height = canvas.offsetHeight * ratio;
         canvas.getContext("2d").scale(ratio, ratio);
-        signaturePad.clear(); // Important pour réinitialiser le tampon interne
+        signaturePad.clear();
     }
 
     window.addEventListener("resize", resizeCanvas);
-    resizeCanvas(); // Appel immédiat
+    resizeCanvas();
 
-    // BOUTON EFFACER
     document.getElementById('clear').addEventListener('click', function(e) {
         e.preventDefault();
         signaturePad.clear();
     });
 
-    // BOUTON ENREGISTRER (Soumission du formulaire)
     const form = document.getElementById('signature-form');
     form.addEventListener('submit', function (e) {
         if (signaturePad.isEmpty()) {
             e.preventDefault();
             alert("Veuillez dessiner votre signature avant d'enregistrer.");
         } else {
-            // On met l'image Base64 dans le champ caché avant d'envoyer
             const dataURL = signaturePad.toDataURL();
             document.getElementById('signature_data').value = dataURL;
         }

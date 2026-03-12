@@ -107,11 +107,17 @@
                         <div class="bg-white py-2 collapse-inner rounded shadow-lg" style="border-left: 5px solid #ff9f43; border-right: 1px solid #fff3e0;">
 
                             {{-- BLOC RÉSERVÉ UNIQUEMENT AUX ADMINS / SUPERVISEURS --}}
+                            {{-- 2. NOUVEAU LIEN SIGNATURE NUMÉRIQUE (Indigo Éclatant) --}}
+                            <a class="collapse-item fw-bold text-dark transition-hover {{ request()->routeIs('profile.signature.*') ? 'bg-light' : '' }}"
+                                href="{{ route('profile.signature.edit') }}">
+                                <i class="fas fa-pen-fancy me-2" style="color: #6610f2;"></i> Ma Signature
+                            </a>
+
                             @hasanyrole('admin|Superviseur')
                                 <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #ee5253;">
                                     <i class="fas fa-user-shield me-1"></i> GESTION SYSTÈME
                                 </h6>
-                                
+
                                 {{-- 1. LIEN LISTE UTILISATEURS --}}
                                 <a class="collapse-item fw-bold text-dark transition-hover" href="{{ route('users.index') }}">
                                     <i class="fas fa-users-cog me-2" style="color: #ff9f43;"></i> Liste Utilisateurs
