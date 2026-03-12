@@ -104,37 +104,72 @@ class ProfileController extends Controller
         return back()->with('status', 'Votre mot de passe a été mis à jour avec succès !');
     }
 
-     
-public function updateSignature(Request $request)
-{
-    $request->validate(['signature_data' => 'required']);
 
-    $user = \Illuminate\Support\Facades\Auth::user();
 
-    // 1. Récupération et nettoyage du Base64
-    $data = $request->signature_data;
-    $image = str_replace('data:image/png;base64,', '', $data);
-    $image = str_replace(' ', '+', $image);
+    public function updateSignature(Request $request)
+    {
+        // 1. Validation avec messages personnalisés
+        $request->validate([
+            'signature_data' => 'required_without:signature_file',
+            'signature_file' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+        ], [
+            'signature_file.mimes' => 'Le fichier doit être au format PNG, JPG ou JPEG.',
+            'signature_file.image' => 'Le fichier sélectionné doit être une image.',
+            'signature_file.max'   => 'L’image est trop lourde (maximum 2 Mo).',
+            'signature_data.required_without' => 'Veuillez soit dessiner votre signature, soit importer un fichier.',
+        ]);
 
-    // 2. Gestion du stockage (Comme pour la photo agent)
-    $fileName = 'sig_' . $user->id . '_' . time() . '.png';
-    $destinationPath = public_path('signatures');
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $oldSignature = $user->signature_path;
+        $fileName = null;
+        $destinationPath = public_path('signatures');
 
-    // Créer le dossier s'il n'existe pas
-    if (!file_exists($destinationPath)) {
-        mkdir($destinationPath, 0777, true);
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0777, true);
+        }
+
+        // 2. Traitement selon l'option choisie
+        if ($request->hasFile('signature_file')) {
+            // CAS A : Fichier scanné (Prioritaire si les deux sont remplis)
+            $file = $request->file('signature_file');
+            $fileName = 'scan_' . $user->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move($destinationPath, $fileName);
+        }
+        elseif ($request->filled('signature_data')) {
+            // CAS B : Dessin sur Canvas
+            $data = $request->signature_data;
+            $image = str_replace(['data:image/png;base64,', ' '], ['', '+'], $data);
+            $fileName = 'pad_' . $user->id . '_' . time() . '.png';
+            file_put_contents($destinationPath . '/' . $fileName, base64_decode($image));
+        }
+
+        // 3. Enregistrement et Log
+        if ($fileName) {
+            // Optionnel : supprimer l'ancien fichier physique pour libérer de l'espace
+            if ($oldSignature && file_exists($destinationPath . '/' . $oldSignature)) {
+                @unlink($destinationPath . '/' . $oldSignature);
+            }
+
+            $user->update(['signature_path' => $fileName]);
+
+            \App\Models\AuditLog::create([
+                'user_id'        => $user->id,
+                'event'          => $request->hasFile('signature_file') ? 'Upload signature scannée' : 'Mise à jour signature pad',
+                'auditable_type' => 'User',
+                'auditable_id'   => $user->id,
+                'old_values'     => json_encode(['path' => $oldSignature]),
+                'new_values'     => json_encode(['path' => $fileName]),
+                'url'            => $request->fullUrl(),
+                'ip_address'     => $request->ip(),
+                'user_agent'     => $request->userAgent(),
+                'method'         => $request->method(),
+            ]);
+
+            return back()->with('success', 'Signature enregistrée avec succès.');
+        }
+
+        return back()->with('error', 'Erreur : Aucune donnée de signature reçue.');
     }
-
-    // On enregistre le fichier directement dans public/signatures
-    file_put_contents($destinationPath . '/' . $fileName, base64_decode($image));
-
-    // 3. Mise à jour de la colonne signature_path (On ne stocke que le nom du fichier)
-    $user->update([
-        'signature_path' => $fileName
-    ]);
-
-    return back()->with('success', 'Votre signature a été enregistrée dans le dossier public.');
-}
 
 
     /**

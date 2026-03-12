@@ -33,91 +33,118 @@
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover align-middle" id="logTable">
-                    <thead class="table-light">
+                    <thead class="table-light border-bottom">
                         <tr>
-                            <th>Date & Heure</th>
-                            <th>Utilisateur</th>
-                            <th>Événement</th>
-                            <th>Module / Cible</th>
-                            <th>Adresse IP</th>
-                            <th class="text-center">Détails</th>
+                            <th class="py-3" style="width: 150px;">Date & Heure</th>
+                            <th class="py-3">Utilisateur & IP</th>
+                            <th class="py-3">Événement & Page</th>
+                            <th class="py-3">Module / Cible</th>
+                            <th class="py-3 text-center" style="width: 100px;">Appareil</th>
+                            <th class="py-3 text-center" style="width: 120px;">Actions</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @foreach($logs as $log)
-
                             @php
                                 $event = strtolower($log->event);
                                 $badgeColor = match(true) {
-                                    str_contains($event, 'created')   => 'success',   // Vert
-                                    str_contains($event, 'updated')   => 'warning',   // Jaune
-                                    str_contains($event, 'deleted')   => 'danger',    // Rouge
-                                    str_contains($event, 'connexion') => 'info',      // Bleu ciel
-                                    str_contains($event, 'archivage') => 'primary',   // Bleu foncé (pour vos courriers)
-                                    default                           => 'secondary'  // Gris
+                                    str_contains($event, 'created')   => 'success',
+                                    str_contains($event, 'updated')   => 'warning',
+                                    str_contains($event, 'deleted')   => 'danger',
+                                    str_contains($event, 'connexion') => 'info',
+                                    str_contains($event, 'archivage') => 'primary',
+                                    default                           => 'secondary'
                                 };
+
+                                // Nettoyage du User Agent pour l'affichage court
+                                $ua = strtolower($log->user_agent ?? '');
+                                $isMobile = str_contains($ua, 'mobile') || str_contains($ua, 'android') || str_contains($ua, 'iphone');
                             @endphp
 
-
                             <tr>
-                                <td class="fw-bold">{{ $log->created_at->format('d/m/Y H:i:s') }}</td>
+                                {{-- 1. Date & Heure --}}
+                                <td class="fw-bold small">{{ $log->created_at->format('d/m/Y H:i:s') }}</td>
+
+                                {{-- 2. Utilisateur --}}
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <div class="avatar-sm me-2 bg-light rounded-circle p-1">
-                                            <i class="fas fa-user text-muted"></i>
+                                        <div class="avatar-sm me-2 bg-light rounded-circle p-1 text-center" style="width:32px">
+                                            <i class="fas fa-user text-muted small"></i>
                                         </div>
                                         <div>
-                                            <div class="fw-bold text-dark">{{ $log->user->name ?? 'Système' }}</div>
-                                            <small class="text-muted">{{ $log->user->email ?? '-' }}</small>
+                                            <div class="fw-bold text-dark small">{{ $log->user->name ?? 'Système' }}</div>
+                                            <code class="text-muted" style="font-size: 0.7rem;">{{ $log->ip_address }}</code>
                                         </div>
                                     </div>
                                 </td>
 
+                                {{-- 3. Événement & URL (Fusionnés pour plus de clarté) --}}
                                 <td>
-                                    <span class="badge bg-{{ $badgeColor }} text-white px-2 py-1 text-uppercase shadow-sm">
+                                    <span class="badge bg-{{ $badgeColor }} text-white px-2 py-1 text-uppercase mb-1" style="font-size: 0.65rem;">
                                         {{ $log->event }}
                                     </span>
-                                </td>
-                               <td>
-                                    @if(!empty($log->auditable_type) && $log->auditable_type !== 'Système')
-                                        {{-- Cas d'un modèle (Courrier, Utilisateur, etc.) --}}
-                                        <small class="fw-bold text-primary">{{ class_basename($log->auditable_type) }}</small>
-                                        <span class="text-muted">#{{ $log->auditable_id }}</span>
-                                    @else
-                                        {{-- Cas d'une action système (Connexion, Déconnexion) --}}
-                                        <span class="badge bg-info-subtle text-info border border-info-subtle px-2">
-                                            <i class="fas fa-shield-alt me-1"></i> AUTHENTIFICATION
-                                        </span>
-                                        <small class="text-muted ms-1">ID-LOG #{{ $log->id }}</small>
+                                    @if($log->url)
+                                        <div class="text-truncate text-muted" style="max-width: 180px; font-size: 0.75rem;" title="{{ $log->url }}">
+                                            <i class="fas fa-link me-1"></i>{{ str_replace(url('/'), '', $log->url) }}
+                                        </div>
                                     @endif
                                 </td>
 
-                                <td><code class="text-primary">{{ $log->ip_address }}</code></td>
+                                {{-- 4. Module / Cible --}}
+                                <td>
+                                    @if(!empty($log->auditable_type) && $log->auditable_type !== 'Système')
+                                        <span class="badge bg-light text-primary border fw-bold">
+                                            {{ class_basename($log->auditable_type) }}
+                                        </span>
+                                        <small class="text-muted d-block">ID: #{{ $log->auditable_id }}</small>
+                                    @else
+                                        <span class="badge bg-info-subtle text-info border border-info-subtle">
+                                            <i class="fas fa-shield-alt me-1"></i> AUTH
+                                        </span>
+                                    @endif
+                                </td>
 
+                                {{-- 5. Appareil (Icône dynamique) --}}
                                 <td class="text-center">
-                                    {{-- Bouton Voir --}}
+                                    <span title="{{ $log->user_agent }}" style="cursor: help;">
+                                        @if($isMobile)
+                                            <i class="fas fa-mobile-alt text-danger fs-5"></i>
+                                            <small class="d-block text-muted" style="font-size: 0.6rem;">Mobile</small>
+                                        @else
+                                            <i class="fas fa-desktop text-primary fs-5"></i>
+                                            <small class="d-block text-muted" style="font-size: 0.6rem;">PC</small>
+                                        @endif
+                                    </span>
+                                </td>
 
-
-<button type="button" class="btn btn-sm btn-outline-dark shadow-sm"
-        onclick="var myModal = new bootstrap.Modal(document.getElementById('modalLog{{ $log->id }}')); myModal.show();">
-    <i class="fas fa-eye"></i>
-</button>
-
-
-                                    {{-- Bouton Supprimer --}}
-                                    <form action="{{ route('admin.logs.destroy', $log->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ce log définitivement ?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm ms-1">
-                                            <i class="fas fa-trash"></i>
+                                {{-- 6. Actions --}}
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center align-items-center gap-2">
+                                        {{-- Bouton Voir (Largeur fixe de 35px) --}}
+                                        <button type="button" class="btn btn-sm btn-outline-dark shadow-sm"
+                                                style="width: 35px; height: 32px;"
+                                                onclick="var myModal = new bootstrap.Modal(document.getElementById('modalLog{{ $log->id }}')); myModal.show();">
+                                            <i class="fas fa-eye"></i>
                                         </button>
-                                    </form>
+
+                                        {{-- Formulaire de suppression --}}
+                                        <form action="{{ route('admin.logs.destroy', $log->id) }}" method="POST" class="m-0" onsubmit="return confirm('Supprimer définitivement ?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            {{-- Bouton Supprimer (Même largeur fixe) --}}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm" style="width: 35px; height: 32px;">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
 
                             </tr>
-                             @include('admin.partials.modal_log', ['log' => $log])
+                            @include('admin.partials.modal_log', ['log' => $log])
                         @endforeach
                     </tbody>
+
                 </table>
             </div>
 
