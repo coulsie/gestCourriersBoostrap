@@ -210,6 +210,12 @@ Route::middleware(['auth'])->group(function () {
                 Route::get('/archives', [CourrierController::class, 'archives'])->name('archives');
                 Route::post('/{courrier}/unlock', [CourrierController::class, 'unlock'])->name('unlock');
             });
+
+            
+
+// Route pour signer un courrier spécifique
+Route::post('/courriers/{id}/sign', [CourrierController::class, 'signCourrier'])->name('courriers.sign');
+
             Route::resource('courriers', CourrierController::class);
 
             // --- RESSOURCES HUMAINES (Présences & Absences) ---

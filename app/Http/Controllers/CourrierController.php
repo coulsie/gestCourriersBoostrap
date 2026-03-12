@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash; // À ajouter en haut du fichier
 use Illuminate\Support\Facades\Crypt; // À ajouter en haut du fichier
+use Illuminate\Support\Facades\Auth; // <-- IMPORTANT
 
 class CourrierController extends Controller
 {
@@ -301,19 +302,44 @@ public function update(Request $request, Courrier $courrier)
     return view('courriers.archives', compact('courriers'));
 }
 
-    public function unlock(Request $request, Courrier $courrier)
-{
-    $request->validate(['code_saisi' => 'required|numeric']);
+        public function unlock(Request $request, Courrier $courrier)
+    {
+        $request->validate(['code_saisi' => 'required|numeric']);
 
-    // On décrypte le code stocké et on compare
-    if (Crypt::decryptString($courrier->code_acces) === $request->code_saisi) {
-        // On stocke l'autorisation en session (expire à la fermeture du navigateur)
-        session(["access_granted_{$courrier->id}" => true]);
-        return redirect()->route('courriers.show', $courrier->id);
+        // On décrypte le code stocké et on compare
+        if (Crypt::decryptString($courrier->code_acces) === $request->code_saisi) {
+            // On stocke l'autorisation en session (expire à la fermeture du navigateur)
+            session(["access_granted_{$courrier->id}" => true]);
+            return redirect()->route('courriers.show', $courrier->id);
+        }
+
+        return back()->with('error', 'Code incorrect. Accès refusé.');
     }
 
-    return back()->with('error', 'Code incorrect. Accès refusé.');
-}
+
+
+    public function signCourrier($id)
+    {
+        $user = auth::user();
+
+        // Vérification de sécurité
+        if (!$user->signature_path) {
+            return back()->with('error', 'Veuillez d\'abord configurer votre signature dans votre profil.');
+        }
+
+        $courrier = Courrier::findOrFail($id);
+
+        // Mise à jour forcée
+        $courrier->signed_by = $user->id;
+        $courrier->signed_at = now();
+        $courrier->statut = 'signé';
+
+        if ($courrier->save()) {
+            return back()->with('success', 'Signature apposée avec succès !');
+        }
+
+        return back()->with('error', 'Erreur lors de l\'enregistrement de la signature.');
+    }
 
 
 }

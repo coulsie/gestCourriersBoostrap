@@ -43,7 +43,10 @@ class Courrier extends Model
         'is_confidentiel', // <-- DOIT ÊTRE PRÉSENT
         'code_acces',      // <-- DOIT ÊTRE PRÉSENT
         'date_document_original', // <-- DOIT ÊTRE PRÉSENT
+        'signed_by', // <--- AJOUTER CECI
+        'signed_at', // <--- AJOUTER CECI
     ];
+
 
     /**
      * The attributes that should be cast to native types.
@@ -98,6 +101,10 @@ class Courrier extends Model
                 return $types[$value] ?? $value;
             },
         );
+    }
+    public function signataire()
+    {
+        return $this->belongsTo(User::class, 'signed_by');
     }
 
 }
