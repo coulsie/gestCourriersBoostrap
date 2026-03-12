@@ -14,6 +14,9 @@
     <!-- Styles -->
     <link href="{{ asset('template/css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('template/vendor/datatables/dataTables.bootstrap4.min.css') }}" rel="stylesheet">
+    <!-- À mettre entre <head> et </head> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net">
+
 
     <style>
     /* 1. Configuration de la Sidebar et de l'ascenseur */

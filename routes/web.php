@@ -211,10 +211,11 @@ Route::middleware(['auth'])->group(function () {
                 Route::post('/{courrier}/unlock', [CourrierController::class, 'unlock'])->name('unlock');
             });
 
-            
+                // Route pour signer un courrier spécifique
+                Route::post('/courriers/{id}/sign', [CourrierController::class, 'signCourrier'])->name('courriers.sign');
 
-// Route pour signer un courrier spécifique
-Route::post('/courriers/{id}/sign', [CourrierController::class, 'signCourrier'])->name('courriers.sign');
+                // Route pour l'envoi du mail
+                Route::post('/courriers/{id}/send-mail', [CourrierController::class, 'sendMail'])->name('courriers.send-mail');
 
             Route::resource('courriers', CourrierController::class);
 

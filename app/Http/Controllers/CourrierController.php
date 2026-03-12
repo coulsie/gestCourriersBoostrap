@@ -341,5 +341,55 @@ public function update(Request $request, Courrier $courrier)
         return back()->with('error', 'Erreur lors de l\'enregistrement de la signature.');
     }
 
+    public function sendMail(Request $request, $id) // Ajout de Request pour capturer la modale
+{
+    // 1. Validation des données de la modale
+    $request->validate([
+        'recipient_email' => 'required|email',
+        'custom_message'  => 'nullable|string|max:500'
+    ]);
+
+    $courrier = Courrier::with('signataire')->findOrFail($id);
+
+    // 2. Génération du PDF
+    $pdf = \PDF::loadView('courriers.pdf_signed', compact('courrier'));
+
+    $fileName = 'Courrier_' . str_replace(['/', '\\'], '_', $courrier->reference) . '.pdf';
+    $directory = storage_path('app/public/temp');
+    $tempPath = $directory . '/' . $fileName;
+
+    if (!file_exists($directory)) {
+        mkdir($directory, 0777, true);
+    }
+
+    $pdf->save($tempPath);
+
+    // 3. Récupération des infos de la modale
+    $recipient = $request->recipient_email;
+    $customMessage = $request->custom_message;
+
+    try {
+        // Envoi de la notification avec le message personnalisé
+        \Notification::route('mail', $recipient)
+            ->notify(new \App\Notifications\SendSignedCourrier($courrier, $tempPath, $customMessage));
+
+        $status = 'success';
+        $message = "Le courrier a été envoyé avec succès à : $recipient";
+
+    } catch (\Exception $e) {
+        $status = 'error';
+        $message = 'Erreur d\'envoi : ' . $e->getMessage();
+        \Log::error("Échec envoi courrier {$id}: " . $e->getMessage());
+    } finally {
+        if (isset($tempPath) && file_exists($tempPath)) {
+            unlink($tempPath);
+        }
+    }
+
+    return back()->with($status, $message);
+}
+
+
+
 
 }
