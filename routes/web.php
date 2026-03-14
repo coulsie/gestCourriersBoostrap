@@ -6,7 +6,8 @@ use App\Http\Controllers\{
     AgentController, CourrierController,
     DirectionController, ServiceController,PresenceController, AbsenceController, TypeAbsenceController,
     AnnonceController, AgentServiceController, ImputationController,
-    StatistiqueController, ReponseController, PostController, RoleController,ExtractionController, HolidayController, RapportController,AuditLogController
+    StatistiqueController, ReponseController, PostController, RoleController,ExtractionController, HolidayController,
+     RapportController,AuditLogController,InterimController
 };
 
 use App\Http\Controllers\Auth\PasswordSetupController;
@@ -61,12 +62,75 @@ Route::get('/admin/logs', [AuditLogController::class, 'journalLogs'])->name('adm
 Route::get('/profile/signature', [ProfileController::class, 'editSignature'])->name('profile.signature.edit');
 Route::post('/profile/signature', [ProfileController::class, 'updateSignature'])->name('profile.signature.update');
 
+
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/interims/store', [InterimController::class, 'store'])->name('interims.store');
+});
+
+
+// Vérifiez que le nom 'interims.store' est bien défini
+Route::post('/interims', [InterimController::class, 'store'])->name('interims.store');
+
+// Dans routes/web.php
+Route::post('/interims/store', [App\Http\Controllers\InterimController::class, 'store'])->name('interims.store');
+
+
 /*
 |--------------------------------------------------------------------------
 | 2. ESPACE SÉCURISÉ (Authentification requise)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
+    // ... vos autres routes
+    Route::get('/profile/signature', [App\Http\Controllers\ProfileController::class, 'signature'])->name('profile.signature');
+});
+
+// Dans routes/web.php
+Route::middleware(['auth'])->group(function () {
+    // La route pour afficher la page de modification de la signature
+    Route::get('/profile/signature/edit', [App\Http\Controllers\ProfileController::class, 'editSignature'])->name('profile.signature.edit');
+
+    // N'oubliez pas la route POST pour enregistrer l'image après l'upload
+    Route::post('/profile/signature/update', [App\Http\Controllers\ProfileController::class, 'updateSignature'])->name('profile.signature.update');
+});
+
+
+
+Route::middleware(['auth'])->group(function () {
+
+    // --- ROUTES POUR LA GESTION DES INTÉRIMS ---
+
+    // 1. Liste de tous les intérims
+    Route::get('/interims', [InterimController::class, 'index'])->name('interims.index');
+
+    // 2. Formulaire de création d'un nouvel intérim
+    Route::get('/interims/create', [InterimController::class, 'create'])->name('interims.create');
+
+    // 3. Enregistrement d'un nouvel intérim (crée aussi l'absence)
+    Route::post('/interims', [InterimController::class, 'store'])->name('interims.store');
+
+    // 4. Affichage des détails d'un intérim spécifique
+    Route::get('/interims/{id}', [InterimController::class, 'show'])->name('interims.show');
+
+    // 5. Formulaire de modification d'un intérim existant
+    Route::get('/interims/{id}/edit', [InterimController::class, 'edit'])->name('interims.edit');
+
+    // 6. Mise à jour de l'intérim (met à jour aussi l'absence liée)
+    Route::put('/interims/{id}', [InterimController::class, 'update'])->name('interims.update');
+
+    // 7. Arrêt prématuré d'un intérim (désactive sans supprimer)
+    Route::patch('/interims/{interim}/stop', [InterimController::class, 'stop'])->name('interims.stop');
+
+    // 8. Suppression définitive (supprime aussi l'absence liée)
+    Route::delete('/interims/{id}', [InterimController::class, 'destroy'])->name('interims.destroy');
+
+});
+
+Route::middleware(['auth'])->group(function () {
+
+
 
     // 1. Affichage de l'interface de saisie
     Route::get('/extraction', [ExtractionController::class, 'index'])

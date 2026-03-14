@@ -1,21 +1,39 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container py-5">
     <div class="row">
         <div class="col-md-11 mx-auto">
-            <!-- Carte principale avec bordure supérieure marquée -->
+            <!-- Carte principale -->
             <div class="card shadow-lg border-0 rounded-xl overflow-hidden">
 
                 {{-- Header Sombre & Contrasté --}}
                 <div class="card-header bg-dark py-3 d-flex align-items-center justify-content-between border-bottom border-primary border-5">
                     <h5 class="mb-0 text-white fw-bold text-uppercase tracking-wider">
-                        <i class="fas fa-id-badge me-2 text-warning"></i> Profil de l'Agent :  {{ $agent->last_name }} {{ $agent->first_name }}
+                        <i class="fas fa-id-badge me-2 text-warning"></i> Profil : {{ $agent->last_name }} {{ $agent->first_name }}
                     </h5>
                     <div class="d-flex gap-2">
                         <a href="{{ route('agents.index') }}" class="btn btn-outline-light btn-sm fw-bold">
                             <i class="fas fa-arrow-left me-1"></i> RETOUR
                         </a>
+
+                        {{-- BOUTON MODALE INTERIM (Ajouté ici) --}}
+                        @if(in_array($agent->status, ['Chef de service', 'Sous-directeur', 'Directeur']))
+
+
+                            <button type="button"
+                                    class="btn btn-info btn-sm fw-bold text-white shadow"
+                                    data-toggle="modal"
+                                    data-target="#modalInterim">
+                                <i class="fas fa-user-shield me-1"></i> PROGRAMMER INTERIM
+                            </button>
+
+
+                        @endif
+
+
+
                         <a href="{{ route('agents.edit', $agent->id) }}" class="btn btn-warning btn-sm fw-bold text-dark shadow">
                             <i class="fas fa-edit me-1"></i> MODIFIER
                         </a>
@@ -61,7 +79,7 @@
 
                     {{-- Grille d'informations détaillées --}}
                     <div class="row g-4">
-                        {{-- Informations de Contact (VERT) --}}
+                        {{-- Coordonnées --}}
                         <div class="col-md-6">
                             <div class="h-100 p-4 border-start border-5 border-success bg-light rounded shadow-sm">
                                 <h5 class="text-success fw-bold mb-4 border-bottom border-2 pb-2 text-uppercase">
@@ -73,8 +91,7 @@
                             </div>
                         </div>
 
-                        {{-- Détails d'Affectation (BLEU) --}}
-
+                        {{-- Poste & Service --}}
                         <div class="col-md-6">
                             <div class="h-100 p-4 border-start border-5 border-primary bg-light rounded shadow-sm">
                                 <h5 class="text-primary fw-bold mb-4 border-bottom border-2 pb-2 text-uppercase">
@@ -83,118 +100,122 @@
                                 <p class="mb-2"><strong>Service :</strong>
                                     @if($agent->service)
                                         <span class="badge bg-primary text-white px-2 py-1">{{ $agent->service->name }}</span>
-                                        <small class="d-block text-muted ms-4">Direction : {{ $agent->service->direction->name ?? 'N/A' }}</small>
                                     @else
                                         <span class="text-danger fw-bold">Non affecté</span>
                                     @endif
                                 </p>
-                                <p class="mb-2"><strong>Emploi/Poste :</strong> <span class="text-dark fw-bold">{{ $agent->Emploi }}</span></p>
-
-                                {{-- GRADE MODIFIÉ : Écriture blanche sur couleur (Emerald/Success) --}}
-                                <p class="mb-2">
-                                    <strong>Grade :</strong>
-                                    <span class="badge px-3 py-2 text-white shadow-sm" style="background-color: #059669; font-size: 0.9rem; border-radius: 8px;">
-                                        <i class="fas fa-medal me-1"></i> {{ $agent->Grade ?? 'N/A' }}
-                                    </span>
-                                </p>
-
-                                <p class="mb-0">
-                                    <strong>Prise de service :</strong>
-                                    <span class="text-dark fw-bold">
-                                        {{ $agent->Date_Prise_de_service ? \Carbon\Carbon::parse($agent->Date_Prise_de_service)->format('d/m/Y') : '' }}
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
-
-                        {{-- État Civil (VIOLET) --}}
-                        <div class="col-md-6">
-                            <div class="h-100 p-4 border-start border-5 border-info bg-light rounded shadow-sm">
-                                <h5 class="text-info fw-bold mb-4 border-bottom border-2 pb-2 text-uppercase text-dark">
-                                    <i class="fas fa-birthday-cake me-2"></i> État Civil
-                                </h5>
-                                <p class="mb-2"><strong>Date de naissance :</strong> {{ $agent->date_of_birth }}</p>
-                                <p class="mb-0"><strong>Lieu de naissance :</strong> {{ $agent->Place_birth }}</p>
-                            </div>
-                        </div>
-
-                        {{-- Urgence (ROUGE RENFORCÉ) --}}
-                        <div class="col-md-6">
-                            <div class="h-100 p-4 border-start border-5 border-danger bg-light rounded shadow-sm">
-                                <h5 class="text-danger fw-bold mb-4 border-bottom border-2 pb-2 text-uppercase text-dark">
-                                    <i class="fas fa-exclamation-triangle me-2"></i> Contact d'Urgence
-                                </h5>
-                                <p class="mb-3 text-dark">
-                                    <strong class="small text-uppercase d-block mb-1">À prévenir :</strong>
-                                    <span class="fs-4 fw-bolder text-uppercase">{{ $agent->Personne_a_prevenir }}</span>
-                                </p>
-
-                                {{-- BLOC TÉLÉPHONE XL --}}
-                                <div class="mt-2">
-                                    <div class="bg-danger text-white p-3 rounded-3 d-inline-flex align-items-center shadow-lg w-100">
-                                        <i class="fas fa-phone-alt fs-1 me-3 animate-pulse"></i>
-                                        <div>
-                                            <small class="d-block fw-bold text-uppercase" style="opacity: 0.8; font-size: 0.75rem;">Numéro Prioritaire :</small>
-                                            <span class="fs-1 fw-black tracking-tighter">
-                                                {{ $agent->Contact_personne_a_prevenir }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                                <p class="mb-2"><strong>Emploi :</strong> <span class="text-dark fw-bold">{{ $agent->Emploi }}</span></p>
+                                <p class="mb-2"><strong>Grade :</strong> <span class="badge bg-success text-white">{{ $agent->Grade ?? 'N/A' }}</span></p>
                             </div>
                         </div>
                     </div>
-
-                    {{-- Section Compte Système --}}
-                    <div class="mt-5 p-4 rounded-4 shadow-sm border border-2 {{ $agent->user ? 'border-success bg-success-subtle' : 'border-danger bg-danger-subtle' }}">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <h5 class="fw-bold mb-1">
-                                    <i class="fas fa-laptop-code me-2"></i> Compte Utilisateur Système
-                                </h5>
-                                <p class="mb-0 small text-dark">Accès requis pour les fonctionnalités de pointage numérique.</p>
-                            </div>
-                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
-                                @if($agent->user)
-                                    <div class="bg-success text-white px-4 py-2 rounded-pill shadow-sm d-inline-block fw-bold">
-                                        <i class="fas fa-check-circle me-1"></i> ACTIF : {{ $agent->user->email }}
-                                    </div>
-                                @else
-                                    <div class="bg-danger text-white px-4 py-2 rounded-pill shadow-sm d-inline-block fw-bold">
-                                        <i class="fas fa-times-circle me-1"></i> AUCUN COMPTE LIÉ
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    /* Styles 2026 */
-    .bg-light { background-color: #f8fafc !important; }
-    .text-primary { color: #2563eb !important; }
-    .bg-primary { background-color: #2563eb !important; }
-    .border-primary { border-color: #2563eb !important; }
-    .rounded-xl { border-radius: 1.5rem !important; }
-    .rounded-4 { border-radius: 1rem !important; }
-    .fw-black { font-weight: 900; }
+{{-- MODALE DE PROGRAMMATION D'INTERIM --}}
+{{-- MODALE DE PROGRAMMATION D'INTERIM --}}
+{{-- MODALE DE PROGRAMMATION D'INTERIM --}}
+<form id="formInterimReal" action="{{ route('interims.store') }}" method="POST">
+    @csrf
+    <div class="modal fade" id="modalInterim" tabindex="-1" aria-labelledby="modalInterimLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title fw-bold" id="modalInterimLabel">
+                        <i class="fas fa-user-shield me-2"></i> Programmer un Intérim
+                    </h5>
+                    {{-- Bouton X de fermeture --}}
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" data-dismiss="modal" aria-label="Close"></button>
+                </div>
 
-    /* Animation Pulse Urgence */
-    .animate-pulse {
-        animation: pulse-red 2s infinite;
-    }
-    @keyframes pulse-red {
-        0% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.15); opacity: 0.8; }
-        100% { transform: scale(1); opacity: 1; }
-    }
+                <div class="modal-body p-4 text-start">
+                    {{-- AFFICHAGE DES ERREURS DE VALIDATION (Laravel) --}}
+                    @if ($errors->any())
+                        <div class="alert alert-danger border-0 shadow-sm mb-4">
+                            <ul class="mb-0 small fw-bold">
+                                @foreach ($errors->all() as $error)
+                                    <li><i class="fas fa-exclamation-circle me-1"></i> {{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
-    .bg-success-subtle { background-color: #d1fae5 !important; }
-    .bg-danger-subtle { background-color: #fee2e2 !important; }
-</style>
+                    <!-- ID du titulaire (caché) -->
+                    <input type="hidden" name="agent_id" value="{{ $agent->id }}">
+
+                    <div class="alert alert-light border mb-4">
+                        <small class="text-muted d-block text-uppercase fw-bold">Titulaire remplacé :</small>
+                        <span class="text-dark fw-bold">{{ $agent->last_name }} {{ $agent->first_name }} ({{ $agent->status }})</span>
+                    </div>
+
+                    <!-- Choix de l'intérimaire -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-uppercase">Choisir l'intérimaire</label>
+                        <select name="interimaire_id" id="select_interimaire" class="form-select shadow-sm border-primary" required>
+                            <option value="">-- Sélectionner l'agent remplaçant --</option>
+                            @foreach($tousLesAgents as $autre)
+                                @if($autre->id !== $agent->id)
+                                    <option value="{{ $autre->id }}">
+                                        {{ $autre->last_name }} {{ $autre->first_name }} ({{ $autre->status }})
+                                    </option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Dates de l'intérim -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase">Date de début</label>
+                            <input type="date" name="date_debut" id="date_debut" class="form-control shadow-sm" required min="{{ date('Y-m-d') }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold small text-uppercase">Date de fin</label>
+                            <input type="date" name="date_fin" id="date_fin" class="form-control shadow-sm" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer bg-light border-0">
+                    {{-- BOUTON ANNULER CORRIGÉ (Double data pour compatibilité BS4/BS5) --}}
+                    <button type="button" class="btn btn-secondary fw-bold shadow-sm" data-bs-dismiss="modal" data-dismiss="modal">ANNULER</button>
+
+                    <!-- Bouton de soumission lié au script JS -->
+                    <button type="button" id="btnSubmitInterimForce" class="btn btn-info text-white fw-bold shadow-sm px-4">
+                        <i class="fas fa-check-circle me-1"></i> CONFIRMER L'INTÉRIM
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@push('scripts')
+<script>
+    $(document).on('click', '#btnSubmitInterimForce', function(e) {
+        e.preventDefault();
+
+        const form = document.getElementById('formInterimReal');
+        const agent = document.getElementById('select_interimaire').value;
+        const debut = document.getElementById('date_debut').value;
+        const fin = document.getElementById('date_fin').value;
+
+        // VALIDATION JAVASCRIPT AVANT ENVOI
+        if (!agent || !debut || !fin) {
+            alert("⚠️ Champs obligatoires : Veuillez sélectionner un intérimaire et définir les dates de début et de fin.");
+            return false;
+        }
+
+        // Si tout est rempli, on soumet le formulaire
+        form.submit();
+    });
+</script>
+@endpush
+
+
+
+
 @endsection

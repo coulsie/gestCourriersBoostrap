@@ -124,6 +124,22 @@ class Agent extends Model
             );
         }
 
+public function getStatutActuelAttribute()
+{
+    // Vérifier s'il y a un intérim actif pour cet agent aujourd'hui
+    $interim = \App\Models\Interim::where('interimaire_id', $this->id)
+        ->where('is_active', true)
+        ->whereDate('date_debut', '<=', now())
+        ->whereDate('date_fin', '>=', now())
+        ->first();
+
+    if ($interim) {
+        // Retourne le statut de la personne qu'il remplace
+        return $interim->agent->status;
+    }
+
+    return $this->status; // Retourne son propre statut sinon
+}
 
 
 

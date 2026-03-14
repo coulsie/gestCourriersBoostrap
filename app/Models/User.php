@@ -58,7 +58,7 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    
+
 
     /**
      * Get the attributes that should be cast.
@@ -81,11 +81,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Affectation::class);
     }
-    public function agent()
-    {
-        // Logique de la méthode ou définition de la relation (par exemple, hasOne, belongsTo, etc.)
-        return $this->hasOne(Agent::class); // Exemple de relation
-    }
+    
+public function agent()
+{
+    // On précise 'user_id' si c'est le nom de la colonne dans la table agents
+    return $this->hasOne(Agent::class, 'user_id');
+}
+
+
     public function affectation()
     {
         return $this->belongsTo(Affectation::class, 'agent_id');

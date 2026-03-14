@@ -82,10 +82,10 @@ public function create(Request $request)
     $services   = Service::orderBy('name', 'asc')->get();
     $agents     = Agent::with('service')->orderBy('last_name', 'asc')->get();
     $courriers  = Courrier::latest()->get();
-    
+
     // AJOUT : Récupérer les utilisateurs pour le champ "Suivi par"
     // On peut filtrer par rôle si nécessaire (ex: uniquement les chefs)
-    $users = \App\Models\User::orderBy('name', 'asc')->get(); 
+    $users = \App\Models\User::orderBy('name', 'asc')->get();
 
     $courrierSelectionne = null;
     $chemin_fichier = null;
@@ -134,47 +134,33 @@ public function store(Request $request)
         'courrier_id'       => 'required|exists:courriers,id',
         'date_imputation'   => 'required|date',
         'niveau'            => 'required|string',
-        'suivi_par'        => 'nullable|exists:users,id',
-        'user_id'          => 'required|exists:users,id',
-
+        'suivi_par'         => 'nullable|exists:users,id',
+        'user_id'           => 'required|exists:users,id',
     ]);
 
     try {
         $user = Auth::user();
 
-        // 2. Récupération du Courrier et de son fichier original
+        // 2. Récupération du Courrier
         $courrier = Courrier::findOrFail($request->courrier_id);
-        // On récupère le chemin du fichier du courrier pour la traçabilité
         $cheminFichierOriginal = $courrier->fichier_chemin;
 
-        // 3. Détermination du Niveau Hiérarchique (Logique 2026)
-        // 1. Récupération sécurisée du rôle (évite l'erreur sur null)
+        // 3. Détermination du Niveau Hiérarchique
         $statusAgent = $user->agent?->status ?? '';
         $roleName = mb_strtolower((string)$statusAgent, 'UTF-8');
 
         $niveau = match(true) {
-            // Niveau Tertiaire : Uniquement Chef de Service
             str_contains($roleName, 'chef de service') => 'tertiaire',
-
-            // Niveau Secondaire : Sous-directeur et Conseiller Technique
-            str_contains($roleName, 'sous-directeur') ||
-            str_contains($roleName, 'conseiller technique') => 'secondaire',
-
-            // Niveau Primaire : Directeur (doit contenir 'directeur' mais PAS 'sous')
+            str_contains($roleName, 'sous-directeur') || str_contains($roleName, 'conseiller technique') => 'secondaire',
             str_contains($roleName, 'directeur') && !str_contains($roleName, 'sous') => 'primaire',
-
-
-
             default => 'autre',
         };
 
-        // 4. Gestion du document annexe dans public/documents/imputations/annexes
+        // 4. Gestion du document annexe
         $annexePath = null;
         if ($request->hasFile('documents_annexes')) {
             $file = $request->file('documents_annexes');
             $fileName = time() . '_' . str_replace(' ', '_', $file->getClientOriginalName());
-
-            // Chemin vers le dossier public
             $destinationPath = public_path('documents/imputations/annexes');
 
             if (!File::exists($destinationPath)) {
@@ -185,25 +171,67 @@ public function store(Request $request)
             $annexePath = 'documents/imputations/annexes/' . $fileName;
         }
 
-        // 5. Création de l'Imputation
+        // 5. Création de l'Imputation (Initiale)
         $imputation = new Imputation();
-        $imputation->courrier_id      = $request->courrier_id;
-        $imputation->user_id          = $user->id;
-        $imputation->niveau           = $niveau;
-        $imputation->instructions     = $request->instructions;
-        $imputation->observations     = $request->observations;
-        $imputation->documents_annexes = $annexePath;
-        $imputation->chemin_fichier    = $cheminFichierOriginal;
-        $imputation->date_imputation   = $request->date_imputation;
-        $imputation->echeancier        = $request->echeancier;
-        $imputation->statut            = $request->statut;
-
+        $imputation->courrier_id       = $request->courrier_id;
+        $imputation->user_id           = $user->id;
+        $imputation->niveau            = $niveau;
+        $imputation->instructions      = $request->instructions;
+        $imputation->observations      = $request->observations;
+        $imputation->documents_annexes  = $annexePath;
+        $imputation->chemin_fichier     = $cheminFichierOriginal;
+        $imputation->date_imputation    = $request->date_imputation;
+        $imputation->echeancier         = $request->echeancier;
+        $imputation->statut             = $request->statut;
         $imputation->save();
 
-        // 6. Liaison avec les agents assignés
-        $imputation->agents()->sync($request->agent_ids);
+        // 6. Gestion dynamique des Agents (Absences & Intérims)
+        $finalAgentIds = [];
+        $dateRef = $request->date_imputation;
+        $notesInterim = "";
 
-        // 7. Mise à jour du Courrier (Affectation)
+        foreach ($request->agent_ids as $agentId) {
+            // Vérifier si l'agent a une absence APPROUVÉE (valeur 2)
+            $absenceApprouvee = \App\Models\Absence::where('agent_id', $agentId)
+                ->where('approuvee', 2)
+                ->whereDate('date_debut', '<=', $dateRef)
+                ->whereDate('date_fin', '>=', $dateRef)
+                ->first();
+
+            if ($absenceApprouvee) {
+                // Chercher l'intérimaire actif
+                $interim = \App\Models\Interim::where('agent_id', $agentId)
+                    ->where('is_active', true)
+                    ->whereDate('date_debut', '<=', $dateRef)
+                    ->whereDate('date_fin', '>=', $dateRef)
+                    ->first();
+
+                if ($interim) {
+                    $finalAgentIds[] = $interim->interimaire_id;
+
+                    $agentTitulaire = \App\Models\Agent::find($agentId);
+                    $nomTitulaire = $agentTitulaire->last_name . ' ' . $agentTitulaire->first_name;
+                    $nomInterim = $interim->interimaire->last_name . ' ' . $interim->interimaire->first_name;
+                    $notesInterim .= "\n[LOG] $nomTitulaire absent (approuvé), redirigé vers l'intérimaire $nomInterim.";
+                } else {
+                    $finalAgentIds[] = $agentId; // Pas d'intérim trouvé, on garde l'agent
+                }
+            } else {
+                $finalAgentIds[] = $agentId; // Pas d'absence approuvée
+            }
+        }
+
+        // Synchronisation des agents finaux (sans doublons)
+        $imputation->agents()->sync(array_unique($finalAgentIds));
+
+        // Mise à jour des observations si des intérims ont été détectés
+        if (!empty($notesInterim)) {
+            $imputation->update([
+                'observations' => $imputation->observations . $notesInterim
+            ]);
+        }
+
+        // 7. Mise à jour du Courrier
         $courrier->update([
             'statut'   => 'affecté',
             'affecter' => 1
@@ -213,13 +241,10 @@ public function store(Request $request)
             ->with('success', "Imputation de niveau " . strtoupper($niveau) . " enregistrée avec succès !");
 
     } catch (\Exception $e) {
-        // Utilisation du chemin complet si l'import pose toujours problème
         \Illuminate\Support\Facades\Log::error('Erreur Imputation 2026 : ' . $e->getMessage());
-
         return back()->withInput()->with('error', "Une erreur est survenue : " . $e->getMessage());
     }
 }
-
 
 
     public function edit(Imputation $imputation)

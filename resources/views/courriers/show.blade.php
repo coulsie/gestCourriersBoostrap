@@ -68,11 +68,16 @@
                 </div>
             </div>
 
+
+
+            <!-- Bloc Action Signature -->
             <!-- Bloc Action Signature -->
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body text-center">
                     <h6 class="text-uppercase text-dark fw-bold small mb-3 text-start">Signature Numérique</h6>
+
                     @if($courrier->signed_by && $courrier->signataire)
+                        {{-- CAS 1 : LE COURRIER EST DÉJÀ SIGNÉ --}}
                         <div class="p-3 rounded bg-white border border-primary shadow-sm">
                             <img src="{{ asset('signatures/' . $courrier->signataire->signature_path) }}" class="img-fluid mb-2" style="max-height: 80px; mix-blend-mode: multiply;">
                             <div class="small border-top pt-2">
@@ -81,19 +86,36 @@
                             </div>
                         </div>
                     @else
-                        @if(auth()->user()->signature_path)
-                            <form action="{{ route('courriers.sign', $courrier->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm" onclick="return confirm('Signer ce courrier ?')">
-                                    <i class="bi bi-pen me-2"></i> Signer maintenant
-                                </button>
-                            </form>
+                        {{-- CAS 2 : LE COURRIER N'EST PAS ENCORE SIGNÉ --}}
+
+                        {{-- ON VÉRIFIE SI L'UTILISATEUR A LE DROIT (PROPRE OU PAR INTÉRIM) --}}
+                        @can('has-role', 'Directeur')
+                            @if(auth()->user()->signature_path)
+                                {{-- S'il a le droit et qu'il a configuré sa signature --}}
+                                <form action="{{ route('courriers.sign', $courrier->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold shadow-sm" onclick="return confirm('Signer ce courrier en tant que Direction ?')">
+                                        <i class="bi bi-pen me-2"></i> Signer maintenant
+                                    </button>
+                                </form>
+                            @else
+                                {{-- S'il a le droit mais n'a pas chargé son image de signature --}}
+                                <div class="alert alert-warning small mb-0">
+                                    <i class="bi bi-exclamation-triangle me-1"></i> Droits de signature actifs, mais aucune signature configurée.
+                                    <a href="{{ route('profile.signature') }}" class="btn btn-link btn-sm p-0 fw-bold">Configurer ici</a>
+                                </div>
+                            @endif
                         @else
-                            <a href="{{ route('profile.signature') }}" class="btn btn-outline-danger btn-sm w-100 fw-bold">Configurer ma signature</a>
-                        @endif
+                            {{-- CAS 3 : L'UTILISATEUR N'A PAS LE DROIT DE SIGNER --}}
+                            <div class="p-3 bg-light rounded border text-muted small">
+                                <i class="bi bi-lock-fill me-1"></i> Signature réservée à la Direction ou à l'intérimaire désigné.
+                            </div>
+                        @endcan
+
                     @endif
                 </div>
             </div>
+
         </div>
 
         <!-- COLONNE DROITE -->

@@ -136,16 +136,23 @@ public function store(Request $request)
 /**
      * Affiche les détails d'un agent spécifique.
      */
-            public function show(Agent $agent): View
-        {
-            // Force le rechargement de TOUTES les colonnes depuis la base de données
-            $agent->refresh();
 
-            // Charge les relations
-            $agent->load(['service.direction', 'user']);
+public function show(Agent $agent): View
+{
+    // Force le rechargement de TOUTES les colonnes depuis la base de données
+    $agent->refresh();
 
-            return view('agents.show', compact('agent'));
-        }
+    // Charge les relations
+    $agent->load(['service.direction', 'user']);
+
+    // RÉCUPÉRATION DES AGENTS POUR LA MODALE D'INTÉRIM
+    // On récupère tous les agents triés par nom
+    $tousLesAgents = Agent::orderBy('last_name')->get();
+
+    // On ajoute 'tousLesAgents' dans le compact
+    return view('agents.show', compact('agent', 'tousLesAgents'));
+}
+
     /**
      * Affiche le formulaire d'édition d'un agent.
      */
