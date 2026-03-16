@@ -329,7 +329,7 @@
 </div>
 
 <script>
-    // --- 1. VOTRE SCRIPT DE FILTRAGE EXISTANT ---
+    // --- 1. SCRIPT DE FILTRAGE EXISTANT ---
     const dirF = document.getElementById('filter_direction');
     const serF = document.getElementById('filter_service');
     const agS = document.getElementById('agent_select');
@@ -354,70 +354,63 @@
     dirF.addEventListener('change', () => { serF.value = ""; filter(); });
     serF.addEventListener('change', filter);
 
-    // --- 2. NOUVELLE LOGIQUE DE VÉRIFICATION DES INTÉRIMS ---
+    // --- 2. LOGIQUE DE VÉRIFICATION DES INTÉRIMS (MODIFIÉE) ---
+    const formImputation = document.getElementById('formImputation');
 
-    // --- 2. LOGIQUE DE VÉRIFICATION DES INTÉRIMS ---
+    formImputation.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
 
-const formImputation = document.getElementById('formImputation');
-
-formImputation.addEventListener('submit', function(e) {
-    // 1. On empêche la soumission immédiate
-    e.preventDefault();
-
-    const formData = new FormData(this);
-
-    // 2. Appel AJAX vers votre route de contrôle
-    fetch("{{ route('imputations.check-interim') }}", {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        // 3. Si des intérims sont trouvés, on affiche la modale
-        if (data.replacements && data.replacements.length > 0) {
-            let html = `
-                <div class="alert alert-warning border-0 shadow-sm mb-3">
-                    <i class="fas fa-user-clock me-2"></i>
-                    <strong>Attention :</strong> Des agents sélectionnés sont actuellement absents.
-                </div>`;
-
-            data.replacements.forEach(item => {
-                html += `
-                    <div class="p-3 mb-2 bg-light border-start border-4 border-primary rounded shadow-sm">
-                        Compte tenu de l'absence de <strong>${item.titulaire}</strong>,
-                        l'intérim est assuré par <strong>${item.interimaire}</strong>
-                        du <span class="badge bg-secondary text-white">${item.debut}</span>
-                        au <span class="badge bg-secondary text-white">${item.fin}</span>.
+        fetch("{{ route('imputations.check-interim') }}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.replacements && data.replacements.length > 0) {
+                let html = `
+                    <div class="alert alert-warning border-0 shadow-sm mb-3">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Attention :</strong> Des absences avec intérim ont été détectées.
                     </div>`;
-            });
 
-            document.getElementById('interimInfoBody').innerHTML = html;
+                data.replacements.forEach(item => {
+                    html += `
+                        <div class="p-3 mb-2 bg-light border-start border-4 border-warning rounded shadow-sm">
+                            Compte tenu de l'absence de <strong>${item.titulaire}</strong>,
+                            l'intérim est assuré par <strong>${item.interimaire}</strong>
+                            du <span class="badge bg-danger text-white px-2 fw-bold">${item.debut}</span>
+                            au <span class="badge bg-danger text-white px-2 fw-bold">${item.fin}</span>.
+                        </div>`;
+                });
 
-            // Affichage de la modale Bootstrap
-            const interimModal = new bootstrap.Modal(document.getElementById('confirmInterimModal'));
-            interimModal.show();
-        } else {
-            // 4. Aucun intérim : on soumet le formulaire normalement
+                document.getElementById('interimInfoBody').innerHTML = html;
+
+                // Initialisation et affichage du modal
+                const interimModal = new bootstrap.Modal(document.getElementById('confirmInterimModal'));
+                interimModal.show();
+            } else {
+                this.submit();
+            }
+        })
+        .catch(error => {
+            console.error('Erreur:', error);
             this.submit();
-        }
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-        this.submit(); // En cas de bug, on laisse passer par sécurité
+        });
     });
-});
 
-/**
- * Fonction appelée par le bouton "OK" de votre modale
- */
-function submitImputationForm() {
-    document.getElementById('formImputation').submit();
-}
+    /**
+     * Fonction appelée par le bouton "OK" de la modale
+     */
+    function submitImputationForm() {
+        document.getElementById('formImputation').submit();
+    }
 </script>
+
 @endsection
 
 

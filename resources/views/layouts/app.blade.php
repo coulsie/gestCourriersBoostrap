@@ -92,103 +92,103 @@
 
             <hr class="sidebar-divider">
 
-<!-- SECTION ADMINISTRATION : Réservée aux Admins (ORANGE ÉLECTRIQUE) -->
-@hasanyrole('admin|Superviseur|utilisateur')
+        <!-- SECTION ADMINISTRATION : Réservée aux Admins (ORANGE ÉLECTRIQUE) -->
+        @hasanyrole('admin|Superviseur|utilisateur')
 
-    <hr class="sidebar-divider" style="border-top: 2px solid #ff9f43; opacity: 0.2;">
-    <div class="sidebar-heading fw-bold" style="color: #ff9f43; letter-spacing: 1px;">
-        <i class="fas fa-tools me-1"></i> ADMINISTRATION & CONSULTATION
-    </div>
-
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAdmin" aria-expanded="true">
-            <i class="fas fa-fw fa-shield-alt" style="color: #ff9f43;"></i>
-            <span style="color: #ff9f43; font-weight: 800;">CONTRÔLE & RH</span>
-        </a>
-        <div id="collapseAdmin" class="collapse" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded shadow-lg" style="border-left: 5px solid #ff9f43; border-right: 1px solid #fff3e0;">
-
-                {{-- 1. LIEN MA SIGNATURE (Visible par admin, superviseur et utilisateur) --}}
-                <a class="collapse-item fw-bold text-dark transition-hover {{ request()->routeIs('profile.signature.*') ? 'bg-light' : '' }}"
-                    href="{{ route('profile.signature.edit') }}">
-                    <i class="fas fa-pen-fancy me-2" style="color: #6610f2;"></i> Ma Signature
-                </a>
-
-                @hasanyrole('admin|Superviseur')
-                    <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #ee5253;">
-                        <i class="fas fa-user-shield me-1"></i> GESTION SYSTÈME
-                    </h6>
-
-                    {{-- LISTE UTILISATEURS --}}
-                    <a class="collapse-item fw-bold text-dark transition-hover" href="{{ route('users.index') }}">
-                        <i class="fas fa-users-cog me-2" style="color: #ff9f43;"></i> Liste Utilisateurs
-                    </a>
-
-                    {{-- SUIVI DES INTÉRIMS (Ambre) --}}
-                    <a class="collapse-item fw-bold text-dark transition-hover {{ request()->routeIs('interims.index') ? 'bg-light' : '' }}" href="{{ route('interims.index') }}">
-                        <i class="fas fa-user-shield me-2" style="color: #f6993f;"></i> Suivi des Intérims
-                    </a>
-
-                    {{-- BOUTON CRÉER INTÉRIM (Vert Émeraude) --}}
-                    <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 my-1 d-flex align-items-center justify-content-center"
-                       href="{{ route('interims.create') }}"
-                       style="background-color: #10b981; height: 35px; border-bottom: 3px solid #059669; text-decoration: none;">
-                        <i class="fas fa-plus-circle me-2"></i> NOUVEL INTÉRIM
-                    </a>
-
-                    <a class="collapse-item fw-bold text-dark" href="{{ route('admin.logs.index') }}">
-                        <i class="fas fa-fingerprint me-2" style="color: #ff9f43;"></i> Journal Événements
-                    </a>
-
-                    <a class="collapse-item fw-bold text-dark" href="{{ route('roles.index') }}">
-                        <i class="fas fa-user-lock me-2" style="color: #ff9f43;"></i> Gestion des Rôles
-                    </a>
-
-                    {{-- BOUTON COFFRE FORT (CRIMSON ÉCLATANT) --}}
-                    <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 my-2 d-flex align-items-center justify-content-center"
-                    href="{{ route('admin.coffre-fort') }}" style="background-color: #ee5253; height: 35px; text-decoration: none;">
-                        <i class="fas fa-vault me-2"></i> COFFRE FORT
-                    </a>
-
-                    <div class="px-3 py-1">
-                        <a class="collapse-item fw-bold small text-indigo p-0" href="{{ route('agents.nouveau') }}"><i class="fas fa-plus-circle me-1"></i> Nouveau Compte</a>
-                        <a class="collapse-item fw-bold small text-success p-0" href="{{ route('agents.index') }}"><i class="fas fa-user-tie me-1"></i> Ressources Humaines</a>
-                        <a class="collapse-item fw-bold small text-secondary p-0" href="{{ route('extraction.index') }}"><i class="fas fa-download me-1"></i> Extraction</a>
-                    </div>
-                @endhasanyrole
-
-                {{-- BLOC CONSULTATION --}}
-                <div class="dropdown-divider" style="border-top: 2px solid #ff9f43; opacity: 0.15;"></div>
-                <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #6c5ce7;">
-                    <i class="fas fa-search me-1"></i> CONSULTATION
-                </h6>
-                <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mb-1" href="{{ route('agents.par.service') }}" style="background-color: #6c5ce7; text-decoration: none;">
-                    <i class="fas fa-building me-2"></i> Agents par Service
-                </a>
-
-                @hasanyrole('admin|Superviseur')
-                    <a class="collapse-item fw-bold text-indigo" href="{{ route('agents.par.service.recherche') }}">
-                        <i class="fas fa-user-search me-2"></i> Recherche Agents
-                    </a>
-
-                    {{-- ANALYSES --}}
-                    <div class="dropdown-divider" style="border-top: 2px solid #ff9f43; opacity: 0.15;"></div>
-                    <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #e67e22;">
-                        <i class="fas fa-chart-line me-1"></i> ANALYSES
-                    </h6>
-                    <a class="collapse-item fw-bold" style="color: #e67e22;" href="{{ route('statistiques.dashboard') }}">
-                        <i class="fas fa-tachometer-alt me-2"></i> Dashboard Stats
-                    </a>
-                    <a class="collapse-item fw-bold text-muted" href="{{ route('typeabsences.index') }}">
-                        <i class="fas fa-cog me-2"></i> Paramétrage Absence
-                    </a>
-                @endhasanyrole
+            <hr class="sidebar-divider" style="border-top: 2px solid #ff9f43; opacity: 0.2;">
+            <div class="sidebar-heading fw-bold" style="color: #ff9f43; letter-spacing: 1px;">
+                <i class="fas fa-tools me-1"></i> ADMINISTRATION & CONSULTATION
             </div>
-        </div>
-    </li>
-@endhasanyrole
 
-<hr class="sidebar-divider">
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAdmin" aria-expanded="true">
+                    <i class="fas fa-fw fa-shield-alt" style="color: #ff9f43;"></i>
+                    <span style="color: #ff9f43; font-weight: 800;">CONTRÔLE & RH</span>
+                </a>
+                <div id="collapseAdmin" class="collapse" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded shadow-lg" style="border-left: 5px solid #ff9f43; border-right: 1px solid #fff3e0;">
+
+                        {{-- 1. LIEN MA SIGNATURE (Visible par admin, superviseur et utilisateur) --}}
+                        <a class="collapse-item fw-bold text-dark transition-hover {{ request()->routeIs('profile.signature.*') ? 'bg-light' : '' }}"
+                            href="{{ route('profile.signature.edit') }}">
+                            <i class="fas fa-pen-fancy me-2" style="color: #6610f2;"></i> Ma Signature
+                        </a>
+
+                        @hasanyrole('admin|Superviseur')
+                            <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #ee5253;">
+                                <i class="fas fa-user-shield me-1"></i> GESTION SYSTÈME
+                            </h6>
+
+                            {{-- LISTE UTILISATEURS --}}
+                            <a class="collapse-item fw-bold text-dark transition-hover" href="{{ route('users.index') }}">
+                                <i class="fas fa-users-cog me-2" style="color: #ff9f43;"></i> Liste Utilisateurs
+                            </a>
+
+                            {{-- SUIVI DES INTÉRIMS (Ambre) --}}
+                            <a class="collapse-item fw-bold text-dark transition-hover {{ request()->routeIs('interims.index') ? 'bg-light' : '' }}" href="{{ route('interims.index') }}">
+                                <i class="fas fa-user-shield me-2" style="color: #f6993f;"></i> Suivi des Intérims
+                            </a>
+
+                            {{-- BOUTON CRÉER INTÉRIM (Vert Émeraude) --}}
+                            <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 my-1 d-flex align-items-center justify-content-center"
+                            href="{{ route('interims.create') }}"
+                            style="background-color: #10b981; height: 35px; border-bottom: 3px solid #059669; text-decoration: none;">
+                                <i class="fas fa-plus-circle me-2"></i> NOUVEL INTÉRIM
+                            </a>
+
+                            <a class="collapse-item fw-bold text-dark" href="{{ route('admin.logs.index') }}">
+                                <i class="fas fa-fingerprint me-2" style="color: #ff9f43;"></i> Journal Événements
+                            </a>
+
+                            <a class="collapse-item fw-bold text-dark" href="{{ route('roles.index') }}">
+                                <i class="fas fa-user-lock me-2" style="color: #ff9f43;"></i> Gestion des Rôles
+                            </a>
+
+                            {{-- BOUTON COFFRE FORT (CRIMSON ÉCLATANT) --}}
+                            <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 my-2 d-flex align-items-center justify-content-center"
+                            href="{{ route('admin.coffre-fort') }}" style="background-color: #ee5253; height: 35px; text-decoration: none;">
+                                <i class="fas fa-vault me-2"></i> COFFRE FORT
+                            </a>
+
+                            <div class="px-3 py-1">
+                                <a class="collapse-item fw-bold small text-indigo p-0" href="{{ route('agents.nouveau') }}"><i class="fas fa-plus-circle me-1"></i> Nouveau Compte</a>
+                                <a class="collapse-item fw-bold small text-success p-0" href="{{ route('agents.index') }}"><i class="fas fa-user-tie me-1"></i> Ressources Humaines</a>
+                                <a class="collapse-item fw-bold small text-secondary p-0" href="{{ route('extraction.index') }}"><i class="fas fa-download me-1"></i> Extraction</a>
+                            </div>
+                        @endhasanyrole
+
+                        {{-- BLOC CONSULTATION --}}
+                        <div class="dropdown-divider" style="border-top: 2px solid #ff9f43; opacity: 0.15;"></div>
+                        <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #6c5ce7;">
+                            <i class="fas fa-search me-1"></i> CONSULTATION
+                        </h6>
+                        <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mb-1" href="{{ route('agents.par.service') }}" style="background-color: #6c5ce7; text-decoration: none;">
+                            <i class="fas fa-building me-2"></i> Agents par Service
+                        </a>
+
+                        @hasanyrole('admin|Superviseur')
+                            <a class="collapse-item fw-bold text-indigo" href="{{ route('agents.par.service.recherche') }}">
+                                <i class="fas fa-user-search me-2"></i> Recherche Agents
+                            </a>
+
+                            {{-- ANALYSES --}}
+                            <div class="dropdown-divider" style="border-top: 2px solid #ff9f43; opacity: 0.15;"></div>
+                            <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #e67e22;">
+                                <i class="fas fa-chart-line me-1"></i> ANALYSES
+                            </h6>
+                            <a class="collapse-item fw-bold" style="color: #e67e22;" href="{{ route('statistiques.dashboard') }}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard Stats
+                            </a>
+                            <a class="collapse-item fw-bold text-muted" href="{{ route('typeabsences.index') }}">
+                                <i class="fas fa-cog me-2"></i> Paramétrage Absence
+                            </a>
+                        @endhasanyrole
+                    </div>
+                </div>
+            </li>
+        @endhasanyrole
+
+        <hr class="sidebar-divider">
 
                             <!-- SECTION COURRIERS : OPÉRATIONS (CYAN ÉCLATANT) -->
             <div class="sidebar-heading text-cyan fw-bolder" style="color: #00e5ff !important; letter-spacing: 1px;">
@@ -306,10 +306,10 @@
                             <div class="dropdown-divider" style="border-top: 1px dashed #2ed573; opacity: 0.2;"></div>
 
                             <a class="collapse-item text-muted fw-bold small" href="{{ route('typeabsences.index') }}">Types d'Autorisations</a>
-                            <a class="collapse-item text-muted fw-bold small" href="{{ route('absences.index') }}">Liste des Demandes</a>
+                            <a class="collapse-item text-muted fw-bold small" href="{{ route('absences.index') }}">Demandes d'Autorisation d'absence</a>
 
                             <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mt-1" href="{{ route('absences.validation_liste') }}" style="background-color: #ffa502;">
-                                <i class="fas fa-tasks me-2"></i> Validation Absences
+                                <i class="fas fa-tasks me-2"></i> Validation Autorisation d'Absences
                             </a>
 
                             {{-- RAPPORTS : BLEU NUIT --}}
