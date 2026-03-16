@@ -23,7 +23,10 @@
                 </div>
 
                 <div class="card-body p-4" style="background-color: #f8fafc;">
-                    <form action="{{ route('imputations.store') }}" method="POST" enctype="multipart/form-data">
+
+
+                    <form id="formImputation" action="{{ route('imputations.store') }}" method="POST" enctype="multipart/form-data">
+
                         @csrf
 
                         <!-- CHAMPS TECHNIQUES -->
@@ -231,8 +234,8 @@
                             </div>
                         </div>
 
-                        <!-- SECTION 3 : TRAITEMENT -->
-                        <!-- SECTION 3 : TRAITEMENT -->
+                        <!-- 3 : TRAITEMENT -->
+                        <!--  3 : TRAITEMENT -->
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="p-4 bg-white rounded-3 shadow-sm border-top border-4 border-success">
@@ -281,11 +284,16 @@
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                        <<div class="d-flex justify-content-between mt-4 pt-3 border-top">
                             <a href="{{ route('courriers.index') }}" class="btn btn-outline-secondary px-4 fw-bold">ANNULER</a>
-                            <button type="submit" class="btn btn-primary btn-lg px-5 shadow fw-bold">
-                                <i class="fas fa-save me-2"></i> ENREGISTRER L'IMPUTATION
-                            </button>
+
+                            <!-- Nouveau bouton qui déclenche la vérification JavaScript -->
+                            <button type="submit" class="btn btn-primary px-5 fw-bold shadow">
+    <i class="fas fa-check-circle me-1"></i> Enregistrer l'imputation
+</button>
+
+
+
                         </div>
                     </form>
                 </div>
@@ -294,8 +302,34 @@
     </div>
 </div>
 
+<!-- Modale de confirmation (à placer idéalement juste avant le ) -->
+<div class="modal fade" id="confirmInterimModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title fw-bold">
+                    <i class="fas fa-info-circle me-2"></i> Information d'Intérim
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="interimInfoBody" class="modal-body py-4">
+                <!-- Le message dynamique sera injecté ici -->
+            </div>
+            <div class="modal-footer border-0 bg-light">
+                <button type="button" class="btn btn-secondary fw-bold" data-bs-dismiss="modal" data-dismiss="modal">
+                    Annuler
+                </button>
+
+                <button type="button" onclick="submitImputationForm()" class="btn btn-warning fw-bold px-4 shadow-sm">
+                    OK, CONTINUER
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Script de filtrage identique au précédent
+    // --- 1. VOTRE SCRIPT DE FILTRAGE EXISTANT ---
     const dirF = document.getElementById('filter_direction');
     const serF = document.getElementById('filter_service');
     const agS = document.getElementById('agent_select');
@@ -319,6 +353,70 @@
 
     dirF.addEventListener('change', () => { serF.value = ""; filter(); });
     serF.addEventListener('change', filter);
+
+    // --- 2. NOUVELLE LOGIQUE DE VÉRIFICATION DES INTÉRIMS ---
+
+    // --- 2. LOGIQUE DE VÉRIFICATION DES INTÉRIMS ---
+
+const formImputation = document.getElementById('formImputation');
+
+formImputation.addEventListener('submit', function(e) {
+    // 1. On empêche la soumission immédiate
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    // 2. Appel AJAX vers votre route de contrôle
+    fetch("{{ route('imputations.check-interim') }}", {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // 3. Si des intérims sont trouvés, on affiche la modale
+        if (data.replacements && data.replacements.length > 0) {
+            let html = `
+                <div class="alert alert-warning border-0 shadow-sm mb-3">
+                    <i class="fas fa-user-clock me-2"></i>
+                    <strong>Attention :</strong> Des agents sélectionnés sont actuellement absents.
+                </div>`;
+
+            data.replacements.forEach(item => {
+                html += `
+                    <div class="p-3 mb-2 bg-light border-start border-4 border-primary rounded shadow-sm">
+                        Compte tenu de l'absence de <strong>${item.titulaire}</strong>,
+                        l'intérim est assuré par <strong>${item.interimaire}</strong>
+                        du <span class="badge bg-secondary text-white">${item.debut}</span>
+                        au <span class="badge bg-secondary text-white">${item.fin}</span>.
+                    </div>`;
+            });
+
+            document.getElementById('interimInfoBody').innerHTML = html;
+
+            // Affichage de la modale Bootstrap
+            const interimModal = new bootstrap.Modal(document.getElementById('confirmInterimModal'));
+            interimModal.show();
+        } else {
+            // 4. Aucun intérim : on soumet le formulaire normalement
+            this.submit();
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        this.submit(); // En cas de bug, on laisse passer par sécurité
+    });
+});
+
+/**
+ * Fonction appelée par le bouton "OK" de votre modale
+ */
+function submitImputationForm() {
+    document.getElementById('formImputation').submit();
+}
 </script>
 @endsection
 

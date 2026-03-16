@@ -246,6 +246,51 @@ public function store(Request $request)
     }
 }
 
+ public function checkInterim(Request $request)
+{
+    // On récupère les IDs du select multiple (agent_ids)
+    $agentIds = $request->agent_ids;
+    $dateRef = $request->date_imputation;
+    $replacements = [];
+
+    if (!$agentIds || !is_array($agentIds)) {
+        return response()->json(['replacements' => []]);
+    }
+
+    foreach ($agentIds as $agentId) {
+        // 1. On cherche l'absence approuvée
+        $absence = \App\Models\Absence::where('agent_id', $agentId)
+            ->where('approuvee', 2)
+            ->whereDate('date_debut', '<=', $dateRef)
+            ->whereDate('date_fin', '>=', $dateRef)
+            ->first();
+
+        if ($absence) {
+            // 2. On cherche l'intérim actif
+            $interim = \App\Models\Interim::where('agent_id', $agentId)
+                ->where('is_active', 1)
+                ->whereDate('date_debut', '<=', $dateRef)
+                ->whereDate('date_fin', '>=', $dateRef)
+                ->first();
+
+            if ($interim) {
+                $titulaire = \App\Models\Agent::find($agentId);
+                $replacements[] = [
+                    'titulaire'   => $titulaire->last_name . ' ' . $titulaire->first_name,
+                    'interimaire' => $interim->interimaire->last_name . ' ' . $interim->interimaire->first_name,
+                    'debut'       => \Carbon\Carbon::parse($interim->date_debut)->format('d/m/Y'),
+                    'fin'         => \Carbon\Carbon::parse($interim->date_fin)->format('d/m/Y'),
+                ];
+            }
+        }
+    }
+
+    return response()->json(['replacements' => $replacements]);
+}
+
+
+
+
 
     public function edit(Imputation $imputation)
     {

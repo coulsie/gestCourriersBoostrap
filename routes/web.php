@@ -75,6 +75,7 @@ Route::post('/interims', [InterimController::class, 'store'])->name('interims.st
 
 // Dans routes/web.php
 Route::post('/interims/store', [App\Http\Controllers\InterimController::class, 'store'])->name('interims.store');
+Route::post('/imputations/check-interim', [ImputationController::class, 'checkInterim'])->name('imputations.check-interim');
 
 
 /*

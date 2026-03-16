@@ -15,6 +15,7 @@ use App\Models\Absence;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Service;
+use App\Models\Holiday; // N'oubliez pas d'importer le modèle
 
 
 class PresenceController extends Controller
@@ -106,7 +107,7 @@ public function store(Request $request)
 
     // 2. VÉRIFICATION JOUR FÉRIÉ (BLOQUANT)
     $ferie = \App\Models\Holiday::where('holiday_date', $dateJour)->first();
-    
+
     if ($ferie) {
         return redirect()->route('presences.index')
             ->with('error', "Enregistrement de présence impossible : le " . $heureArrivee->format('d/m/Y') . " est un jour férié (" . $ferie->name . ").");
@@ -240,7 +241,7 @@ public function statsPresences(Request $request)
 
     // --- 2. FILTRAGE ---
     if ($mois) $query->whereMonth('heure_arrivee', $mois);
-    
+
     if ($semaine) $query->whereRaw('WEEK(heure_arrivee, 1) = ?', [$semaine]);
 
     if ($service_id) {
@@ -309,8 +310,8 @@ public function stats(Request $request)
 
     // 4. Stats Hebdo avec Jours Fériés
     $hebdo = \App\Models\Presence::select(
-            DB::raw('WEEK(heure_arrivee, 1) as semaine'), 
-            DB::raw("COUNT(*) as total"), 
+            DB::raw('WEEK(heure_arrivee, 1) as semaine'),
+            DB::raw("COUNT(*) as total"),
             DB::raw("SUM(statut = 'Présent') as presents"),
             DB::raw("SUM(statut = 'Férié') as feries")
         )
@@ -320,8 +321,8 @@ public function stats(Request $request)
 
     // 5. Stats Mensuelles avec Jours Fériés
     $mensuel = \App\Models\Presence::select(
-            DB::raw('MONTH(heure_arrivee) as mois'), 
-            DB::raw("COUNT(*) as total"), 
+            DB::raw('MONTH(heure_arrivee) as mois'),
+            DB::raw("COUNT(*) as total"),
             DB::raw("SUM(statut = 'Présent') as presents"),
             DB::raw("SUM(statut = 'Férié') as feries")
         )
@@ -355,7 +356,7 @@ public function indexValidationHebdo()
             // SI c'est un jour férié, on passe au jour suivant sans rien détecter
             if (in_array($dateStr, $joursFeries)) {
                 $currentDate->addDay();
-                continue; 
+                continue;
             }
 
             $dejaValide = Presence::where('agent_id', $agent->id)
@@ -458,18 +459,43 @@ public function rapport(Request $request)
 /**
  * Vue pour que l'agent puisse pointer lui-même
  */
+ 
 public function monPointage()
 {
-    $agentId = Auth::user()->agent->id; // On récupère l'ID agent lié à l'utilisateur connecté
+    $agent = Auth::user()->agent;
+
+    if (!$agent) {
+        return back()->with('error', "Aucun profil agent associé à cet utilisateur.");
+    }
+
+    $agentId = $agent->id;
     $aujourdhui = Carbon::today();
 
-    // On cherche si un pointage existe aujourd'hui pour cet agent
+    // 1. Vérification du jour férié
+    // On gère les jours récurrents (ex: 1er Janvier chaque année) et les dates spécifiques
+    $ferie = Holiday::where(function($query) use ($aujourdhui) {
+        $query->whereDate('holiday_date', $aujourdhui)
+              ->orWhere(function($q) use ($aujourdhui) {
+                  $q->where('is_recurring', true)
+                    ->whereMonth('holiday_date', $aujourdhui->month)
+                    ->whereDay('holiday_date', $aujourdhui->day);
+              });
+    })->first();
+
+    // 2. Si c'est un jour férié, on retourne à la page précédente avec le message d'erreur
+    if ($ferie) {
+        $dateAffichage = $aujourdhui->format('d/m/Y');
+        return back()->with('error', "Enregistrement de présence impossible : le $dateAffichage est un jour férié ($ferie->name).");
+    }
+
+    // 3. Si ce n'est pas férié, on cherche le pointage existant
     $presence = Presence::where('agent_id', $agentId)
                         ->whereDate('heure_arrivee', $aujourdhui)
                         ->first();
 
     return view('presences.self_pointage', compact('presence'));
 }
+
 
 /**
  * Logique de clic unique (Arrivée ou Départ)

@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : jeu. 12 mars 2026 à 16:29
--- Version du serveur : 11.4.9-MariaDB
--- Version de PHP : 8.3.28
+-- Généré le : lun. 16 mars 2026 à 01:11
+-- Version du serveur : 11.5.2-MariaDB
+-- Version de PHP : 8.3.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `absences` (
   PRIMARY KEY (`id`),
   KEY `absences_agent_id_foreign` (`agent_id`),
   KEY `absences_type_absence_id_foreign` (`type_absence_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `absences`
@@ -68,7 +68,10 @@ INSERT INTO `absences` (`id`, `agent_id`, `type_absence_id`, `date_debut`, `date
 (28, 25, 7, '2026-03-20', '2026-03-22', 2, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-11 10:15:33'),
 (29, 9, 7, '2026-03-20', '2026-03-22', 1, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-11 10:15:35'),
 (30, 18, 7, '2026-03-20', '2026-03-22', 1, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-11 10:15:34'),
-(31, 20, 7, '2026-03-10', '2026-03-15', 1, '1773223805_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-11 10:10:05', '2026-03-11 10:10:33');
+(31, 20, 7, '2026-03-10', '2026-03-15', 1, '1773223805_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-11 10:10:05', '2026-03-11 10:10:33'),
+(32, 5, 1, '2026-03-15', '2026-03-18', 2, 'Généré par intérim #1773486234', '2026-03-14 11:03:54', '2026-03-14 11:03:54'),
+(33, 5, 1, '2026-03-22', '2026-03-25', 2, 'seminaire a dakar', '2026-03-14 11:16:33', '2026-03-14 11:16:33'),
+(34, 25, 1, '2026-03-15', '2026-03-17', 2, 'repos maladie', '2026-03-15 14:41:44', '2026-03-15 14:41:44');
 
 -- --------------------------------------------------------
 
@@ -155,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `agent_imputation` (
   PRIMARY KEY (`id`),
   KEY `agent_imputation_imputation_id_foreign` (`imputation_id`),
   KEY `agent_imputation_agent_id_foreign` (`agent_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `agent_imputation`
@@ -187,7 +190,10 @@ INSERT INTO `agent_imputation` (`id`, `imputation_id`, `agent_id`, `created_at`,
 (33, 27, 1, NULL, NULL),
 (34, 28, 1, NULL, NULL),
 (35, 28, 2, NULL, NULL),
-(36, 28, 4, NULL, NULL);
+(36, 28, 4, NULL, NULL),
+(39, 31, 18, NULL, NULL),
+(38, 30, 18, NULL, NULL),
+(41, 33, 1, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -241,7 +247,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `audit_logs_user_id_foreign` (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `audit_logs`
@@ -272,12 +278,22 @@ INSERT INTO `audit_logs` (`id`, `user_id`, `event`, `auditable_type`, `auditable
 (36, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1773304855.png\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1773309881.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 10:04:41', '2026-03-12 10:04:41'),
 (37, 3, 'Upload signature scannée', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1773309881.png\\\"}\"', '\"{\\\"path\\\":\\\"scan_3_1773309928.JPG\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 10:05:28', '2026-03-12 10:05:28'),
 (38, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"scan_3_1773309928.JPG\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1773309946.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 10:05:46', '2026-03-12 10:05:46'),
-(39, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 13:41:42', '2026-03-12 13:41:42'),
-(40, 3, 'updated', 'App\\Models\\Courrier', 12, '\"{\\\"id\\\":12,\\\"num_enregistrement\\\":\\\"REG-2026-698879A786900\\\",\\\"affecter\\\":false,\\\"reference\\\":\\\"000222\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"essai coffre fort\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-02-08T00:00:00.000000Z\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1770551719_Note_Service_Objectifs_de_recettes_r\\\\u00e9vis\\\\u00e9s_2025_N\'GUESSAN.doc.pdf\\\",\\\"created_at\\\":\\\"2026-02-08T11:55:19.000000Z\\\",\\\"updated_at\\\":\\\"2026-02-08T11:55:19.000000Z\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', '\"{\\\"id\\\":12,\\\"num_enregistrement\\\":\\\"REG-2026-698879A786900\\\",\\\"affecter\\\":0,\\\"reference\\\":\\\"000222\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"essai coffre fort\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-02-08\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"sign\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1770551719_Note_Service_Objectifs_de_recettes_r\\\\u00e9vis\\\\u00e9s_2025_N\'GUESSAN.doc.pdf\\\",\\\"created_at\\\":\\\"2026-02-08 11:55:19\\\",\\\"updated_at\\\":\\\"2026-03-12 13:42:09\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":3,\\\"signed_at\\\":\\\"2026-03-12T13:42:09.014192Z\\\"}\"', 'http://127.0.0.1:8000/courriers/12/sign', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 13:42:09', '2026-03-12 13:42:09'),
-(41, 3, 'updated', 'App\\Models\\Courrier', 11, '\"{\\\"id\\\":11,\\\"num_enregistrement\\\":\\\"REG-2026-697B3140CAE6F\\\",\\\"affecter\\\":true,\\\"reference\\\":\\\"444444\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"juste un essai\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-01-29T00:00:00.000000Z\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"archiv\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1769681216_COMMISSION_PARITAIRE_DE_SUIVI_DU_PROFIL_DE_CARRIERE.pdf\\\",\\\"created_at\\\":\\\"2026-01-29T10:06:56.000000Z\\\",\\\"updated_at\\\":\\\"2026-01-29T10:21:46.000000Z\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', '\"{\\\"id\\\":11,\\\"num_enregistrement\\\":\\\"REG-2026-697B3140CAE6F\\\",\\\"affecter\\\":1,\\\"reference\\\":\\\"444444\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"juste un essai\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-01-29\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"sign\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1769681216_COMMISSION_PARITAIRE_DE_SUIVI_DU_PROFIL_DE_CARRIERE.pdf\\\",\\\"created_at\\\":\\\"2026-01-29 10:06:56\\\",\\\"updated_at\\\":\\\"2026-03-12 15:37:48\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":3,\\\"signed_at\\\":\\\"2026-03-12T15:37:48.231784Z\\\"}\"', 'http://127.0.0.1:8000/courriers/11/sign', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 15:37:48', '2026-03-12 15:37:48'),
-(42, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 16:10:15', '2026-03-12 16:10:15'),
-(43, 6, 'Connexion réussie', 'Système', 6, NULL, '\"{\\\"email\\\":\\\"andoume@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 16:11:01', '2026-03-12 16:11:01'),
-(44, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 16:14:02', '2026-03-12 16:14:02');
+(39, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-12 17:01:38', '2026-03-12 17:01:38'),
+(40, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 01:05:58', '2026-03-13 01:05:58'),
+(41, 3, 'updated', 'App\\Models\\Courrier', 11, '\"{\\\"id\\\":11,\\\"num_enregistrement\\\":\\\"REG-2026-697B3140CAE6F\\\",\\\"affecter\\\":true,\\\"reference\\\":\\\"444444\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"juste un essai\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-01-29T00:00:00.000000Z\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"archiv\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1769681216_COMMISSION_PARITAIRE_DE_SUIVI_DU_PROFIL_DE_CARRIERE.pdf\\\",\\\"created_at\\\":\\\"2026-01-29T10:06:56.000000Z\\\",\\\"updated_at\\\":\\\"2026-01-29T10:21:46.000000Z\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', '\"{\\\"id\\\":11,\\\"num_enregistrement\\\":\\\"REG-2026-697B3140CAE6F\\\",\\\"affecter\\\":1,\\\"reference\\\":\\\"444444\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"juste un essai\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-01-29\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"sign\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1769681216_COMMISSION_PARITAIRE_DE_SUIVI_DU_PROFIL_DE_CARRIERE.pdf\\\",\\\"created_at\\\":\\\"2026-01-29 10:06:56\\\",\\\"updated_at\\\":\\\"2026-03-13 01:06:51\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":3,\\\"signed_at\\\":\\\"2026-03-13T01:06:51.535412Z\\\"}\"', 'http://127.0.0.1:8000/courriers/11/sign', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 01:06:51', '2026-03-13 01:06:51'),
+(42, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 10:30:27', '2026-03-13 10:30:27'),
+(43, 9, 'Connexion réussie', 'Système', 9, NULL, '\"{\\\"email\\\":\\\"iadico@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 13:22:04', '2026-03-13 13:22:04'),
+(44, 9, 'Mise à jour signature pad', 'User', 9, '\"{\\\"path\\\":null}\"', '\"{\\\"path\\\":\\\"pad_9_1773408453.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 13:27:33', '2026-03-13 13:27:33'),
+(45, 9, 'updated', 'App\\Models\\Courrier', 10, '\"{\\\"id\\\":10,\\\"num_enregistrement\\\":\\\"REG-2026-6979ED4466FDE\\\",\\\"affecter\\\":true,\\\"reference\\\":\\\"01210\\\",\\\"type\\\":\\\"Outgoing Externe\\\",\\\"objet\\\":\\\"Visite de MTN C\\\\u00f4te d\'Ivoire\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-01-28T00:00:00.000000Z\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"CABINET DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"affect\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1769598276_Projet_de_Note_du_DSESF_au_DG_S\\\\u00e9minaire_Loi_de_r\\\\u00e8glement_18_20_d\\\\u00e9c_2024.pdf\\\",\\\"created_at\\\":\\\"2026-01-28T11:04:36.000000Z\\\",\\\"updated_at\\\":\\\"2026-02-09T14:49:51.000000Z\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', '\"{\\\"id\\\":10,\\\"num_enregistrement\\\":\\\"REG-2026-6979ED4466FDE\\\",\\\"affecter\\\":1,\\\"reference\\\":\\\"01210\\\",\\\"type\\\":\\\"Outgoing Externe\\\",\\\"objet\\\":\\\"Visite de MTN C\\\\u00f4te d\'Ivoire\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-01-28\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"CABINET DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"sign\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1769598276_Projet_de_Note_du_DSESF_au_DG_S\\\\u00e9minaire_Loi_de_r\\\\u00e8glement_18_20_d\\\\u00e9c_2024.pdf\\\",\\\"created_at\\\":\\\"2026-01-28 11:04:36\\\",\\\"updated_at\\\":\\\"2026-03-13 13:28:47\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":9,\\\"signed_at\\\":\\\"2026-03-13T13:28:47.876177Z\\\"}\"', 'http://127.0.0.1:8000/courriers/10/sign', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 13:28:47', '2026-03-13 13:28:47'),
+(46, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 15:16:21', '2026-03-13 15:16:21'),
+(47, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 22:38:52', '2026-03-13 22:38:52'),
+(48, 9, 'Connexion réussie', 'Système', 9, NULL, '\"{\\\"email\\\":\\\"iadico@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 22:42:38', '2026-03-13 22:42:38'),
+(49, 9, 'updated', 'App\\Models\\Courrier', 12, '\"{\\\"id\\\":12,\\\"num_enregistrement\\\":\\\"REG-2026-698879A786900\\\",\\\"affecter\\\":false,\\\"reference\\\":\\\"000222\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"essai coffre fort\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-02-08T00:00:00.000000Z\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1770551719_Note_Service_Objectifs_de_recettes_r\\\\u00e9vis\\\\u00e9s_2025_N\'GUESSAN.doc.pdf\\\",\\\"created_at\\\":\\\"2026-02-08T11:55:19.000000Z\\\",\\\"updated_at\\\":\\\"2026-02-08T11:55:19.000000Z\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', '\"{\\\"id\\\":12,\\\"num_enregistrement\\\":\\\"REG-2026-698879A786900\\\",\\\"affecter\\\":0,\\\"reference\\\":\\\"000222\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"essai coffre fort\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-02-08\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"sign\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1770551719_Note_Service_Objectifs_de_recettes_r\\\\u00e9vis\\\\u00e9s_2025_N\'GUESSAN.doc.pdf\\\",\\\"created_at\\\":\\\"2026-02-08 11:55:19\\\",\\\"updated_at\\\":\\\"2026-03-13 22:43:31\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":9,\\\"signed_at\\\":\\\"2026-03-13T22:43:31.897186Z\\\"}\"', 'http://127.0.0.1:8000/courriers/12/sign', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-13 22:43:31', '2026-03-13 22:43:31'),
+(50, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-14 09:16:15', '2026-03-14 09:16:15'),
+(51, 3, 'updated', 'App\\Models\\Courrier', 11, '\"{\\\"id\\\":11,\\\"num_enregistrement\\\":\\\"REG-2026-697B3140CAE6F\\\",\\\"affecter\\\":true,\\\"reference\\\":\\\"444444\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"juste un essai\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-01-29T00:00:00.000000Z\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"sign\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1769681216_COMMISSION_PARITAIRE_DE_SUIVI_DU_PROFIL_DE_CARRIERE.pdf\\\",\\\"created_at\\\":\\\"2026-01-29T10:06:56.000000Z\\\",\\\"updated_at\\\":\\\"2026-03-13T01:06:51.000000Z\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":3,\\\"signed_at\\\":\\\"2026-03-13 01:06:51\\\"}\"', '\"{\\\"id\\\":11,\\\"num_enregistrement\\\":\\\"REG-2026-697B3140CAE6F\\\",\\\"affecter\\\":1,\\\"reference\\\":\\\"444444\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"juste un essai\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-01-29\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"affect\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1769681216_COMMISSION_PARITAIRE_DE_SUIVI_DU_PROFIL_DE_CARRIERE.pdf\\\",\\\"created_at\\\":\\\"2026-01-29 10:06:56\\\",\\\"updated_at\\\":\\\"2026-03-14 10:24:26\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":3,\\\"signed_at\\\":\\\"2026-03-13 01:06:51\\\"}\"', 'http://127.0.0.1:8000/imputations', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-14 10:24:26', '2026-03-14 10:24:26'),
+(52, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-15 12:16:03', '2026-03-15 12:16:03'),
+(53, 3, 'updated', 'App\\Models\\Courrier', 12, '\"{\\\"id\\\":12,\\\"num_enregistrement\\\":\\\"REG-2026-698879A786900\\\",\\\"affecter\\\":false,\\\"reference\\\":\\\"000222\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"essai coffre fort\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-02-08T00:00:00.000000Z\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"sign\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1770551719_Note_Service_Objectifs_de_recettes_r\\\\u00e9vis\\\\u00e9s_2025_N\'GUESSAN.doc.pdf\\\",\\\"created_at\\\":\\\"2026-02-08T11:55:19.000000Z\\\",\\\"updated_at\\\":\\\"2026-03-13T22:43:31.000000Z\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":9,\\\"signed_at\\\":\\\"2026-03-13 22:43:31\\\"}\"', '\"{\\\"id\\\":12,\\\"num_enregistrement\\\":\\\"REG-2026-698879A786900\\\",\\\"affecter\\\":1,\\\"reference\\\":\\\"000222\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"essai coffre fort\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-02-08\\\",\\\"date_document_original\\\":null,\\\"expediteur_nom\\\":\\\"Cabinet DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"affect\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1770551719_Note_Service_Objectifs_de_recettes_r\\\\u00e9vis\\\\u00e9s_2025_N\'GUESSAN.doc.pdf\\\",\\\"created_at\\\":\\\"2026-02-08 11:55:19\\\",\\\"updated_at\\\":\\\"2026-03-15 14:05:31\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":9,\\\"signed_at\\\":\\\"2026-03-13 22:43:31\\\"}\"', 'http://127.0.0.1:8000/imputations', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-15 14:05:31', '2026-03-15 14:05:31'),
+(54, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-16 00:26:57', '2026-03-16 00:26:57');
 
 -- --------------------------------------------------------
 
@@ -298,7 +314,7 @@ CREATE TABLE IF NOT EXISTS `cache` (
 --
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('laravel-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:8:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"creer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:5;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:18:\"supprimer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:17:\"voir-utilisateurs\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:2;i:2;i:4;i:3;i:5;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"manage-users\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:17:\"modifier articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:5;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:18:\"supprimer articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:11:\"gerer-roles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:17:\"acceder-dashboard\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:3;i:2;i:4;i:3;i:5;}}}s:5:\"roles\";a:5:{i:0;a:3:{s:1:\"a\";i:1;s:1:\"b\";s:5:\"admin\";s:1:\"c\";s:3:\"web\";}i:1;a:3:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"utilisateur\";s:1:\"c\";s:3:\"web\";}i:2;a:3:{s:1:\"a\";i:5;s:1:\"b\";s:11:\"Superviseur\";s:1:\"c\";s:3:\"web\";}i:3;a:3:{s:1:\"a\";i:4;s:1:\"b\";s:2:\"rh\";s:1:\"c\";s:3:\"web\";}i:4;a:3:{s:1:\"a\";i:3;s:1:\"b\";s:7:\"editeur\";s:1:\"c\";s:3:\"web\";}}}', 1773394525);
+('laravel-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:8:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"creer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:5;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:18:\"supprimer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:17:\"voir-utilisateurs\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:2;i:2;i:4;i:3;i:5;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"manage-users\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:17:\"modifier articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:5;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:18:\"supprimer articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:11:\"gerer-roles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:17:\"acceder-dashboard\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:3;i:2;i:4;i:3;i:5;}}}s:5:\"roles\";a:5:{i:0;a:3:{s:1:\"a\";i:1;s:1:\"b\";s:5:\"admin\";s:1:\"c\";s:3:\"web\";}i:1;a:3:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"utilisateur\";s:1:\"c\";s:3:\"web\";}i:2;a:3:{s:1:\"a\";i:5;s:1:\"b\";s:11:\"Superviseur\";s:1:\"c\";s:3:\"web\";}i:3;a:3:{s:1:\"a\";i:4;s:1:\"b\";s:2:\"rh\";s:1:\"c\";s:3:\"web\";}i:4;a:3:{s:1:\"a\";i:3;s:1:\"b\";s:7:\"editeur\";s:1:\"c\";s:3:\"web\";}}}', 1773663364);
 
 -- --------------------------------------------------------
 
@@ -379,12 +395,12 @@ INSERT INTO `courriers` (`id`, `num_enregistrement`, `affecter`, `reference`, `t
 (4, 'REG-2026-697209DAABA90', 1, '06391', 'Incoming', 'Demane de mise à disposition de M. BROU Konan Amani', NULL, '2026-01-21', NULL, 'CABINET DGI', NULL, 'Direction DSESFGénérale', NULL, 'affecté', 'Non assigné', '1769081306_06391_2026-01-22_112741.pdf', '2026-01-22 11:28:26', '2026-01-28 09:42:31', 0, NULL, NULL, NULL),
 (5, 'REG-2026-697210C0D9ED1', 1, '06410', 'Outgoing Externe', 'Demande de rectification des états financiers par téléliasse', NULL, '2026-01-21', NULL, 'CABINET DGI', NULL, 'DSESF', NULL, 'Archivé', 'Non assigné', '1769083072_06410_2026-01-22_115627.pdf', '2026-01-22 11:57:52', '2026-02-09 14:49:29', 0, NULL, NULL, NULL),
 (6, 'REG-2026-69721207AC2B6', 1, '0759232466', 'Incoming', 'Demande données statistiques pour mémoire de fin de cycle', NULL, '2026-01-21', NULL, 'KOSSONOU Affoué Ella Mireille Stagiaire de l\'ENA', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1769083399_0759232466_2026-01-22_120224.pdf', '2026-01-22 12:03:19', '2026-01-28 09:42:08', 0, NULL, NULL, NULL),
-(10, 'REG-2026-6979ED4466FDE', 1, '01210', 'Outgoing Externe', 'Visite de MTN Côte d\'Ivoire', NULL, '2026-01-28', NULL, 'CABINET DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1769598276_Projet_de_Note_du_DSESF_au_DG_Séminaire_Loi_de_règlement_18_20_déc_2024.pdf', '2026-01-28 11:04:36', '2026-02-09 14:49:51', 0, NULL, NULL, NULL),
+(10, 'REG-2026-6979ED4466FDE', 1, '01210', 'Outgoing Externe', 'Visite de MTN Côte d\'Ivoire', NULL, '2026-01-28', NULL, 'CABINET DGI', NULL, 'DSESF', NULL, 'signé', 'Non assigné', '1769598276_Projet_de_Note_du_DSESF_au_DG_Séminaire_Loi_de_règlement_18_20_déc_2024.pdf', '2026-01-28 11:04:36', '2026-03-13 13:28:47', 0, NULL, 9, '2026-03-13 13:28:47'),
 (7, 'REG-2026-69774D5D847F5', 1, '03220', 'Incoming', 'Formation des Agents Non Fiscalistes', NULL, '2026-01-26', NULL, 'CABINET DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1769426269_Document_2026-01-26_formation.pdf', '2026-01-26 11:17:49', '2026-01-28 09:41:20', 0, NULL, NULL, NULL),
 (8, 'REG-2026-697752B52AA6B', 1, '0784', 'Incoming', 'Proposition pour utilisation du nouveau serveur', NULL, '2026-01-26', NULL, 'DSESF', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1769427637_Document_2026-01-26_Proposition_serveur.pdf', '2026-01-26 11:40:37', '2026-01-28 11:47:59', 0, NULL, NULL, NULL),
 (9, 'REG-2026-69775E4353DEF', 1, '02218', 'Incoming', 'Mission d\'explication des statistiques mensuelles des recettes', NULL, '2026-01-26', NULL, 'CABINET DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1769430595_Statistiques_Mensuelles_Recette_2026-01-26_122728.pdf', '2026-01-26 12:29:55', '2026-01-26 12:30:52', 0, NULL, NULL, NULL),
-(11, 'REG-2026-697B3140CAE6F', 1, '444444', 'Incoming', 'juste un essai', NULL, '2026-01-29', NULL, 'Cabinet DGI', NULL, 'DSESF', NULL, 'signé', 'Non assigné', '1769681216_COMMISSION_PARITAIRE_DE_SUIVI_DU_PROFIL_DE_CARRIERE.pdf', '2026-01-29 10:06:56', '2026-03-12 15:37:48', 0, NULL, 3, '2026-03-12 15:37:48'),
-(12, 'REG-2026-698879A786900', 0, '000222', 'Incoming', 'essai coffre fort', NULL, '2026-02-08', NULL, 'Cabinet DGI', NULL, 'DSESF', NULL, 'signé', 'Non assigné', '1770551719_Note_Service_Objectifs_de_recettes_révisés_2025_N\'GUESSAN.doc.pdf', '2026-02-08 11:55:19', '2026-03-12 13:42:09', 0, NULL, 3, '2026-03-12 13:42:09'),
+(11, 'REG-2026-697B3140CAE6F', 1, '444444', 'Incoming', 'juste un essai', NULL, '2026-01-29', NULL, 'Cabinet DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1769681216_COMMISSION_PARITAIRE_DE_SUIVI_DU_PROFIL_DE_CARRIERE.pdf', '2026-01-29 10:06:56', '2026-03-14 10:24:26', 0, NULL, 3, '2026-03-13 01:06:51'),
+(12, 'REG-2026-698879A786900', 1, '000222', 'Incoming', 'essai coffre fort', NULL, '2026-02-08', NULL, 'Cabinet DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1770551719_Note_Service_Objectifs_de_recettes_révisés_2025_N\'GUESSAN.doc.pdf', '2026-02-08 11:55:19', '2026-03-15 14:05:31', 0, NULL, 9, '2026-03-13 22:43:31'),
 (13, 'REG-2026-69887B3F86D8A', 0, '002221', 'Incoming', 'essai coffre fort1', NULL, '2026-02-08', NULL, 'Cabinet DGI', NULL, 'DSESF', NULL, 'reçu', 'Non assigné', '1770552127_Note_au_MFB__Objectif_de_recettes_TOFE_Aout_2025.pdf', '2026-02-08 12:02:07', '2026-02-08 12:02:07', 0, NULL, NULL, NULL),
 (14, 'REG-2026-69887CB125567', 1, '0022222', 'Outgoing', 'essai coffre fort2', NULL, '2026-02-08', NULL, 'Cabinet DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1770552497_Note_Service_Objectifs_de_recettes_révisés_2025_N\'GUESSAN.doc.pdf', '2026-02-08 12:08:17', '2026-02-09 14:50:03', 1, 'eyJpdiI6InNSK0RFSE1IZ2pELzFVb1d0aitUZGc9PSIsInZhbHVlIjoid1djN2xzRVJtVUJGYjgwbWFpUWY5UT09IiwibWFjIjoiNzY4NzJjZWZlYTZiYjE0NWU5MmQ2NjU2MWJiOWY1MzdlZWMzNDFhNDNhZWIwNmYyYzQ1NWI3MzJhYjU3YjE2MyIsInRhZyI6IiJ9', NULL, NULL),
 (15, 'REG-2026-698882381615A', 1, '23333', 'Incoming', 'essai coffre fort3', NULL, '2026-02-08', NULL, 'Cabinet DGI', NULL, 'DSESF', NULL, 'signé', 'Non assigné', '1770553912_Note_de_service_DEMANDE_D\'INFORMATIONS_COMITE_COUT_SDEEF.pdf', '2026-02-08 12:31:52', '2026-03-12 10:02:18', 1, 'eyJpdiI6IldRcGw0blZUckRxUE10RXR6MnloVVE9PSIsInZhbHVlIjoieUdrMEc2bkxtWUs4Tm83MkRWTDBBdz09IiwibWFjIjoiYzYxYTM5MWI4NzVlYjEwNjY4MDg0YWZlNjIzZmY2NzE4ODNhNTU1Y2JkZWZmNGVhZDgzZjdjZTRiNzVlODNhMiIsInRhZyI6IiJ9', 3, '2026-03-12 10:02:18'),
@@ -501,7 +517,7 @@ INSERT INTO `holidays` (`id`, `name`, `holiday_date`, `description`, `is_recurri
 (10, 'Noël', '2026-12-25', NULL, 1, '2026-03-07 08:53:31', '2026-03-07 08:53:31'),
 (11, 'Tabaski', '2026-05-30', NULL, 0, '2026-03-07 09:45:12', '2026-03-07 09:45:12'),
 (12, 'Ramadan', '2026-03-20', NULL, 0, '2026-03-07 09:45:41', '2026-03-07 09:45:41'),
-(13, 'Nuit du Destin', '2026-03-17', NULL, 0, '2026-03-11 10:11:40', '2026-03-11 10:11:40');
+(13, 'Nuit du Destin', '2026-03-16', NULL, 0, '2026-03-11 10:11:40', '2026-03-16 00:24:05');
 
 -- --------------------------------------------------------
 
@@ -562,7 +578,7 @@ CREATE TABLE IF NOT EXISTS `imputations` (
   KEY `imputations_courrier_id_foreign` (`courrier_id`),
   KEY `imputations_user_id_foreign` (`user_id`),
   KEY `imputations_suivi_par_foreign` (`suivi_par`)
-) ENGINE=MyISAM AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `imputations`
@@ -588,7 +604,43 @@ INSERT INTO `imputations` (`id`, `courrier_id`, `chemin_fichier`, `user_id`, `su
 (25, 14, NULL, 3, NULL, 'autre', 'taf', NULL, NULL, '2026-02-08', NULL, '2026-02-14', 'en_attente', '2026-02-08 12:29:47', '2026-02-08 12:29:47'),
 (26, 15, NULL, 3, NULL, 'autre', 'verif', NULL, NULL, '2026-02-08', NULL, '2026-02-15', 'en_attente', '2026-02-08 12:32:44', '2026-02-08 12:32:44'),
 (27, 21, NULL, 3, NULL, 'autre', 'travail à rendre au plus tard le 15 fevrier2026', NULL, '\"documents\\/imputations\\/annexes\\/1770810418_1769688440_Code_LARAVEL.docx\"', '2026-02-11', NULL, '2026-02-15', 'en_attente', '2026-02-11 11:46:58', '2026-02-11 11:46:58'),
-(28, 23, NULL, 9, NULL, 'primaire', 'travail à excuter pour vendredi 10h', NULL, '\"documents\\/imputations\\/annexes\\/1772026843_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-02-25', NULL, '2026-02-27', 'termine', '2026-02-25 13:40:43', '2026-02-25 13:50:36');
+(28, 23, NULL, 9, NULL, 'primaire', 'travail à excuter pour vendredi 10h', NULL, '\"documents\\/imputations\\/annexes\\/1772026843_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-02-25', NULL, '2026-02-27', 'termine', '2026-02-25 13:40:43', '2026-02-25 13:50:36'),
+(31, 12, NULL, 3, NULL, 'autre', 'ras', '\n[LOG] ADICO Innocent absent (approuvé), redirigé vers l\'intérimaire BEZI Mathurin.', '\"documents\\/imputations\\/annexes\\/1773583531_Note_au_MFB__Objectif_de_recettes_TOFE_Aout_2025.pdf\"', '2026-03-15', NULL, '2026-03-16', 'en_attente', '2026-03-15 14:05:31', '2026-03-15 14:05:31'),
+(30, 14, NULL, 3, NULL, 'autre', 'essai pour voir si l\'imputation tient compte des interims', '\n[LOG] ADICO Innocent absent (approuvé), redirigé vers l\'intérimaire BEZI Mathurin.', '\"documents\\/imputations\\/annexes\\/1773577305_Note_Service_Objectifs_de_recettes_r\\u00e9vis\\u00e9s_2025_N\'GUESSAN.doc.pdf\"', '2026-03-15', NULL, '2026-03-17', 'en_attente', '2026-03-15 12:21:45', '2026-03-15 12:21:45'),
+(33, 11, NULL, 3, NULL, 'autre', 'verif', '\n[LOG] ANGELS Riviere michel absent (approuvé), redirigé vers l\'intérimaire COULIBALY Sié Yacouba.', '\"documents\\/imputations\\/annexes\\/1773585780_Note_au_MFB__Objectif_de_recettes_TOFE_Aout_2025.pdf\"', '2026-03-15', NULL, '2026-03-17', 'en_attente', '2026-03-15 14:43:00', '2026-03-15 14:43:00');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `interims`
+--
+
+DROP TABLE IF EXISTS `interims`;
+CREATE TABLE IF NOT EXISTS `interims` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `agent_id` bigint(20) UNSIGNED NOT NULL,
+  `interimaire_id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `date_debut` date NOT NULL,
+  `date_fin` date NOT NULL,
+  `motif` text DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `interims_agent_id_foreign` (`agent_id`),
+  KEY `interims_interimaire_id_foreign` (`interimaire_id`),
+  KEY `interims_user_id_foreign` (`user_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `interims`
+--
+
+INSERT INTO `interims` (`id`, `agent_id`, `interimaire_id`, `user_id`, `date_debut`, `date_fin`, `motif`, `is_active`, `created_at`, `updated_at`) VALUES
+(7, 5, 18, 18, '2026-03-15', '2026-03-18', NULL, 1, '2026-03-14 11:03:54', '2026-03-14 11:03:54'),
+(9, 25, 1, 3, '2026-03-15', '2026-03-17', 'repos maladie', 1, '2026-03-15 14:41:44', '2026-03-15 14:41:44'),
+(8, 5, 25, 25, '2026-03-22', '2026-03-25', 'seminaire a dakar', 1, '2026-03-14 11:16:33', '2026-03-14 11:16:33');
 
 -- --------------------------------------------------------
 
@@ -642,7 +694,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(191) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=61 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `migrations`
@@ -707,7 +759,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (56, '2026_03_10_071800_create_audit_logs_table', 16),
 (57, '2026_03_11_140457_add_signature_to_users_table', 17),
 (58, '2026_03_12_072529_add_navigation_details_to_audit_logs_table', 18),
-(59, '2026_03_12_085518_add_signature_to_courriers', 19);
+(59, '2026_03_12_085518_add_signature_to_courriers', 19),
+(60, '2026_03_13_104756_create_interims_table', 20);
 
 -- --------------------------------------------------------
 
@@ -851,7 +904,7 @@ CREATE TABLE IF NOT EXISTS `presences` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `presences_agent_id_foreign` (`agent_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=727 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=728 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `presences`
@@ -1457,7 +1510,6 @@ INSERT INTO `presences` (`id`, `agent_id`, `heure_arrivee`, `heure_depart`, `sta
 (596, 15, '2026-02-26 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-02 13:46:42', '2026-03-02 13:46:42'),
 (597, 15, '2026-02-27 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-02 13:46:42', '2026-03-02 13:46:42'),
 (598, 1, '2026-03-03 10:53:58', NULL, 'En Retard', 'Pointage automatique (Self-service)', '2026-03-03 10:53:58', '2026-03-03 10:53:58'),
-(599, 1, '2026-03-19 09:46:00', NULL, 'Présent', 'Jour férié : Ramadan.', '2026-03-07 09:50:58', '2026-03-07 10:10:58'),
 (600, 1, '2026-03-09 08:28:25', '2026-03-09 17:05:21', 'En Retard', 'Pointage automatique (Self-service)', '2026-03-09 08:28:25', '2026-03-09 17:05:21'),
 (601, 1, '2026-03-04 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-09 10:53:54', '2026-03-09 10:53:54'),
 (602, 1, '2026-03-05 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-09 10:53:54', '2026-03-09 10:53:54'),
@@ -1915,7 +1967,7 @@ INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `mu
 (4, 'Nafata KONE', 'nafie410@dgi.gouv.ci', NULL, '$2y$12$SeJ9qwQwxWogSSNTO8hdSevf3HLZzNoiovKKNiSAbaH3Zfuf958Ha', 0, NULL, NULL, '2026-01-20 13:46:32', '2026-03-11 09:26:40', NULL, NULL, NULL),
 (5, 'Rosine Générosa Epse Dje OUSSOU', 'roussou@dgi.gouv.ci', NULL, '$2y$12$6levTuTb0vIp1M1nBq/oROhQkRMA0T.OpNdr8GOByOjJy.X9YpvMW', 1, NULL, NULL, '2026-01-20 13:48:59', '2026-01-22 12:31:18', NULL, NULL, NULL),
 (6, 'Arlette N\'DOUME', 'andoume@dgi.gouv.ci', NULL, '$2y$12$UptzFnNTF5sgio1UqRK6Ne8.yG7QxbhjxLqmpy9hIoJRKQahDNwmS', 0, NULL, NULL, '2026-01-21 10:43:13', '2026-03-12 06:58:44', NULL, NULL, 'sig_6_1773298724.png'),
-(9, 'Innocent ADICO', 'iadico@dgi.gouv.ci', NULL, '$2y$12$dCDgWWMz.kvecxIjncNv0eGBT2eXI55l21HCwN.X4Ih3KxbXyfBTG', 0, NULL, NULL, '2026-01-21 11:50:04', '2026-01-22 15:15:21', NULL, NULL, NULL),
+(9, 'Innocent ADICO', 'iadico@dgi.gouv.ci', NULL, '$2y$12$dCDgWWMz.kvecxIjncNv0eGBT2eXI55l21HCwN.X4Ih3KxbXyfBTG', 0, NULL, NULL, '2026-01-21 11:50:04', '2026-03-13 13:27:33', NULL, NULL, 'pad_9_1773408453.png'),
 (10, 'Moctar Michel Djépa KEITA', 'michelkeita@dgi.gouv.ci', NULL, '$2y$12$GVJZkuOfiwTdDE.A6946U.6coCnMxYZPHLh.MyfdwfSb3I7eYIBsq', 1, NULL, NULL, '2026-01-21 11:56:29', '2026-01-28 14:20:16', NULL, NULL, NULL),
 (11, 'Assi Roger OKPEKON', 'asokpekon@dgi.gouv.ci', NULL, '$2y$12$p4VhIUU7bg6ju1tusqWJneMBfeAbl/nTIKgM.hr832AVQhg7wwVw6', 0, NULL, NULL, '2026-01-21 11:59:18', '2026-01-29 11:08:51', NULL, NULL, NULL),
 (12, 'Née Brou Amenan M. KOUADIO', 'kbrou04@dgi.gouv.ci', NULL, '$2y$12$NRt7n8PnxT41./IvAD.GFetDLPqFXcBveV4WdaA10D4DnMtLI/DDm', 1, NULL, NULL, '2026-01-21 12:02:21', '2026-01-21 12:02:21', NULL, NULL, NULL),

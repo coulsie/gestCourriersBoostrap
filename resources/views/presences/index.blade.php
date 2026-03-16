@@ -72,7 +72,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
-    
+
     {{-- La table commence ensuite --}}
     <div class="table-responsive rounded shadow-sm">
         <table class="table table-hover align-middle border">
@@ -140,14 +140,27 @@
                         </td>
                         <td class="text-center">
                             <div class="btn-group shadow-sm">
+                                <!-- Bouton Voir -->
                                 <a href="{{ route('presences.show', $presence->id) }}" class="btn btn-sm btn-info text-white" title="Détails">
                                     <i class="fas fa-eye"></i>
                                 </a>
+
+                                <!-- Bouton Modifier -->
                                 <a href="{{ route('presences.edit', $presence->id) }}" class="btn btn-sm btn-warning text-white" title="Modifier">
                                     <i class="fas fa-edit"></i>
                                 </a>
+
+                                <!-- Bouton Supprimer -->
+                                <form action="{{ route('presences.destroy', $presence->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce pointage ?');" style="display: inline-block;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
+
                     </tr>
                 @empty
                     <tr>
