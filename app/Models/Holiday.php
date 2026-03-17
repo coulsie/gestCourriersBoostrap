@@ -28,6 +28,7 @@ class Holiday extends Model
         return [
             'holiday_date' => 'date',
             'is_recurring' => 'boolean',
+            
         ];
     }
 

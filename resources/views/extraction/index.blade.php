@@ -63,14 +63,22 @@
                                     <small class="text-muted" style="font-size: 0.7rem;">{{ $script->type_impot ?? 'Général' }}</small>
                                 </div>
 
-                                <!-- Bouton Supprimer -->
-                                <form action="{{ route('scripts.destroy', $script->id) }}" method="POST" onsubmit="return confirm('Supprimer ce script ?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-link text-danger p-0 ms-2">
-                                        <i class="fas fa-trash-alt"></i>
+                                <!-- Groupe d'Actions -->
+                                <div class="d-flex align-items-center gap-2">
+                                    <!-- BOUTON MODIFIER -->
+                                    <button type="button" class="btn btn-link text-warning p-0" onclick="loadScript({{ $script->id }})" title="Modifier">
+                                        <i class="fas fa-edit"></i>
                                     </button>
-                                </form>
+
+                                    <!-- BOUTON SUPPRIMER -->
+                                    <form action="{{ route('scripts.destroy', $script->id) }}" method="POST" onsubmit="return confirm('Supprimer ce script ?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-link text-danger p-0" title="Supprimer">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     @empty
@@ -79,6 +87,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- COLONNE DROITE (9/12) : FORMULAIRE ET RÉSULTATS -->
         <div class="col-md-9">
@@ -173,7 +182,7 @@
                                 <i class="fas fa-file-excel me-1"></i> EXPORTER EXCEL
                             </button>
 
-                            
+
                         </form>
                     </div>
                     <div class="card-body p-0">

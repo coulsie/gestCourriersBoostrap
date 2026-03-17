@@ -1,8 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid py-4">
 
+<div class="container-fluid py-4">
+{{-- Affichage de l'erreur de doublon de date --}}
+    @if ($errors->has('holiday_date'))
+        <div class="alert alert-danger shadow-sm border-start border-4 border-danger alert-dismissible fade show" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-exclamation-circle fa-2x me-3"></i>
+                <div>
+                    <h6 class="fw-bold mb-1 text-uppercase">Erreur d'enregistrement</h6>
+                    {{ $errors->first('holiday_date') }}
+                </div>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800 fw-bold">
@@ -26,14 +39,24 @@
                     <form action="{{ route('holidays.store') }}" method="POST">
                         @csrf
                         <div class="form-group mb-3">
-                            <label class="font-weight-bold text-dark small text-uppercase">Désignation</label>
+                        <label class="font-weight-bold text-dark small text-uppercase">Désignation</label>
                             <div class="input-group">
                                 <div class="input-group-prepend">
-                                    <span class="input-group-text bg-light border-right-0"><i class="fas fa-tag text-muted"></i></span>
+                                    <span class="input-group-text bg-light border-right-0">
+                                        <i class="fas fa-tag text-muted"></i>
+                                    </span>
                                 </div>
-                                <input type="text" name="name" class="form-control border-left-0" placeholder="ex: Noël" required>
+                                <!-- style : affichage majuscule | oninput : transformation réelle de la valeur -->
+                                <input type="text"
+                                    name="name"
+                                    class="form-control border-left-0"
+                                    placeholder="ex: NOËL"
+                                    required
+                                    style="text-transform: uppercase;"
+                                    oninput="this.value = this.value.toUpperCase()">
                             </div>
                         </div>
+
                         <div class="form-group mb-4">
                             <label class="font-weight-bold text-dark small text-uppercase">Date du jour chômé</label>
                             <div class="input-group">
@@ -48,6 +71,30 @@
                         </button>
                     </form>
                 </div>
+                <!-- Ajoutez ce bloc juste après la fermeture de la div class="card-body p-0" -->
+                <div class="card-footer bg-light py-3 border-0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        @php
+                            $currentYear = date('Y');
+                            $totalThisYear = $holidays->filter(function($h) use ($currentYear) {
+                                return \Carbon\Carbon::parse($h->holiday_date)->year == $currentYear;
+                            })->count();
+                        @endphp
+
+                        <span class="text-muted small fw-bold">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Récapitulatif annuel
+                        </span>
+
+                        <div class="text-info font-weight-bold">
+                            Total pour l'année {{ $currentYear }} :
+                            <span class="badge badge-info ml-2 px-3 py-2 shadow-sm" style="font-size: 0.9rem;">
+                                {{ $totalThisYear }} JOUR{{ $totalThisYear > 1 ? 'S' : '' }} FÉRIÉ{{ $totalThisYear > 1 ? 'S' : '' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -106,6 +153,8 @@
                 </div>
             </div>
         </div>
+
+
     </div>
 </div>
 
