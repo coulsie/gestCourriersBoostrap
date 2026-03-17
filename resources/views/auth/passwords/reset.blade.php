@@ -4,22 +4,30 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Reset Password') }}</div>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white fw-bold">
+                    {{ __('Changer le mot de passe') }}
+                </div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('password.update') }}">
+                    {{-- Affichage du message de succès --}}
+                    @if (session('status'))
+                        <div class="alert alert-success border-0 shadow-sm mb-4">
+                            <i class="fas fa-check-circle me-2"></i> {{ session('status') }}
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('user.password.custom.update') }}">
                         @csrf
 
-                        <input type="hidden" name="token" value="{{ $token }}">
-
+                        <!-- ANCIEN MOT DE PASSE -->
                         <div class="row mb-3">
-                            <label for="email" class="col-md-4 col-form-label text-md-end">{{ __('Email Address') }}</label>
-
+                            <label for="current_password" class="col-md-4 col-form-label text-md-end">Mot de passe actuel</label>
                             <div class="col-md-6">
-                                <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
-
-                                @error('email')
+                                <input id="current_password" type="password"
+                                       class="form-control @error('current_password') is-invalid @enderror"
+                                       name="current_password" required autofocus>
+                                @error('current_password')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
@@ -27,12 +35,13 @@
                             </div>
                         </div>
 
+                        <!-- NOUVEAU MOT DE PASSE -->
                         <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
-
+                            <label for="password" class="col-md-4 col-form-label text-md-end">Nouveau mot de passe</label>
                             <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
-
+                                <input id="password" type="password"
+                                       class="form-control @error('password') is-invalid @enderror"
+                                       name="password" required>
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -41,19 +50,23 @@
                             </div>
                         </div>
 
+                        <!-- CONFIRMATION -->
                         <div class="row mb-3">
-                            <label for="password-confirm" class="col-md-4 col-form-label text-md-end">{{ __('Confirm Password') }}</label>
-
+                            <label for="password-confirm" class="col-md-4 col-form-label text-md-end">Confirmer le nouveau</label>
                             <div class="col-md-6">
-                                <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
+                                <input id="password-confirm" type="password" class="form-control"
+                                       name="password_confirmation" required>
                             </div>
                         </div>
 
                         <div class="row mb-0">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Reset Password') }}
+                            <div class="col-md-6 offset-md-4 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-4 fw-bold">
+                                    <i class="fas fa-save me-1"></i> Mettre à jour
                                 </button>
+                                <a href="{{ route('profile.show') }}" class="btn btn-outline-secondary">
+                                    Annuler
+                                </a>
                             </div>
                         </div>
                     </form>
