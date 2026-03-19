@@ -123,7 +123,9 @@ public function create(Request $request)
 
 public function store(Request $request)
 {
-    // 1. Validation rigoureuse
+   
+
+// 1. Validation avec messages en français
     $request->validate([
         'agent_ids'         => 'required|array',
         'instructions'      => 'required|string',
@@ -136,7 +138,26 @@ public function store(Request $request)
         'niveau'            => 'required|string',
         'suivi_par'         => 'nullable|exists:users,id',
         'user_id'           => 'required|exists:users,id',
+    ], [
+        // Messages pour les champs 'required' (requis)
+        'agent_ids.required'       => 'Veuillez sélectionner au moins un **agent** pour l\'imputation.',
+        'instructions.required'    => 'Le champ **instructions** est obligatoire.',
+        'statut.required'          => 'Le **statut** de l\'imputation doit être défini.',
+        'courrier_id.required'     => 'La référence au **courrier** est manquante.',
+        'date_imputation.required' => 'La **date d\'imputation** est obligatoire.',
+        'niveau.required'          => 'Le **niveau hiérarchique** doit être précisé.',
+        'user_id.required'         => 'L\'identifiant de l\'**utilisateur** est requis.',
+
+        // Messages pour les contraintes 'exists' et 'format'
+        'agent_ids.array'          => 'Le format des agents sélectionnés est invalide.',
+        'courrier_id.exists'       => 'Le courrier sélectionné n\'existe pas dans la base de données.',
+        'user_id.exists'           => 'L\'utilisateur créateur est introuvable.',
+        'documents_annexes.mimes'  => 'Le document doit être un fichier de type : pdf, jpg, png, doc, xls ou ppt.',
+        'documents_annexes.max'    => 'Le document est trop volumineux.',
+        'date_imputation.date'     => 'La date d\'imputation doit être une date valide.',
     ]);
+
+
 
     try {
         $user = Auth::user();

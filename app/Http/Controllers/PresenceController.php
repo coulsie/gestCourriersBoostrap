@@ -181,39 +181,55 @@ public function store(Request $request)
     /**
      * Met à jour la ressource (présence) spécifiée dans la base de données.
      */
-    public function update(Request $request, Presence $presence): RedirectResponse
-    {
-        // Validation des données entrantes pour la mise à jour
-        $validatedData = $request->validate([
-            // 'Agent_id'      => 'required|exists:agents,id',
-            // 'HeureArrivee' => 'required|date',
-            // 'HeureDepart'  => 'nullable|date|after:HeureArrivee',
-            // 'Statut'       => 'required|string|max:50',
-            // 'Notes'        => 'nullable|string',
-            'agent_id' => 'required|integer|exists:agents,id',
 
-            // 'heure_arrivee' is required and must be a valid date/time string
-            // 'heurearrivee' => 'required|date',//ce champs n'est pas bien nommé. Faire attention au nom des champs
-            'heure_arrivee' => 'required|date',
 
-            // 'heure_depart' is optional (nullable in DB) and must be a valid date/time if provided
-            // 'heuredepart' => 'nullable|date|after:heure_arrivee',//ce champs n'est pas bien nommé. Faire attention au nom des champs
-            'heure_depart' => 'nullable|date|after:heure_arrivee',
+  public function update(Request $request, Presence $presence): RedirectResponse
+{
+    $validatedData = $request->validate([
+        'agent_id'      => 'required|integer|exists:agents,id',
+        'heure_arrivee' => 'required|date',
+        'heure_depart'  => 'nullable|date|after:heure_arrivee',
+        'notes'         => 'nullable|string|max:1000',
+    ], [
+        'agent_id.required'      => 'L\'agent est obligatoire.',
+        'heure_arrivee.required' => 'L\'heure d\'arrivée est requise.',
+        'heure_depart.after'     => 'L\'heure de départ doit être après l\'heure d\'arrivée.',
+    ]);
 
-            // 'statut' must be one of the defined enum values
-            'statut' => ['required',Rule::in(['Absent', 'Présent', 'En Retard']),],
+    try {
+        // 1. Récupération de l'horaire (ex: lié à l'agent ou au service)
+        $horaire = \App\Models\Horaire::first();
 
-            // 'notes' is optional (text field)
-            'notes' => 'nullable|string|max:1000',
-        ]);
+        if ($horaire && !empty($horaire->heure_debut)) {
+            // Conversion sécurisée en objet Carbon pour la comparaison
+            $arrivee = \Carbon\Carbon::parse($validatedData['heure_arrivee']);
 
-        // Mise à jour de l'enregistrement
+            // Nettoyage de l'heure de référence (ex: "08:00:00") pour éviter l'erreur de "Separation symbol"
+            $reference = \Carbon\Carbon::parse($horaire->heure_debut);
+
+            // 2. Comparaison des heures uniquement (H:i:s)
+            if ($arrivee->format('H:i:s') > $reference->format('H:i:s')) {
+                $validatedData['statut'] = 'En Retard';
+            } else {
+                $validatedData['statut'] = 'Présent';
+            }
+        } else {
+            // Statut par défaut si aucun horaire n'est défini
+            $validatedData['statut'] = 'Présent';
+        }
+
         $presence->update($validatedData);
 
-        // Redirection avec un message de succès
         return redirect()->route('presences.index')
-                         ->with('success', 'Présence mise à jour avec succès.');
+                         ->with('success', 'Présence et statut mis à jour avec succès.');
+
+    } catch (\Exception $e) {
+        // Log de l'erreur réelle pour le développeur
+        \Illuminate\Support\Facades\Log::error("Erreur Format Heure: " . $e->getMessage());
+
+        return back()->with('error', 'Erreur de format de l\'heure de référence dans la table horaires.');
     }
+}
 
     /**
      * Supprime la ressource (présence) spécifiée de la base de données.
@@ -447,19 +463,10 @@ public function rapport(Request $request)
 // Fichier: app/Http/Controllers/PresenceController.php
 
 
-
-
-
-
-
-
-
-
-
 /**
  * Vue pour que l'agent puisse pointer lui-même
  */
- 
+
 public function monPointage()
 {
     $agent = Auth::user()->agent;
