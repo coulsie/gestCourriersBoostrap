@@ -152,22 +152,26 @@
     <!-- Information Jours Ouvrables -->
     @if($mois)
     <div class="row mb-3">
+    
     <div class="col-12">
-        <div class="card shadow-sm border-0 bg-light">
-            <div class="card-body py-2 d-flex justify-content-between align-items-center">
-                <span class="fw-bold text-muted small text-uppercase">
-                    <i class="fas fa-calendar-check me-2 text-danger"></i>
-                    Capacité du mois (Jours ouvrables hors fériés) :
-                </span>
-                <!-- bg-danger pour le fond rouge, text-white pour l'écriture blanche -->
+    <div class="card shadow-sm border-0 bg-light">
+        <div class="card-body py-2 d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-muted small text-uppercase">
+                <i class="fas fa-calendar-check me-2 text-danger"></i>
+                Capacité de la période (Hors week-ends & fériés) :
+            </span>
 
-                <span class="badge bg-danger text-white fs-6 shadow-sm px-3">
-                    {{ $joursOuvrables }} Jours
-                </span>
-
-            </div>
+            <!-- Badge Rouge avec Mois en blanc et mention Jours Ouvrables -->
+            <span class="badge bg-danger text-white fs-6 shadow-sm px-3 py-2 border-capacity">
+                @if($mois)
+                    {{ \Carbon\Carbon::create()->month((int)$mois)->locale('fr')->translatedFormat('F') }} :
+                @endif
+                {{ $joursOuvrables ?? 0 }} Jours Ouvrables
+            </span>
         </div>
     </div>
+</div>
+
 </div>
     @endif
     <!-- Statistiques Globales avec Ascenseur -->
