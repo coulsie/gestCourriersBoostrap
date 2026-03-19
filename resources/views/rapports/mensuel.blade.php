@@ -19,93 +19,94 @@
         </div>
 
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle" id="rapportTable">
-                    <thead class="table-dark">
-                        {{-- Ligne 1 : Titres principaux cliquables --}}
-                        <tr>
-                            <th class="text-start ps-4" style="cursor:pointer"><i class="fas fa-users me-2"></i>Agents</th>
-                            <th class="text-start" style="cursor:pointer"><i class="fas fa-layer-group me-2"></i>Services</th>
-                            <th class="text-center" style="cursor:pointer"><i class="fas fa-check-circle me-1 text-success"></i> Présents</th>
-                            <th class="text-center" style="cursor:pointer"><i class="fas fa-clock me-1 text-warning"></i> Retards</th>
-                            <th class="text-center text-danger" style="cursor:pointer"><i class="fas fa-user-times me-1"></i> Injustifiées</th>
-                            <th class="text-center text-info" style="cursor:pointer"><i class="fas fa-file-medical me-1"></i> Justifiées</th>
-                            <th class="text-center" style="cursor:pointer"><i class="fas fa-chart-line me-2"></i>Taux</th>
-                            <th class="text-center no-export"><i class="fas fa-cog"></i></th>
-                        </tr>
-
-
-                    </thead>
-
-
-                    <tbody>
-                        @foreach($rapports as $rapport)
-                            @php
-                                // Préparation des données pour éviter les erreurs de calcul
-                                $nomC = strtoupper($rapport->agent->last_name) . ' ' . $rapport->agent->first_name;
-                                $serv = $rapport->agent->service->name ?? 'Non assigné';
-                                $tx = $rapport->taux ?? 0;
-
-                                // Logique de couleur du taux
-                                $colorTaux = $tx >= 80 ? 'bg-success' : ($tx >= 50 ? 'bg-warning' : 'bg-danger');
-
-                                // Palette de couleurs éclatantes pour les services
-                                $palette = ['primary', 'indigo', 'success', 'danger', 'warning', 'info', 'purple', 'pink', 'orange', 'teal'];
-                                $serviceId = $rapport->agent->service->id ?? 0;
-                                $couleurS = $palette[$serviceId % count($palette)];
-                            @endphp
-                            <tr>
-                                {{-- Colonne Agent --}}
-
-                                <td data-search="{{ $nomC }}" data-order="{{ $nomC }}" class="ps-4 fw-bold">
-                                    <span class="text-primary">{{ $nomC }}</span>
-                                    <div class="small text-muted" style="font-size: 0.7rem;">ID: <span class="fw-bolder text-dark">{{ $rapport->agent->matricule }}</span></div>
-                                </td>
-
-
-                                {{-- Colonne Service (Cruciale pour le filtre) --}}
-
-
-                                <td data-search="{{ $serv }}" data-order="{{ $serv }}">
-                                    <span class="badge bg-{{ $couleurS }}-subtle text-{{ $couleurS }} border border-{{ $couleurS }} px-3 py-2 text-uppercase shadow-sm" style="font-weight: 700; font-size: 0.7rem;">
-                                        {{ $serv }}
-                                    </span>
-                                </td>
-
-
-                                {{-- Chiffres de présence --}}
-                                <td class="text-center fw-bold text-dark">{{ $rapport->presents }}</td>
-                                <td class="text-center fw-bold text-warning">{{ $rapport->retards }}</td>
-                                <td class="text-center fw-bold text-danger">{{ $rapport->absences }}</td>
-                                <td class="text-center fw-bold text-info">{{ $rapport->absences_justifiees }}</td>
-
-                                {{-- Barre de progression du taux --}}
-                                <td class="text-center" data-order="{{ $tx }}" style="min-width: 130px;">
-                                    <div class="d-flex align-items-center justify-content-center">
-                                        <div class="progress flex-grow-1 shadow-sm" style="height: 10px; background-color: #eee !important;">
-                                            <div class="progress-bar progress-bar-striped progress-bar-animated {{ $colorTaux }}"
-                                                role="progressbar"
-                                                style="width: {{ $tx }}%"></div>
-                                        </div>
-                                        <span class="ms-2 fw-bold text-dark" style="font-size: 0.8rem;">{{ $tx }}%</span>
-                                    </div>
-                                </td>
-
-                                {{-- Action --}}
-                                <td class="text-center">
-                                    <a href="{{ route('rapports.export.pdf', ['agent_id' => $rapport->agent->id, 'periode' => $periode]) }}"
-                                    class="btn btn-sm btn-outline-danger shadow-sm border-2"
-                                    title="Exporter en PDF">
-                                        <i class="fas fa-file-pdf"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        @endforeach
-
-                    </tbody>
-                </table>
+    <!-- NOUVEAU : Badge de Capacité Mensuelle (Blanc sur Rouge) -->
+    <div class="mb-4">
+        <div class="card shadow-sm border-0 bg-light">
+            <div class="card-body py-2 d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-muted small text-uppercase">
+                    <i class="fas fa-calendar-alt me-2 text-danger"></i>
+                    Capacité réelle du mois (Hors week-ends & fériés) :
+                </span>
+                <span class="badge bg-danger text-white fs-6 shadow-sm px-3 py-2 border-0">
+                    <i class="fas fa-bullseye me-1"></i> {{ $nomMois }} : {{ $joursOuvrables }} JOURS OUVRABLES
+                </span>
             </div>
         </div>
+    </div>
+
+    <!-- Tableau des Rapports -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle border" id="rapportTable">
+            <thead class="table-dark">
+                <tr>
+                    <th class="text-start ps-4" style="cursor:pointer"><i class="fas fa-users me-2"></i>Agents</th>
+                    <th class="text-start" style="cursor:pointer"><i class="fas fa-layer-group me-2"></i>Services</th>
+                    <th class="text-center" style="cursor:pointer; color: #2ecc71;"><i class="fas fa-check-circle me-1"></i> Présents</th>
+                    <th class="text-center" style="cursor:pointer; color: #f1c40f;"><i class="fas fa-clock me-1"></i> Retards</th>
+                    <th class="text-center" style="cursor:pointer; color: #e74c3c;"><i class="fas fa-user-times me-1"></i> Injustifiées</th>
+                    <th class="text-center" style="cursor:pointer; color: #3498db;"><i class="fas fa-file-medical me-1"></i> Justifiées</th>
+                    <th class="text-center" style="cursor:pointer"><i class="fas fa-chart-line me-2"></i>Taux</th>
+                    <th class="text-center no-export"><i class="fas fa-cog"></i></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach($rapports as $rapport)
+                    @php
+                        $nomC = strtoupper($rapport->agent->last_name) . ' ' . $rapport->agent->first_name;
+                        $serv = $rapport->agent->service->name ?? 'Non assigné';
+                        $tx = $rapport->taux ?? 0;
+
+                        // Logique de couleur du taux
+                        $colorTaux = $tx >= 80 ? 'bg-success' : ($tx >= 50 ? 'bg-warning' : 'bg-danger');
+
+                        // Palette pour les services
+                        $palette = ['primary', 'indigo', 'success', 'danger', 'warning', 'info', 'purple', 'pink', 'orange', 'teal'];
+                        $serviceId = $rapport->agent->service->id ?? 0;
+                        $couleurS = $palette[$serviceId % count($palette)];
+                    @endphp
+                    <tr class="transition-row">
+                        <td data-search="{{ $nomC }}" class="ps-4 fw-bold">
+                            <span class="text-primary">{{ $nomC }}</span>
+                            <div class="small text-muted" style="font-size: 0.65rem;">MATRICULE: <span class="fw-bolder text-dark">{{ $rapport->agent->matricule }}</span></div>
+                        </td>
+
+                        <td>
+                            <span class="badge bg-{{ $couleurS }}-subtle text-{{ $couleurS }} border border-{{ $couleurS }} px-2 py-1 text-uppercase" style="font-size: 0.65rem;">
+                                {{ $serv }}
+                            </span>
+                        </td>
+
+                        <td class="text-center fw-bolder text-success fs-6">{{ $rapport->presents }}</td>
+                        <td class="text-center fw-bolder text-warning fs-6">{{ $rapport->retards }}</td>
+                        <td class="text-center fw-bolder text-danger fs-6">{{ $rapport->absences }}</td>
+                        <td class="text-center fw-bolder text-info fs-6">{{ $rapport->absences_justifiees }}</td>
+
+                        <td class="text-center" data-order="{{ $tx }}">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="progress flex-grow-1 shadow-sm" style="height: 8px; background-color: #f0f0f0;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated {{ $colorTaux }}"
+                                        role="progressbar"
+                                        style="width: {{ $tx }}%"></div>
+                                </div>
+                                <span class="ms-2 fw-bold text-dark" style="font-size: 0.75rem;">{{ $tx }}%</span>
+                            </div>
+                        </td>
+
+                        <td class="text-center">
+                            <a href="{{ route('rapports.export.pdf', ['agent_id' => $rapport->agent->id, 'periode' => $periode]) }}"
+                            class="btn btn-sm btn-outline-danger shadow-sm"
+                            title="PDF Individuel">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
     </div>
 </div>
 
