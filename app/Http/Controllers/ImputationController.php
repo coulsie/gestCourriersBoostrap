@@ -123,7 +123,7 @@ public function create(Request $request)
 
 public function store(Request $request)
 {
-   
+
 
 // 1. Validation avec messages en français
     $request->validate([
@@ -207,50 +207,44 @@ public function store(Request $request)
         $imputation->save();
 
         // 6. Gestion dynamique des Agents (Absences & Intérims)
-        $finalAgentIds = [];
-        $dateRef = $request->date_imputation;
-        $notesInterim = "";
+       // 6. Gestion dynamique des Agents (Priorité à l'Intérim Actif)
+// 6. Gestion dynamique des Agents (Absences & Intérims)
+$finalAgentIds = [];
+$dateRef = \Carbon\Carbon::parse($request->date_imputation)->format('Y-m-d');
+$notesInterim = "";
 
-        foreach ($request->agent_ids as $agentId) {
-            // Vérifier si l'agent a une absence APPROUVÉE (valeur 2)
-            $absenceApprouvee = \App\Models\Absence::where('agent_id', $agentId)
-                ->where('approuvee', 2)
-                ->whereDate('date_debut', '<=', $dateRef)
-                ->whereDate('date_fin', '>=', $dateRef)
-                ->first();
+foreach ($request->agent_ids as $agentId) {
+    // A. On vérifie l'absence APPROUVÉE (valeur 1 selon votre remarque)
+    $absence = \App\Models\Absence::where('agent_id', $agentId)
+        ->where('approuvee', 1) // Correction de 2 vers 1 ici
+        ->whereDate('date_debut', '<=', $dateRef)
+        ->whereDate('date_fin', '>=', $dateRef)
+        ->first();
 
-            if ($absenceApprouvee) {
-                // Chercher l'intérimaire actif
-                $interim = \App\Models\Interim::where('agent_id', $agentId)
-                    ->where('is_active', true)
-                    ->whereDate('date_debut', '<=', $dateRef)
-                    ->whereDate('date_fin', '>=', $dateRef)
-                    ->first();
+    // B. On cherche l'intérimaire (Priorité si l'agent est absent ou si l'intérim est forcé)
+    $interim = \App\Models\Interim::where('agent_id', $agentId)
+        ->where('is_active', true)
+        ->whereDate('date_debut', '<=', $dateRef)
+        ->whereDate('date_fin', '>=', $dateRef)
+        ->first();
 
-                if ($interim) {
-                    $finalAgentIds[] = $interim->interimaire_id;
+    if ($absence && $interim && $interim->interimaire_id) {
+        // REDIRECTION vers l'intérimaire
+        $finalAgentIds[] = (int) $interim->interimaire_id;
 
-                    $agentTitulaire = \App\Models\Agent::find($agentId);
-                    $nomTitulaire = $agentTitulaire->last_name . ' ' . $agentTitulaire->first_name;
-                    $nomInterim = $interim->interimaire->last_name . ' ' . $interim->interimaire->first_name;
-                    $notesInterim .= "\n[LOG] $nomTitulaire absent (approuvé), redirigé vers l'intérimaire $nomInterim.";
-                } else {
-                    $finalAgentIds[] = $agentId; // Pas d'intérim trouvé, on garde l'agent
-                }
-            } else {
-                $finalAgentIds[] = $agentId; // Pas d'absence approuvée
-            }
-        }
+        $titulaire = \App\Models\Agent::find($agentId);
+        $remplacant = \App\Models\Agent::find($interim->interimaire_id);
 
-        // Synchronisation des agents finaux (sans doublons)
-        $imputation->agents()->sync(array_unique($finalAgentIds));
+        $notesInterim .= "\n[INTÉRIM] " . ($titulaire->last_name ?? 'Agent') . " absent, remplacé par " . ($remplacant->last_name ?? 'Intérimaire') . ".";
+    } else {
+        // Agent présent ou pas d'intérimaire trouvé : on garde l'ID original
+        $finalAgentIds[] = (int) $agentId;
+    }
+}
 
-        // Mise à jour des observations si des intérims ont été détectés
-        if (!empty($notesInterim)) {
-            $imputation->update([
-                'observations' => $imputation->observations . $notesInterim
-            ]);
-        }
+// Synchronisation finale sans doublons
+$imputation->agents()->sync(array_unique($finalAgentIds));
+
 
         // 7. Mise à jour du Courrier
         $courrier->update([
@@ -267,6 +261,8 @@ public function store(Request $request)
     }
 }
 
+
+
  public function checkInterim(Request $request)
 {
     // On récupère les IDs du select multiple (agent_ids)
@@ -281,7 +277,7 @@ public function store(Request $request)
     foreach ($agentIds as $agentId) {
         // 1. On cherche l'absence approuvée
         $absence = \App\Models\Absence::where('agent_id', $agentId)
-            ->where('approuvee', 2)
+            ->where('approuvee', 1)
             ->whereDate('date_debut', '<=', $dateRef)
             ->whereDate('date_fin', '>=', $dateRef)
             ->first();
