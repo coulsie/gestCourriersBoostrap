@@ -94,15 +94,42 @@
 
                         <hr class="my-5 shadow-sm">
 
+
+                        @if(session('warning_conflit'))
+                            <div class="alert alert-warning border-start border-4 border-warning shadow-sm mb-4">
+                                <div class="d-flex">
+                                    <div class="py-1"><i class="fas fa-exclamation-triangle fa-2x me-3"></i></div>
+                                    <div>
+                                        <h5 class="fw-bold text-dark">Attention : Conflit d'intérim</h5>
+                                        <p class="mb-0 text-dark">{{ session('warning_conflit') }}</p>
+
+                                        {{-- IMPORTANT : Ce champ caché dit au contrôleur de forcer l'enregistrement --}}
+                                        <input type="hidden" name="force_confirm" value="1">
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
+
                         <!-- Boutons d'action -->
                         <div class="d-flex justify-content-between align-items-center">
                             <a href="{{ route('interims.index') }}" class="btn btn-outline-secondary px-4 fw-bold rounded-pill shadow-sm">
                                 <i class="fas fa-arrow-left me-1"></i> Annuler
                             </a>
-                            <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-pill shadow">
-                                <i class="fas fa-save me-2"></i> ENREGISTRER L'INTÉRIM
-                            </button>
+
+                            @if(session('warning_conflit'))
+                                {{-- Bouton de confirmation forcée --}}
+                                <button type="submit" class="btn btn-warning px-5 py-2 fw-bold rounded-pill shadow text-white">
+                                    <i class="fas fa-check-circle me-2"></i> OUI, VALIDER CET INTÉRIM
+                                </button>
+                            @else
+                                {{-- Bouton d'enregistrement standard --}}
+                                <button type="submit" class="btn btn-primary px-5 py-2 fw-bold rounded-pill shadow">
+                                    <i class="fas fa-save me-2"></i> ENREGISTRER L'INTÉRIM
+                                </button>
+                            @endif
                         </div>
+
                     </form>
                 </div>
             </div>

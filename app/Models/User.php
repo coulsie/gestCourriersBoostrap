@@ -70,8 +70,12 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean', // <--- IMPORTANT
+
         ];
     }
+   
+
     protected $casts = [
         'role' => \App\Enums\UserRole::class,
         'must_change_password' => 'boolean',
@@ -81,7 +85,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(Affectation::class);
     }
-    
+
 public function agent()
 {
     // On précise 'user_id' si c'est le nom de la colonne dans la table agents

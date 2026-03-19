@@ -44,80 +44,86 @@ public function edit($id)
 
 
 
-public function store(Request $request)
-{
-    // 1. Validation des données
+    public function store(Request $request)
+    {
+        // 1. Validation des données
         $validated = $request->validate([
             'agent_id'       => 'required|exists:agents,id',
             'interimaire_id' => 'required|exists:agents,id|different:agent_id',
             'date_debut'     => 'required|date|after_or_equal:today',
-            'date_fin'       => 'required|date|after:date_debut',
-            'motif'          => 'nullable|string|max:1000', // Ajout du motif
+            'date_fin'       => 'required|date|after_or_equal:date_debut',
+            'motif'          => 'nullable|string|max:1000',
+            'force_confirm'  => 'nullable|boolean', // Champ pour la validation forcée
         ], [
             'interimaire_id.different' => 'L\'intérimaire doit être une personne différente du titulaire.',
             'date_fin.after'           => 'La date de fin doit être postérieure à la date de début.',
-            'motif.string'             => 'Le motif doit être un texte valide.',
         ]);
 
+        try {
+            $interimaire = \App\Models\Agent::findOrFail($validated['interimaire_id']);
 
-    try {
-        // 2. Récupérer l'agent intérimaire
-        $interimaire = \App\Models\Agent::findOrFail($validated['interimaire_id']);
+            if (!$interimaire->user_id) {
+                return back()->with('error', "L'agent " . $interimaire->last_name . " ne possède pas de compte utilisateur.");
+            }
 
-        // SÉCURITÉ : Vérifier si l'intérimaire possède bien un compte utilisateur
-        if (!$interimaire->user_id) {
-            return back()->with('error', "L'agent " . $interimaire->last_name . " ne possède pas de compte utilisateur.");
+            // A. VÉRIFICATION PERMISSIONNAIRE (Bloquante)
+            $isPermissionnaire = \App\Models\Absence::where('agent_id', $validated['interimaire_id'])
+                ->where(function ($query) use ($validated) {
+                    $query->where('date_debut', '<=', $validated['date_fin'])
+                        ->where('date_fin', '>=', $validated['date_debut']);
+                })->exists();
+
+            if ($isPermissionnaire) {
+                return back()->with('error', "Impossible : l'agent remplaçant est déjà permissionnaire sur cette période.");
+            }
+
+            // B. VÉRIFICATION CONFLIT INTERIM (Avertissement avec option de forcer)
+            $conflitInterim = \App\Models\Interim::where('interimaire_id', $validated['interimaire_id'])
+                ->where('is_active', true)
+                ->where(function ($query) use ($validated) {
+                    $query->where('date_debut', '<=', $validated['date_fin'])
+                        ->where('date_fin', '>=', $validated['date_debut']);
+                })->exists();
+
+            // Si conflit et que l'utilisateur n'a pas encore cliqué sur "Valider quand même"
+            if ($conflitInterim && !$request->has('force_confirm')) {
+                return back()
+                    ->withInput() // Garde les données saisies
+                    ->with('warning_conflit', "Cet agent est déjà programmé pour un autre intérim sur cette période. Voulez-vous qu'il assure ce nouvel intérim ?");
+            }
+
+            // 3. TRANSACTION : Création
+            \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $interimaire) {
+                \App\Models\Interim::create([
+                    'agent_id'       => $validated['agent_id'],
+                    'interimaire_id' => $validated['interimaire_id'],
+                    'user_id'        => $interimaire->user_id,
+                    'date_debut'     => $validated['date_debut'],
+                    'date_fin'       => $validated['date_fin'],
+                    'motif'          => $validated['motif'],
+                    'is_active'      => true,
+                ]);
+
+                \App\Models\Absence::create([
+                    'agent_id'        => $validated['agent_id'],
+                    'date_debut'      => $validated['date_debut'],
+                    'date_fin'        => $validated['date_fin'],
+                    'approuvee'       => 1,
+                    'type_absence_id' => 1,
+                    'document_justificatif' => $validated['motif'] ?? 'Intérim programmé #' . time(),
+                ]);
+            });
+
+            return redirect()->route('interims.index')
+                ->with('success', "L'intérim a été enregistré avec succès.");
+        } catch (\Exception $e) {
+            return back()->with('error', "Erreur système : " . $e->getMessage());
         }
-
-        // SÉCURITÉ : Vérifier les conflits d'intérim
-        $conflit = \App\Models\Interim::where('interimaire_id', $validated['interimaire_id'])
-            ->where('is_active', true)
-            ->where(function($query) use ($validated) {
-                $query->whereBetween('date_debut', [$validated['date_debut'], $validated['date_fin']])
-                      ->orWhereBetween('date_fin', [$validated['date_debut'], $validated['date_fin']]);
-            })->exists();
-
-        if ($conflit) {
-            return back()->with('error', "Cet agent est déjà programmé pour un autre intérim sur cette période.");
-        }
-
-        // UTILISATION D'UNE TRANSACTION pour garantir que les deux enregistrements sont créés ensemble
-
-        // UTILISATION D'UNE TRANSACTION pour garantir que les deux enregistrements sont créés ensemble
-        \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $interimaire) {
-
-            // 3. Création de l'intérim (avec le motif récupéré de la validation)
-            \App\Models\Interim::create([
-                'agent_id'       => $validated['agent_id'],
-                'interimaire_id' => $validated['interimaire_id'],
-                'user_id'        => $interimaire->user_id,
-                'date_debut'     => $validated['date_debut'],
-                'date_fin'       => $validated['date_fin'],
-                'motif'          => $validated['motif'], // <-- Ajout de la colonne motif
-                'is_active'      => true,
-            ]);
-
-            // 4. CRÉATION AUTOMATIQUE DE L'ABSENCE APPROUVÉE (Valeur 2)
-            \App\Models\Absence::create([
-                'agent_id'        => $validated['agent_id'],
-                'date_debut'      => $validated['date_debut'],
-                'date_fin'        => $validated['date_fin'],
-                'approuvee'       => 2,
-                'type_absence_id' => 1,
-                // On utilise le motif de l'intérim comme justificatif pour l'absence
-                'document_justificatif' => $validated['motif'] ?? 'Absence autorisée et Intérim programmé #' . time(),
-            ]);
-        });
-
-        return redirect()->route('interims.index')
-            ->with('success', "L'intérim et l'absence correspondante ont été enregistrés avec succès.");
-
-    } catch (\Exception $e) {
-        return back()->with('error', "Erreur système : " . $e->getMessage());
     }
-}
 
-public function update(Request $request, $id)
+
+
+    public function update(Request $request, $id)
 {
     $interim = \App\Models\Interim::findOrFail($id);
 

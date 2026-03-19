@@ -224,6 +224,8 @@ Route::middleware(['auth'])->group(function () {
             Route::match(['put', 'post'], '/update', [ProfileController::class, 'update'])->name('update');
         });
 
+
+
         // --- GESTION DES STRUCTURES ---
         Route::resource('directions', DirectionController::class);
         Route::resource('services', ServiceController::class);

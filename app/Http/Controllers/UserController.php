@@ -168,6 +168,9 @@ public function update(Request $request, $id)
      * @param  int  $id
      * @return \Illuminate\Http\RedirectResponse
      */
+
+
+
     public function destroy($id)
         {
             $user = User::findOrFail($id);
@@ -175,6 +178,9 @@ public function update(Request $request, $id)
 
             return redirect()->route('users.index')->with('success', 'Utilisateur supprimé avec succès !');
         }
+
+
+        
 
     public function resetPassword(Request $request, $id)
     {

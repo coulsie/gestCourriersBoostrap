@@ -134,7 +134,7 @@
                                 <div class="bg-warning text-dark rounded-circle p-2 me-3">
                                     <i class="fas fa-clock"></i>
                                 </div>
-                                <span class="fw-bold text-warning">Absence en attente de validation</span>
+                                <span class="fw-bold text-warning">Absence validée</span>
                             @endif
                         </div>
                     @else

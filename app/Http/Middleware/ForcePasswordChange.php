@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
-class ForcePasswordChange 
+class ForcePasswordChange
 {
     /**
      * Gère la requête entrante.
@@ -24,4 +24,10 @@ class ForcePasswordChange
 
         return $next($request);
     }
+
+
+
+
+
 }
+
