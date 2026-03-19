@@ -2,62 +2,133 @@
 
 @section('content')
 <style>
-    /* Styles pour l'affichage et l'impression */
+    /* 1. Couleurs éclatantes pour les statuts */
+    .status-present { background-color: #28a745 !important; color: white; }
+    .status-retard  { background-color: #ffc107 !important; color: #000; }
+    .status-absent  { background-color: #dc3545 !important; color: white; }
+    .status-justifie { background-color: #17a2b8 !important; color: white; }
+
+    /* 2. Design du tableau de statistiques (Synthèse) */
+    .bg-gradient-dark { background: linear-gradient(45deg, #212529, #343a40); }
+
+    .transition-row { transition: all 0.2s ease-in-out; cursor: default; }
+    .transition-row:hover {
+        background-color: rgba(13, 110, 253, 0.08) !important;
+        transform: scale(1.002);
+        box-shadow: inset 4px 0 0 #0d6efd;
+    }
+
+    /* Gestion de l'ascenseur et de l'en-tête fixe */
+    .sticky-top {
+        position: sticky !important;
+        top: 0;
+        z-index: 1020;
+        background-color: white !important;
+    }
+
+    .table-stats thead th {
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #dee2e6;
+    }
+
+    /* 3. Style personnalisé pour la barre de défilement (Scrollbar) */
+    .table-responsive::-webkit-scrollbar {
+        width: 8px;
+    }
+    .table-responsive::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #ced4da;
+        border-radius: 10px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb:hover {
+        background: #adb5bd;
+    }
+
+    /* 4. Style du badge de capacité (Rouge/Blanc) */
+    .badge-capacity {
+        box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+        border: 2px solid rgba(255,255,255,0.2);
+    }
+
+    /* 5. Pagination personnalisée */
+    .page-item.active .page-link {
+        background-color: #212529 !important;
+        border-color: #212529 !important;
+    }
+    .page-link {
+        color: #212529;
+        font-weight: bold;
+    }
+
+    /* 6. Configuration de l'impression */
     @media print {
-        .no-print, .btn, .card-header, .form-control, .form-select { display: none !important; }
+        .no-print, .btn, .card-header, .form-control, .form-select, .pagination, .page-item {
+            display: none !important;
+        }
         .card { border: none !important; box-shadow: none !important; }
         .container { width: 100% !important; max-width: 100% !important; margin: 0; padding: 0; }
-
-        .table { border-collapse: collapse !important; width: 100% !important; }
-        .table border, .table th, .table td { border: 1px solid #000 !important; padding: 8px; }
-
-        .badge { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; text-transform: uppercase; }
+        .table { width: 100% !important; border-collapse: collapse !important; }
+        .table th, .table td { border: 1px solid #dee2e6 !important; padding: 5px !important; font-size: 10pt; }
+        .table-responsive { max-height: none !important; overflow: visible !important; }
+        .badge { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; }
         .print-only { display: block !important; }
+
+        /* Forcer les couleurs à l'impression */
+        .text-success { color: #28a745 !important; font-weight: bold; }
+        .text-warning { color: #f39c12 !important; font-weight: bold; }
+        .text-danger  { color: #dc3545 !important; font-weight: bold; }
+        .text-info    { color: #17a2b8 !important; font-weight: bold; }
     }
 
+    /* 7. Utilitaires */
     .print-only { display: none; }
-    .badge-status { color: white !important; font-weight: bold; min-width: 100px; font-size: 0.8rem; }
-
-    .table-bordered-custom th, .table-bordered-custom td {
-        border: 1px solid #dee2e6 !important;
+    .badge-status {
+        padding: 0.5em 0.8em;
+        border-radius: 50px;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        display: inline-block;
+        min-width: 100px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .table-striped-custom tbody tr:nth-of-type(odd) {
-        background-color: rgba(0,0,0,.02);
-    }
-
-    /* Harmonisation de la hauteur des composants de filtrage */
-    .form-label { margin-bottom: 0.5rem; }
+    .table-hover tbody tr:hover { background-color: rgba(0,0,0,.03); }
 </style>
 
+
+
 <div class="container py-4">
-    <!-- Titre Impression (Invisible à l'écran) -->
+    <!-- En-tête Impression -->
     <div class="print-only text-center mb-4">
-        <h2 class="mb-1 text-uppercase">État Récapitulatif des Présences</h2>
-        <p class="mb-0">Période : {{ $mois ? \Carbon\Carbon::create()->month((int)$mois)->locale('fr')->translatedFormat('F') : 'Année' }} {{ $annee }}</p>
+        <h2 class="text-uppercase fw-bold">Rapport d'Assiduité des Agents</h2>
+        <p class="text-muted">Période : {{ $mois ? \Carbon\Carbon::create()->month((int)$mois)->locale('fr')->translatedFormat('F') : 'Toute l\'année' }} {{ $annee }}</p>
         <hr>
     </div>
 
-    <!-- Section Filtres -->
+    <!-- Filtres (Masqués à l'impression) -->
     <div class="card shadow-sm border-0 mb-4 no-print">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-            <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filtres de recherche</h5>
-            <button onclick="window.print()" class="btn btn-success btn-sm fw-bold shadow-sm">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 fw-bold"><i class="fas fa-filter me-2"></i>Critères de Recherche</h6>
+            <button onclick="window.print()" class="btn btn-light btn-sm shadow-sm">
                 <i class="fas fa-print me-1"></i> Imprimer l'état
             </button>
         </div>
-        <div class="card-body bg-light">
+        <div class="card-body">
             <form action="{{ route('presences.etat') }}" method="GET" class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label fw-bold small text-muted">ANNÉE</label>
-                    <select name="annee" class="form-select shadow-sm border-secondary-subtle">
+                <div class="col-md-4">
+                    <label class="small fw-bold text-muted">ANNÉE</label>
+                    <select name="annee" class="form-select">
                         @for($i = 2024; $i <= 2026; $i++)
                             <option value="{{ $i }}" {{ $annee == $i ? 'selected' : '' }}>{{ $i }}</option>
                         @endfor
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-bold small text-muted">MOIS</label>
-                    <select name="mois" class="form-select shadow-sm border-secondary-subtle">
+                <div class="col-md-4">
+                    <label class="small fw-bold text-muted">MOIS</label>
+                    <select name="mois" class="form-select">
                         <option value="">Tous les mois</option>
                         @foreach(range(1, 12) as $m)
                             <option value="{{ $m }}" {{ $mois == $m ? 'selected' : '' }}>
@@ -66,123 +137,148 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-bold small text-muted">SEMAINE (N°)</label>
-                    <input type="number" name="semaine" class="form-control shadow-sm border-secondary-subtle"
-                           value="{{ $semaine }}" placeholder="Ex: 4" min="1" max="53">
-                </div>
-                <div class="col-md-3">
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary w-100 shadow-sm fw-bold">
-                            <i class="fas fa-search me-1"></i> Filtrer
-                        </button>
-                        <a href="{{ route('presences.etat') }}" class="btn btn-outline-secondary shadow-sm" title="Réinitialiser">
-                            <i class="fas fa-sync-alt"></i>
-                        </a>
-                    </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">
+                        <i class="fas fa-search me-1"></i> Filtrer
+                    </button>
+                    <a href="{{ route('presences.etat') }}" class="btn btn-outline-secondary" title="Réinitialiser">
+                        <i class="fas fa-sync-alt"></i>
+                    </a>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Section Statistiques -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card shadow-sm border-0 border-top border-info border-3">
-                <div class="card-header bg-white py-2">
-                    <h6 class="mb-0 text-info fw-bold"><i class="fas fa-chart-pie me-2"></i>Résumé Statistique par Agent</h6>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered table-bordered-custom mb-0">
-                        <thead class="bg-light small">
-                            <tr class="text-center align-middle">
-                                <th class="text-start" style="width: 250px;">Agent</th>
-                                <th class="text-success" style="width: 100px;">Présents</th>
-                                <th class="text-warning" style="width: 100px;">Retards</th>
-                                <th class="text-danger" style="width: 100px;">Absents</th>
-                                <th class="text-primary" style="width: 100px;">Justifiés</th>
-                                <th class="bg-dark text-white" style="width: 100px;">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($statsAgents as $stat)
-                            <tr class="text-center small align-middle">
-                                <td class="text-start fw-bold">{{ $stat['nom'] }}</td>
-                                <td class="table-success fw-bold">{{ $stat['presents'] }}</td>
-                                <td class="table-warning fw-bold">{{ $stat['retards'] }}</td>
-                                <td class="table-danger fw-bold">{{ $stat['absents'] }}</td>
-                                <td class="table-primary fw-bold">{{ $stat['justifies'] }}</td>
-                                <td class="fw-bold bg-light">{{ $stat['total'] }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+    <!-- Information Jours Ouvrables -->
+    @if($mois)
+    <div class="row mb-3">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 bg-light">
+            <div class="card-body py-2 d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-muted small text-uppercase">
+                    <i class="fas fa-calendar-check me-2 text-danger"></i>
+                    Capacité du mois (Jours ouvrables hors fériés) :
+                </span>
+                <!-- bg-danger pour le fond rouge, text-white pour l'écriture blanche -->
+
+                <span class="badge bg-danger text-white fs-6 shadow-sm px-3">
+                    {{ $joursOuvrables }} Jours
+                </span>
+
             </div>
         </div>
     </div>
+</div>
+    @endif
+    <!-- Statistiques Globales avec Ascenseur -->
+<div class="card border-0 shadow-lg mb-5" style="border-radius: 12px; overflow: hidden;">
+    <div class="card-header bg-gradient-dark py-3">
+        <h6 class="mb-0 text-white fw-bold"><i class="fas fa-chart-line me-2"></i>SYNTHÈSE DE PERFORMANCE PAR AGENT</h6>
+    </div>
 
-    <!-- Tableau détaillé -->
-    <div class="card shadow-sm border-0 border-top border-dark border-3">
+    <!-- Conteneur de l'ascenseur (max-height à 400px) -->
+    <div class="table-responsive" style="max-height: 450px; overflow-y: auto; scrollbar-width: thin;">
+        <table class="table table-hover align-middle mb-0 table-stats">
+            <thead class="text-secondary small text-uppercase fw-bolder sticky-top bg-white shadow-sm" style="z-index: 10;">
+                <tr class="text-center">
+                    <th class="text-start ps-4 py-3 bg-white" style="width: 30%">Agent</th>
+                    <th class="py-3 bg-white"><span class="text-success"><i class="fas fa-check-circle me-1"></i>Présents</span></th>
+                    <th class="py-3 bg-white"><span class="text-warning"><i class="fas fa-clock me-1"></i>Retards</span></th>
+                    <th class="py-3 bg-white"><span class="text-danger"><i class="fas fa-times-circle me-1"></i>Absents</span></th>
+                    <th class="py-3 bg-white"><span class="text-info"><i class="fas fa-file-medical me-1"></i>Justifiés</span></th>
+                    <th class="py-3 bg-light" style="width: 15%">Total Général</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                @foreach($statsAgents as $stat)
+                <tr class="transition-row">
+                    <td class="text-start ps-4 py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white fw-bold me-2" style="width: 35px; height: 35px; font-size: 0.9rem; background: linear-gradient(135deg, #0d6efd, #0b5ed7);">
+                                {{ substr($stat['nom'], 0, 1) }}
+                            </div>
+                            <span class="fw-bold text-dark">{{ $stat['nom'] }}</span>
+                        </div>
+                    </td>
+                    <td class="py-3"><span class="badge rounded-pill bg-success-subtle text-success fs-6 px-3 py-2 border border-success-subtle">{{ $stat['presents'] }}</span></td>
+                    <td class="py-3"><span class="badge rounded-pill bg-warning-subtle text-warning fs-6 px-3 py-2 border border-warning-subtle">{{ $stat['retards'] }}</span></td>
+                    <td class="py-3"><span class="badge rounded-pill bg-danger-subtle text-danger fs-6 px-3 py-2 border border-danger-subtle">{{ $stat['absents'] }}</span></td>
+                    <td class="py-3"><span class="badge rounded-pill bg-info-subtle text-info fs-6 px-3 py-2 border border-info-subtle">{{ $stat['justifies'] }}</span></td>
+                    <td class="py-3 bg-light fw-bolder fs-5 text-dark">{{ $stat['total'] }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination Suivant / Précédent -->
+<div class="card shadow-sm border-0 mb-4 no-print bg-white p-3 rounded-3">
+    <div class="d-flex flex-column align-items-center">
+        <div class="mb-3">
+            {{ $presences->links('pagination::bootstrap-5') }}
+        </div>
+        <div class="text-muted small">
+            Affichage de <b>{{ $presences->firstItem() }}</b> à <b>{{ $presences->lastItem() }}</b> sur un total de <b>{{ $presences->total() }}</b> enregistrements
+        </div>
+    </div>
+</div>
+
+    <!-- Détail des Pointages -->
+    <div class="card shadow-sm border-0">
         <div class="table-responsive">
-            <table class="table table-bordered-custom table-striped-custom align-middle mb-0" id="tablePresences">
-                <thead class="table-dark">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-dark small text-uppercase">
                     <tr>
-                        <th style="width: 250px;">Agent</th>
-                        <th style="width: 200px;">Date & Heure Arrivée</th>
-                        <th style="width: 150px;">Heure Départ</th>
-                        <th class="text-center" style="width: 180px;">Statut</th>
-                        <th class="no-print">Notes</th>
+                        <th>Agent</th>
+                        <th>Date & Heure Arrivée</th>
+                        <th>Heure Départ</th>
+                        <th class="text-center">Statut</th>
+                        <th class="no-print">Observations</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="small">
                     @forelse($presences as $p)
                         <tr>
                             <td>
-                                <div class="fw-bold text-primary">{{ strtoupper($p->agent->last_name) }}</div>
-                                <div class="small text-muted">{{ ucfirst(strtolower($p->agent->first_name)) }}</div>
-                                <div class="badge bg-light text-dark border small no-print" style="font-size: 0.65rem;">
-                                    {{ $p->agent->service->nom ?? ($p->agent->service->libelle ?? 'S/S') }}
-                                </div>
+                                <div class="fw-bold text-dark">{{ strtoupper($p->agent->last_name) }}</div>
+                                <div class="text-muted">{{ ucfirst(strtolower($p->agent->first_name)) }}</div>
                             </td>
                             <td>
-                                {{ \Carbon\Carbon::parse($p->heure_arrivee)->locale('fr')->translatedFormat('d M Y') }}
-                                <br>
-                                <span class="badge bg-light text-dark border shadow-xs">
-                                    <i class="far fa-clock me-1 text-primary"></i>{{ \Carbon\Carbon::parse($p->heure_arrivee)->format('H:i') }}
-                                </span>
+                                <i class="far fa-calendar-alt me-1 text-muted"></i>
+                                {{ \Carbon\Carbon::parse($p->heure_arrivee)->translatedFormat('d/m/Y') }}
+                                <b class="ms-1 text-primary">{{ \Carbon\Carbon::parse($p->heure_arrivee)->format('H:i') }}</b>
                             </td>
                             <td>
                                 @if($p->heure_depart)
-                                    <span class="badge bg-light text-dark border">
-                                        <i class="far fa-clock me-1 text-danger"></i>{{ \Carbon\Carbon::parse($p->heure_depart)->format('H:i') }}
-                                    </span>
+                                    <i class="far fa-clock me-1 text-muted"></i>{{ \Carbon\Carbon::parse($p->heure_depart)->format('H:i') }}
                                 @else
-                                    <span class="text-muted small">--:--</span>
+                                    <span class="text-danger small italic">Non pointé</span>
                                 @endif
                             </td>
                             <td class="text-center">
                                 @php
-                                    $color = match($p->statut) {
-                                        'Présent' => 'success',
-                                        'En Retard' => 'warning',
-                                        'Absent' => 'danger',
-                                        'Absence Justifiée' => 'primary',
-                                        default => 'secondary'
+                                    $statusClass = match($p->statut) {
+                                        'Présent' => 'status-present',
+                                        'En Retard' => 'status-retard',
+                                        'Absent' => 'status-absent',
+                                        'Justifié' => 'status-justifie',
+                                        default => 'bg-secondary text-white'
                                     };
                                 @endphp
-                                <span class="badge bg-{{ $color }} badge-status shadow-sm">{{ $p->statut }}</span>
+                                <span class="badge-status {{ $statusClass }}">
+                                    {{ $p->statut }}
+                                </span>
                             </td>
-                            <td class="no-print small text-muted italic">{{ $p->note ?? '-' }}</td>
+                            <td class="no-print text-muted small italic">{{ $p->notes ?? '-' }}</td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-4 text-muted italic">Aucune donnée trouvée pour cette période.</td>
-                        </tr>
+                        <tr><td colspan="5" class="text-center py-4 text-muted">Aucun enregistrement pour cette période.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
 @endsection

@@ -244,110 +244,7 @@ public function store(Request $request)
     }
 
 
-public function statsPresences(Request $request)
-{
-    $annee = $request->input('annee', 2026);
-    $mois = $request->input('mois');
-    $semaine = $request->input('semaine');
-    $service_id = $request->input('service_id');
 
-    // --- 1. DÉFINITION DE LA VARIABLE $query (OBLIGATOIRE) ---
-    $query = \App\Models\Presence::with(['agent.service'])
-        ->whereYear('heure_arrivee', $annee);
-
-    // --- 2. FILTRAGE ---
-    if ($mois) $query->whereMonth('heure_arrivee', $mois);
-
-    if ($semaine) $query->whereRaw('WEEK(heure_arrivee, 1) = ?', [$semaine]);
-
-    if ($service_id) {
-        $query->whereHas('agent', function($q) use ($service_id) {
-            $q->where('service_id', $service_id);
-        });
-    }
-
-    // --- 3. EXÉCUTION ---
-    $presences = $query->orderBy('heure_arrivee', 'desc')->get();
-
-    // --- 4. CALCULS ---
-    $statsAgents = $presences->groupBy('agent_id')->map(function ($items) {
-        $agent = $items->first()->agent;
-        return [
-            'nom' => strtoupper($agent->last_name ?? '') . ' ' . ucfirst(strtolower($agent->first_name ?? '')),
-            'total' => $items->count(),
-            'presents' => $items->where('statut', 'Présent')->count(),
-            'retards' => $items->where('statut', 'En Retard')->count(),
-            'absents' => $items->where('statut', 'Absent')->count(),
-            'justifies' => $items->where('statut', 'Absence Justifiée')->count(),
-            'feries' => $items->where('statut', 'Férié')->count(), // Ajouté
-        ];
-    });
-
-    $services = \App\Models\Service::all();
-
-    return view('presences.etat', compact('presences', 'statsAgents', 'annee', 'mois', 'semaine', 'services'));
-}
-
-
-    public function agent()
-    {
-        // Laravel cherchera par défaut la colonne agent_id dans la table presences
-        return $this->belongsTo(Agent::class, 'agent_id');
-    }
-
-
-public function stats(Request $request)
-{
-    $annee = 2026;
-    $dateDebut = $request->input('date_debut');
-    $dateFin = $request->input('date_fin');
-
-    // 1. Initialisation correcte de la variable $query
-    $query = \App\Models\Presence::with('agent')
-        ->select(
-            DB::raw('DATE(heure_arrivee) as date'),
-            DB::raw("COUNT(*) as total"),
-            DB::raw("SUM(CASE WHEN statut = 'Présent' THEN 1 ELSE 0 END) as presents"),
-            DB::raw("SUM(CASE WHEN statut = 'En Retard' THEN 1 ELSE 0 END) as retards"),
-            DB::raw("SUM(CASE WHEN statut = 'Absent' THEN 1 ELSE 0 END) as absents"),
-            DB::raw("SUM(CASE WHEN statut = 'Férié' THEN 1 ELSE 0 END) as feries") // Ajouté
-        )
-        ->whereYear('heure_arrivee', $annee);
-
-    // 2. Application des filtres de date
-    if ($dateDebut && $dateFin) {
-        $query->whereBetween(DB::raw('DATE(heure_arrivee)'), [$dateDebut, $dateFin]);
-    }
-
-    // 3. Exécution de la requête groupée
-    $journalier = $query->groupBy('date')
-        ->orderBy('date', 'desc')
-        ->get();
-
-    // 4. Stats Hebdo avec Jours Fériés
-    $hebdo = \App\Models\Presence::select(
-            DB::raw('WEEK(heure_arrivee, 1) as semaine'),
-            DB::raw("COUNT(*) as total"),
-            DB::raw("SUM(statut = 'Présent') as presents"),
-            DB::raw("SUM(statut = 'Férié') as feries")
-        )
-        ->whereYear('heure_arrivee', $annee)
-        ->groupBy('semaine')
-        ->get();
-
-    // 5. Stats Mensuelles avec Jours Fériés
-    $mensuel = \App\Models\Presence::select(
-            DB::raw('MONTH(heure_arrivee) as mois'),
-            DB::raw("COUNT(*) as total"),
-            DB::raw("SUM(statut = 'Présent') as presents"),
-            DB::raw("SUM(statut = 'Férié') as feries")
-        )
-        ->whereYear('heure_arrivee', $annee)
-        ->groupBy('mois')
-        ->get();
-
-    return view('presences.stats', compact('journalier', 'hebdo', 'mensuel', 'annee', 'dateDebut', 'dateFin'));
-}
 
 
         // app/Http/Controllers/PresenceController.php
@@ -637,4 +534,80 @@ public function listeFiltree(Request $request)
 
     return view('presences.liste_filtree', compact('resultats', 'directions', 'services'));
 }
+
+
+
+    /**
+     * Affiche l'état récapitulatif des présences avec calcul des jours ouvrables.
+     */
+
+ public function statsPresences(Request $request)
+{
+    // 1. Récupération des filtres
+    $annee = (int) $request->input('annee', date('Y'));
+    $mois = $request->input('mois');
+    $joursOuvrables = 0;
+
+    // 2. Calcul des jours ouvrables (Si un mois est sélectionné)
+    if (!empty($mois)) {
+        $moisNum = (int)$mois;
+
+        $feries = \App\Models\Holiday::whereYear('holiday_date', $annee)
+            ->whereMonth('holiday_date', $moisNum)
+            ->pluck('holiday_date')
+            ->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))
+            ->toArray();
+
+        $dateRef = \Carbon\Carbon::createFromDate($annee, $moisNum, 1);
+        $nombreJours = $dateRef->daysInMonth;
+
+        for ($i = 1; $i <= $nombreJours; $i++) {
+            $currentDay = \Carbon\Carbon::createFromDate($annee, $moisNum, $i);
+            if ($currentDay->isWeekday() && !in_array($currentDay->format('Y-m-d'), $feries)) {
+                $joursOuvrables++;
+            }
+        }
+    }
+
+    // 3. Récupération des données pour les STATISTIQUES (Toutes les données du mois)
+    $allPresences = \App\Models\Presence::whereYear('heure_arrivee', $annee)
+        ->when($mois, fn($q) => $q->whereMonth('heure_arrivee', $mois))
+        ->get();
+
+    // 4. Récupération des données pour le TABLEAU DÉTAILLÉ (Paginées)
+    $presences = \App\Models\Presence::with('agent')
+        ->whereYear('heure_arrivee', $annee)
+        ->when($mois, fn($q) => $q->whereMonth('heure_arrivee', $mois))
+        ->orderBy('heure_arrivee', 'desc')
+        ->paginate(20) // Pagination : 20 par page
+        ->withQueryString(); // Garde les filtres lors du changement de page
+
+    // 5. Calcul des statistiques par agent (sur la totalité des données)
+    $statsAgents = [];
+    $agents = \App\Models\Agent::orderBy('last_name', 'asc')
+                ->orderBy('first_name', 'asc')
+                ->get();
+
+    foreach ($agents as $agent) {
+        $p = $allPresences->where('agent_id', $agent->id);
+        $statsAgents[] = [
+            'nom' => strtoupper($agent->last_name) . ' ' . $agent->first_name,
+            'presents' => $p->where('statut', 'Présent')->count(),
+            'retards' => $p->where('statut', 'En Retard')->count(),
+            'absents' => $p->where('statut', 'Absent')->count(),
+            'justifies' => $p->where('statut', 'Justifié')->count(),
+            'total' => $p->count(),
+        ];
+    }
+
+    return view('presences.etat', compact(
+        'presences',
+        'statsAgents',
+        'annee',
+        'mois',
+        'joursOuvrables'
+    ));
+}
+
+
 }

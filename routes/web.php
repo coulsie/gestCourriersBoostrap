@@ -256,12 +256,13 @@ Route::middleware(['auth'])->group(function () {
 
 
         // --- PRÉSENCES & POINTAGES ---
+        Route::get('/presences/etat', [PresenceController::class, 'etat'])->name('presences.etat');
         Route::prefix('presences')->name('presences.')->group(function () {
             Route::get('/mon-pointage', [PresenceController::class, 'monPointage'])->name('monPointage');
             Route::post('/mon-pointage/enregistrer', [PresenceController::class, 'enregistrerPointage'])->name('enregistrerPointage');
             Route::get('/mon-historique', [PresenceController::class, 'monHistorique'])->name('monHistorique');
             Route::get('/liste-filtree', [PresenceController::class, 'listeFiltree'])->name('listeFiltree');
-            Route::get('/etat', [PresenceController::class, 'etat'])->name('etat'); // Ajouté selon votre sidebar
+
         });
 
 
