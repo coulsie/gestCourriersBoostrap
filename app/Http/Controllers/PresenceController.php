@@ -595,7 +595,7 @@ public function listeFiltree(Request $request)
             'presents' => $p->where('statut', 'Présent')->count(),
             'retards' => $p->where('statut', 'En Retard')->count(),
             'absents' => $p->where('statut', 'Absent')->count(),
-            'justifies' => $p->where('statut', 'Justifié')->count(),
+            'justifies' => $p->where('statut', 'Absence Justifiée')->count(),
             'total' => $p->count(),
         ];
     }
