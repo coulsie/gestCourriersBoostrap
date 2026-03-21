@@ -256,7 +256,7 @@ Route::middleware(['auth'])->group(function () {
 
 
         // --- PRÉSENCES & POINTAGES ---
-        Route::get('/presences/etat', [PresenceController::class, 'etat'])->name('presences.etat');
+        
         Route::prefix('presences')->name('presences.')->group(function () {
             Route::get('/mon-pointage', [PresenceController::class, 'monPointage'])->name('monPointage');
             Route::post('/mon-pointage/enregistrer', [PresenceController::class, 'enregistrerPointage'])->name('enregistrerPointage');

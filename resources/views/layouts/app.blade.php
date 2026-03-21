@@ -283,33 +283,28 @@
                             <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #2f3542;">
                                 <i class="fas fa-user-shield me-1"></i> CONTRÔLE & RH
                             </h6>
-                            <a class="collapse-item text-secondary fw-bold" href="{{ route('absences.createListe') }}">
-                                <i class="fas fa-users-cog me-2"></i>Absence Groupée
-                            </a>
+
                             <a class="collapse-item text-secondary fw-bold" href="{{ route('holidays.index') }}">
                                 <i class="fas fa-umbrella-beach me-2"></i>Jours fériés
                             </a>
                             <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.index') }}">
                                 <i class="fas fa-stopwatch me-2"></i>Enregistrement pointage
                             </a>
-                            <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.listeFiltree') }}">
-                                <i class="fas fa-stream me-2"></i>Liste de présence
-                            </a>
+
                             <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.validation-hebdo') }}">
                                 <i class="fas fa-check-double me-2"></i>Validation hebdo.
                             </a>
 
-                            <a class="collapse-item fw-bold text-dark bg-light-success rounded mx-2 my-1" href="{{ route('presences.etat') }}">
-                                <i class="fas fa-clipboard-list me-2" style="color: #2ed573;"></i> État des Présences
-                            </a>
 
                             <div class="dropdown-divider" style="border-top: 1px dashed #2ed573; opacity: 0.2;"></div>
 
                             <a class="collapse-item text-muted fw-bold small" href="{{ route('typeabsences.index') }}">Types d'Autorisations</a>
                             <a class="collapse-item text-muted fw-bold small" href="{{ route('absences.index') }}">Demandes d'Autorisation d'absence</a>
-
+                            <a class="collapse-item text-secondary fw-bold" href="{{ route('absences.createListe') }}">
+                                <i class="fas fa-users-cog me-2"></i>Demande Autorisation d'Absence Groupée
+                            </a>
                             <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mt-1" href="{{ route('absences.validation_liste') }}" style="background-color: #ffa502;">
-                                <i class="fas fa-tasks me-2"></i> Validation Autorisation d'Absences
+                                <i class="fas fa-tasks me-2"></i> Validation Autorisation d'Absence
                             </a>
 
                             {{-- RAPPORTS : BLEU NUIT --}}
@@ -317,6 +312,15 @@
                             <h6 class="collapse-header fw-bold border-bottom pb-1 mx-2 mb-2" style="color: #1e3799;">
                                 <i class="fas fa-file-signature me-1"></i> RAPPORTS
                             </h6>
+
+                            <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.listeFiltree') }}">
+                                <i class="fas fa-stream me-2"></i>Liste de présence
+                            </a>
+
+                            <a class="collapse-item fw-bold text-dark bg-light-success rounded mx-2 my-1" href="{{ route('presences.etat') }}">
+                                <i class="fas fa-clipboard-list me-2" style="color: #2ed573;"></i> État des Présences
+                            </a>
+
                             <a class="collapse-item fw-bold text-dark" href="{{ route('rapports.presences.periodique') }}">
                                 <i class="fas fa-file-medical-alt me-2" style="color: #1e3799;"></i> Rapport Périodique
                             </a>
