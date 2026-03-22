@@ -2,24 +2,56 @@
 
 @section('content')
 <style>
-    /* Styles pour l'impression */
-    @media print {
-        .no-print { display: none !important; }
-        .card { border: none !important; box-shadow: none !important; }
-        thead { display: table-header-group; background-color: #000 !important; color: #fff !important; }
-        tr { page-break-inside: avoid; }
-        .table td, .table th { padding: 8px !important; border: 1px solid #dee2e6 !important; }
-    }
-
+    /* --- STYLES ÉCRAN --- */
     .extra-small { font-size: 0.75rem; }
     .table-header-custom { background-color: #000; color: #fff; text-transform: uppercase; font-size: 0.85rem; }
+    .badge-present { background-color: #198754 !important; color: #ffffff !important; }
+    .badge-retard { background-color: #ffc107 !important; color: #000000 !important; }
+    .badge-absent { background-color: #dc3545 !important; color: #ffffff !important; }
+    .badge-justifie { background-color: #0d6efd !important; color: #ffffff !important; }
 
-    /* Couleurs fixes pour les statuts */
-    .badge-present { background-color: #198754 !important; color: #ffffff !important; } /* Vert */
-    .badge-retard { background-color: #ffc107 !important; color: #000000 !important; }  /* Jaune (texte noir pour contraste) */
-    .badge-absent { background-color: #dc3545 !important; color: #ffffff !important; }  /* Rouge */
-    .badge-justifie { background-color: #0d6efd !important; color: #ffffff !important; } /* Bleu */
+    /* --- STYLES IMPRESSION --- */
+    @media print {
+        /* 1. On cache TOUT ce qui est sur la page (menus, barres latérales, filtres) */
+        body * {
+            visibility: hidden;
+        }
+
+        /* 2. On réaffiche UNIQUEMENT la zone du tableau (l'ID que tu as mis) */
+        #printableArea, #printableArea * {
+            visibility: visible;
+        }
+
+        /* 3. On repositionne le tableau en haut à gauche de la feuille */
+        #printableArea {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+
+        /* 4. On force les titres de colonnes (Fond noir / Texte blanc) */
+        .table-header-custom th {
+            background-color: #000 !important;
+            color: #fff !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            border: 1px solid #000 !important;
+        }
+
+        /* 5. On force les badges en couleur sur le papier */
+        .badge-present, .badge-retard, .badge-absent, .badge-justifie {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* 6. Mise en page générale */
+        @page { size: landscape; margin: 1cm; }
+        .table td, .table th { border: 1px solid #dee2e6 !important; padding: 8px !important; }
+        .no-print { display: none !important; }
+    }
 </style>
+
 
 <div class="container-fluid py-4 px-4">
     <!-- EN-TÊTE -->
@@ -30,10 +62,12 @@
             </a>
             <h3 class="mb-0 fw-bold text-dark text-uppercase">Rapport Global des Présences 2026</h3>
         </div>
-        <button onclick="window.print()" class="btn btn-secondary shadow-sm px-4">
+
+        <button type="button" onclick="window.print()" class="btn btn-success shadow-sm px-4 no-print">
             <i class="fas fa-print me-2"></i> Imprimer
         </button>
-    </div>
+
+     </div>
 
     <!-- ZONE DE FILTRAGE (no-print) -->
     <div class="card shadow-sm border-0 mb-4 bg-dark text-white rounded-3 no-print">
@@ -100,7 +134,42 @@
     </div>
 
     <!-- TABLEAU DE RÉSULTATS -->
-    <div class="card shadow border-0 rounded-3 overflow-hidden">
+    <div id="printableArea" class="card shadow border-0 rounded-3 overflow-hidden">
+
+        <!-- Ce titre sera invisible sur ton site, mais apparaîtra sur l'impression -->
+        <!-- EN-TÊTE D'IMPRESSION DYNAMIQUE -->
+        <div class="d-none d-print-block p-4 border-bottom mb-4">
+            <div class="text-center">
+                <h2 class="fw-bold text-uppercase mb-1">Rapport Global des Présences 2026</h2>
+                <p class="text-muted small">Document généré le {{ now()->format('d/m/2026 à H:i') }}</p>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-6">
+                    <ul class="list-unstyled small">
+                        <li><strong>Direction :</strong>
+                            {{ $directions->where('id', request('direction_id'))->first()->name ?? 'Toutes les Directions' }}
+                        </li>
+                        <li><strong>Service :</strong>
+                            {{ $services->where('id', request('service_id'))->first()->name ?? 'Tous les Services' }}
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-6 text-end">
+                    <ul class="list-unstyled small">
+                        <li><strong>Période :</strong>
+                            @if(request('date_debut') && request('date_fin'))
+                                Du {{ date('d/m/2026', strtotime(request('date_debut'))) }} au {{ date('d/m/2026', strtotime(request('date_fin'))) }}
+                            @else
+                                Année 2026 (Complète)
+                            @endif
+                        </li>
+                        <li><strong>Statut :</strong> {{ request('statut') ?: 'Tous les statuts' }}</li>
+                    </ul>
+                </div>
+            </div>
+            <hr>
+        </div>
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -162,10 +231,13 @@
         </div>
 
         <!-- PAGINATION (Suivant / Précédent) -->
-        @if($resultats->hasPages())
+        {{-- On ne vérifie la pagination QUE si on n'est pas en mode impression --}}
+        {{-- On vérifie d'abord si on n'est PAS en mode impression et si l'objet peut paginer --}}
+        @if(!request()->has('print') && method_exists($resultats, 'hasPages') && $resultats->hasPages())
         <div class="card-footer bg-white border-top py-3 no-print">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="small text-muted">
+                    {{-- Utilisation de method_exists pour sécuriser les appels aux fonctions de pagination --}}
                     Affichage de {{ $resultats->firstItem() }} à {{ $resultats->lastItem() }} sur {{ $resultats->total() }} résultats
                 </div>
                 <nav>
@@ -188,29 +260,28 @@
             </div>
         </div>
         @endif
+
+
+
     </div>
 </div>
 
 <script>
-    // Script de filtrage dynamique Services -> Direction
-    document.getElementById('direction_id').addEventListener('change', function() {
-        const dirId = this.value;
-        const serviceSelect = document.getElementById('service_id');
-        const options = serviceSelect.querySelectorAll('option');
-
-        options.forEach(opt => {
-            if (opt.value === "") {
-                opt.style.display = "block";
-            } else if (dirId === "" || opt.getAttribute('data-direction') === dirId) {
+    // Uniquement le filtrage (sans les fonctions d'impression qui buggent)
+    document.getElementById('direction_id')?.addEventListener('change', function() {
+        var dirId = this.value;
+        var serviceSelect = document.getElementById('service_id');
+        var options = serviceSelect.querySelectorAll('option');
+        options.forEach(function(opt) {
+            if (opt.value === "" || dirId === "" || opt.getAttribute('data-direction') === dirId) {
                 opt.style.display = "block";
             } else {
                 opt.style.display = "none";
             }
         });
-
-        if (dirId !== "" && serviceSelect.options[serviceSelect.selectedIndex].getAttribute('data-direction') !== dirId) {
-            serviceSelect.value = "";
-        }
+        serviceSelect.value = "";
     });
 </script>
+
+
 @endsection

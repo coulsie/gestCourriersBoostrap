@@ -525,11 +525,18 @@ public function listeFiltree(Request $request)
           ->select('presences.*')
           ->orderBy('agents.last_name', $directionTri);
 
-    // 7. Exécution de la pagination
-    $resultats = $query->paginate(25)->withQueryString();
+        // 7. Exécution de la pagination
+        // 7. Gestion de l'affichage (Tout ou Pagination)
+        if ($request->has('print')) {
+            // Si on demande l'impression, on récupère tout (limite haute à 5000 pour sécurité)
+            $resultats = $query->take(5000)->get();
+        } else {
+            // Sinon, pagination classique de 25 par page
+            $resultats = $query->paginate(25)->withQueryString();
+        }
 
-    // 8. Récupération des listes pour les menus déroulants des filtres
-    $directions = \App\Models\Direction::orderBy('name')->get();
+        // 8. Récupération des listes pour les menus déroulants des filtres
+        $directions = \App\Models\Direction::orderBy('name')->get();
     $services = \App\Models\Service::orderBy('name')->get();
 
     return view('presences.liste_filtree', compact('resultats', 'directions', 'services'));

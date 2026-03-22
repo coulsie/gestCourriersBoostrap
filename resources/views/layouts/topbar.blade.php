@@ -59,17 +59,26 @@
                 <div class="d-flex flex-column align-items-end mr-3">
                     @auth
                         <span class="text-gray-800 small font-weight-bold">{{ Auth::user()->name }}</span>
+                        <span class="text-success x-small" style="font-size: 10px;">Connecté</span>
                     @endauth
-                    <span class="text-gray-500 x-small" style="font-size: 10px;">Connecté</span>
                 </div>
-                <img class="img-profile rounded-circle border shadow-sm"
+
                 @auth
-                    <img src="https://ui-avatars.com{{ urlencode(Auth::user()->name) }}&background=4e73df&color=fff&bold=true">
+                    @if(Auth::user()->agent && Auth::user()->agent->photo)
+                        {{-- Affiche la photo de l'agent (ajustez le chemin storage selon votre config) --}}
+                        <img class="img-profile rounded-circle border shadow-sm"
+                            src="{{ asset('agents_photos/' . Auth::user()->agent->photo) }}"
+                            
+                            style="width: 32px; height: 32px; object-fit: cover;">
+                    @else
+                        {{-- Avatar par défaut avec les initiales --}}
+                        <img class="img-profile rounded-circle border shadow-sm"
+                            src="https://ui-avatars.com{{ urlencode(Auth::user()->name) }}&background=4e73df&color=fff&bold=true">
+                    @endif
                 @else
-                    <img src="https://ui-avatars.comInvite&background=cccccc&color=fff">
+                    <img class="img-profile rounded-circle border shadow-sm" src="https://ui-avatars.comInvite&background=cccccc&color=fff">
                 @endauth
             </a>
-
             <!-- Menu déroulant Profil -->
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
                 <a class="dropdown-item" href="{{ route('profile.show') }}">
