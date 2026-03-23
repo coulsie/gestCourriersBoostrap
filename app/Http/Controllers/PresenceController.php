@@ -247,15 +247,19 @@ public function store(Request $request)
 
 
 
-        // app/Http/Controllers/PresenceController.php
-public function indexValidationHebdo()
+ public function indexValidationHebdo()
 {
     $debutSemaine = now()->subWeek()->startOfWeek();
-    $finSemaine = now()->subWeek()->endOfWeek()->subDays(2); // Vendredi
+    // On s'arrête au vendredi pour ignorer le weekend
+    $finSemaine = now()->subWeek()->startOfWeek()->addDays(4);
 
-    // Récupérer tous les jours fériés de la période en une seule fois (optimisation)
-    $joursFeries = \App\Models\Holiday::whereBetween('holiday_date', [$debutSemaine->toDateString(), $finSemaine->toDateString()])
+    // 1. Forcer le format string 'Y-m-d' pour les jours fériés
+    $joursFeries = \App\Models\Holiday::whereBetween('holiday_date', [
+            $debutSemaine->toDateString(),
+            $finSemaine->toDateString()
+        ])
         ->pluck('holiday_date')
+        ->map(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d'))
         ->toArray();
 
     $agents = Agent::all();
@@ -263,38 +267,44 @@ public function indexValidationHebdo()
 
     foreach ($agents as $agent) {
         $currentDate = $debutSemaine->copy();
+
         while ($currentDate <= $finSemaine) {
             $dateStr = $currentDate->toDateString();
 
-            // SI c'est un jour férié, on passe au jour suivant sans rien détecter
+            // 2. EXCLUSION STRICTE : Si férié, on saute DIRECTEMENT au jour suivant
             if (in_array($dateStr, $joursFeries)) {
                 $currentDate->addDay();
                 continue;
             }
 
-            $dejaValide = Presence::where('agent_id', $agent->id)
+            // 3. Vérifier si une présence (peu importe le statut) existe déjà
+            $dejaPointe = Presence::where('agent_id', $agent->id)
                                  ->whereDate('heure_arrivee', $dateStr)
                                  ->exists();
 
-            if (!$dejaValide) {
+            if (!$dejaPointe) {
+                // On cherche si une permission (statut 1) couvre ce jour
                 $justif = \App\Models\Absence::where('agent_id', $agent->id)
+                    ->where('approuvee', 1) // On utilise votre statut validé
                     ->whereDate('date_debut', '<=', $dateStr)
                     ->whereDate('date_fin', '>=', $dateStr)
                     ->first();
 
                 $absencesDetectees[] = [
                     'agent_id'     => $agent->id,
-                    'nom'          => $agent->last_name . ' ' . $agent->first_name,
+                    'nom'          => strtoupper($agent->last_name) . ' ' . $agent->first_name,
                     'date'         => $dateStr,
                     'est_justifie' => !is_null($justif),
-                    'motif'        => $justif ? $justif->motif : null,
+                    'motif'        => $justif ? $justif->motif : 'Non justifié',
                 ];
             }
             $currentDate->addDay();
         }
     }
+
     return view('presences.validation-hebdo', compact('absencesDetectees'));
 }
+
 
 public function storeValidationHebdo(Request $request)
 {
