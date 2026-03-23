@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : jeu. 19 mars 2026 à 11:58
+-- Généré le : lun. 23 mars 2026 à 08:36
 -- Version du serveur : 11.4.9-MariaDB
 -- Version de PHP : 8.3.28
 
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `absences` (
   PRIMARY KEY (`id`),
   KEY `absences_agent_id_foreign` (`agent_id`),
   KEY `absences_type_absence_id_foreign` (`type_absence_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `absences`
@@ -77,7 +77,10 @@ INSERT INTO `absences` (`id`, `agent_id`, `type_absence_id`, `date_debut`, `date
 (37, 4, 1, '2026-03-19', '2026-03-21', 1, 'essai verif', '2026-03-19 07:59:17', '2026-03-19 07:59:17'),
 (38, 24, 7, '2026-04-12', '2026-04-16', 1, '1773919851_Note au MFB_ Objectif de recettes TOFE Aout 2025.pdf', '2026-03-19 11:30:51', '2026-03-19 11:31:05'),
 (39, 7, 7, '2026-04-12', '2026-04-16', 1, '1773919851_Note au MFB_ Objectif de recettes TOFE Aout 2025.pdf', '2026-03-19 11:30:51', '2026-03-19 11:31:09'),
-(40, 3, 7, '2026-04-12', '2026-04-16', 1, '1773919851_Note au MFB_ Objectif de recettes TOFE Aout 2025.pdf', '2026-03-19 11:30:51', '2026-03-19 11:31:11');
+(40, 3, 7, '2026-04-12', '2026-04-16', 1, '1773919851_Note au MFB_ Objectif de recettes TOFE Aout 2025.pdf', '2026-03-19 11:30:51', '2026-03-19 11:31:11'),
+(50, 18, 7, '2026-03-25', '2026-03-27', 1, '1774251853_Note au MFB_ Objectif de recettes TOFE Aout 2025.pdf', '2026-03-23 07:44:13', '2026-03-23 08:13:38'),
+(51, 4, 7, '2026-03-25', '2026-03-27', 1, '1774251853_Note au MFB_ Objectif de recettes TOFE Aout 2025.pdf', '2026-03-23 07:44:13', '2026-03-23 08:13:40'),
+(52, 17, 7, '2026-03-25', '2026-03-27', 1, '1774251853_Note au MFB_ Objectif de recettes TOFE Aout 2025.pdf', '2026-03-23 07:44:13', '2026-03-23 08:13:42');
 
 -- --------------------------------------------------------
 
@@ -164,7 +167,7 @@ CREATE TABLE IF NOT EXISTS `agent_imputation` (
   PRIMARY KEY (`id`),
   KEY `agent_imputation_imputation_id_foreign` (`imputation_id`),
   KEY `agent_imputation_agent_id_foreign` (`agent_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `agent_imputation`
@@ -203,7 +206,11 @@ INSERT INTO `agent_imputation` (`id`, `imputation_id`, `agent_id`, `created_at`,
 (42, 34, 18, NULL, NULL),
 (43, 35, 18, NULL, NULL),
 (44, 36, 18, NULL, NULL),
-(45, 37, 25, NULL, NULL);
+(45, 37, 25, NULL, NULL),
+(56, 49, 21, NULL, NULL),
+(57, 50, 21, NULL, NULL),
+(55, 48, 21, NULL, NULL),
+(54, 47, 21, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -257,7 +264,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `audit_logs_user_id_foreign` (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=86 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=91 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `audit_logs`
@@ -334,7 +341,13 @@ INSERT INTO `audit_logs` (`id`, `user_id`, `event`, `auditable_type`, `auditable
 (82, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-19 09:55:42', '2026-03-19 09:55:42'),
 (83, 3, 'created', 'App\\Models\\Courrier', 25, NULL, '\"{\\\"reference\\\":\\\"X01\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"juste verifier\\\",\\\"date_courrier\\\":\\\"2026-03-19 00:00:00\\\",\\\"expediteur_nom\\\":\\\"france telecom\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"chemin_fichier\\\":\\\"1773918646_Projet_de_Note_du_DSESF_au_DG_S\\\\u00e9minaire_Loi_de_r\\\\u00e8glement_18_20_d\\\\u00e9c_2024.pdf\\\",\\\"is_confidentiel\\\":true,\\\"code_acces\\\":\\\"eyJpdiI6IjJIU05Jci8yRHNpNkFzVTE5dXBVQ0E9PSIsInZhbHVlIjoiWmMvQko1ZVByUG13UG9SK2M5NDhRZz09IiwibWFjIjoiYjBlOTFkZjYyNGMyNTVkYjQxYjlkNzdjMjkyYTdiMDQwMGExNTJjYjU2M2JjZDFlYmNiNjA1MGJiNzY3M2I3MyIsInRhZyI6IiJ9\\\",\\\"date_document_original\\\":\\\"2026-03-11\\\",\\\"num_enregistrement\\\":\\\"REG-2026-69BBD9B60F33A\\\",\\\"affecter\\\":0,\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"updated_at\\\":\\\"2026-03-19 11:10:46\\\",\\\"created_at\\\":\\\"2026-03-19 11:10:46\\\",\\\"id\\\":25}\"', 'http://127.0.0.1:8000/courriers', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-19 11:10:46', '2026-03-19 11:10:46'),
 (84, 3, 'updated', 'App\\Models\\Courrier', 25, '\"{\\\"id\\\":25,\\\"num_enregistrement\\\":\\\"REG-2026-69BBD9B60F33A\\\",\\\"affecter\\\":false,\\\"reference\\\":\\\"X01\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"juste verifier\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-03-19T00:00:00.000000Z\\\",\\\"date_document_original\\\":\\\"2026-03-11\\\",\\\"expediteur_nom\\\":\\\"france telecom\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1773918646_Projet_de_Note_du_DSESF_au_DG_S\\\\u00e9minaire_Loi_de_r\\\\u00e8glement_18_20_d\\\\u00e9c_2024.pdf\\\",\\\"created_at\\\":\\\"2026-03-19T11:10:46.000000Z\\\",\\\"updated_at\\\":\\\"2026-03-19T11:10:46.000000Z\\\",\\\"is_confidentiel\\\":1,\\\"code_acces\\\":\\\"eyJpdiI6IjJIU05Jci8yRHNpNkFzVTE5dXBVQ0E9PSIsInZhbHVlIjoiWmMvQko1ZVByUG13UG9SK2M5NDhRZz09IiwibWFjIjoiYjBlOTFkZjYyNGMyNTVkYjQxYjlkNzdjMjkyYTdiMDQwMGExNTJjYjU2M2JjZDFlYmNiNjA1MGJiNzY3M2I3MyIsInRhZyI6IiJ9\\\",\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', '\"{\\\"id\\\":25,\\\"num_enregistrement\\\":\\\"REG-2026-69BBD9B60F33A\\\",\\\"affecter\\\":1,\\\"reference\\\":\\\"X01\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"juste verifier\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-03-19\\\",\\\"date_document_original\\\":\\\"2026-03-11\\\",\\\"expediteur_nom\\\":\\\"france telecom\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"affect\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1773918646_Projet_de_Note_du_DSESF_au_DG_S\\\\u00e9minaire_Loi_de_r\\\\u00e8glement_18_20_d\\\\u00e9c_2024.pdf\\\",\\\"created_at\\\":\\\"2026-03-19 11:10:46\\\",\\\"updated_at\\\":\\\"2026-03-19 11:11:54\\\",\\\"is_confidentiel\\\":1,\\\"code_acces\\\":\\\"eyJpdiI6IjJIU05Jci8yRHNpNkFzVTE5dXBVQ0E9PSIsInZhbHVlIjoiWmMvQko1ZVByUG13UG9SK2M5NDhRZz09IiwibWFjIjoiYjBlOTFkZjYyNGMyNTVkYjQxYjlkNzdjMjkyYTdiMDQwMGExNTJjYjU2M2JjZDFlYmNiNjA1MGJiNzY3M2I3MyIsInRhZyI6IiJ9\\\",\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', 'http://127.0.0.1:8000/imputations', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-19 11:11:54', '2026-03-19 11:11:54'),
-(85, 3, 'created', 'App\\Models\\Courrier', 26, NULL, '\"{\\\"reference\\\":\\\"X02\\\",\\\"type\\\":\\\"Incoming Externe\\\",\\\"objet\\\":\\\"cvfdghg\\\",\\\"date_courrier\\\":\\\"2026-03-19 00:00:00\\\",\\\"expediteur_nom\\\":\\\"DIRECTION BUDGET\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"chemin_fichier\\\":\\\"1773919082_Note_Service_Objectifs_de_recettes_r\\\\u00e9vis\\\\u00e9s_2025_N\'GUESSAN.pdf\\\",\\\"is_confidentiel\\\":true,\\\"code_acces\\\":\\\"eyJpdiI6IlEzY0phdHFteFlXMTduRE16dU1uSEE9PSIsInZhbHVlIjoic0JCWldDQ2tseHE2Ynd6UEZOVGVhUT09IiwibWFjIjoiZTg1ZDEyZWQzNTQzZmU2MmM0NWRhOGM3ZWIwYWY4MTEyZjY4ZmM5YzFlY2Q0NDhiNTE4ZTQ2NDZiMjYwM2Q0ZiIsInRhZyI6IiJ9\\\",\\\"date_document_original\\\":\\\"2026-03-12\\\",\\\"num_enregistrement\\\":\\\"REG-2026-69BBDB6AAB80B\\\",\\\"affecter\\\":0,\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"updated_at\\\":\\\"2026-03-19 11:18:02\\\",\\\"created_at\\\":\\\"2026-03-19 11:18:02\\\",\\\"id\\\":26}\"', 'http://127.0.0.1:8000/courriers', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-19 11:18:02', '2026-03-19 11:18:02');
+(85, 3, 'created', 'App\\Models\\Courrier', 26, NULL, '\"{\\\"reference\\\":\\\"X02\\\",\\\"type\\\":\\\"Incoming Externe\\\",\\\"objet\\\":\\\"cvfdghg\\\",\\\"date_courrier\\\":\\\"2026-03-19 00:00:00\\\",\\\"expediteur_nom\\\":\\\"DIRECTION BUDGET\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"chemin_fichier\\\":\\\"1773919082_Note_Service_Objectifs_de_recettes_r\\\\u00e9vis\\\\u00e9s_2025_N\'GUESSAN.pdf\\\",\\\"is_confidentiel\\\":true,\\\"code_acces\\\":\\\"eyJpdiI6IlEzY0phdHFteFlXMTduRE16dU1uSEE9PSIsInZhbHVlIjoic0JCWldDQ2tseHE2Ynd6UEZOVGVhUT09IiwibWFjIjoiZTg1ZDEyZWQzNTQzZmU2MmM0NWRhOGM3ZWIwYWY4MTEyZjY4ZmM5YzFlY2Q0NDhiNTE4ZTQ2NDZiMjYwM2Q0ZiIsInRhZyI6IiJ9\\\",\\\"date_document_original\\\":\\\"2026-03-12\\\",\\\"num_enregistrement\\\":\\\"REG-2026-69BBDB6AAB80B\\\",\\\"affecter\\\":0,\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"updated_at\\\":\\\"2026-03-19 11:18:02\\\",\\\"created_at\\\":\\\"2026-03-19 11:18:02\\\",\\\"id\\\":26}\"', 'http://127.0.0.1:8000/courriers', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-19 11:18:02', '2026-03-19 11:18:02'),
+(86, 3, 'created', 'App\\Models\\Courrier', 27, NULL, '\"{\\\"reference\\\":\\\"X02022\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"BHJKKL\\\",\\\"date_courrier\\\":\\\"2026-03-19 00:00:00\\\",\\\"expediteur_nom\\\":\\\"CABINET DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"chemin_fichier\\\":\\\"1773931720_Projet_de_Note_du_DSESF_au_DG_S\\\\u00e9minaire_Loi_de_r\\\\u00e8glement_18_20_d\\\\u00e9c_2024.pdf\\\",\\\"code_acces\\\":null,\\\"date_document_original\\\":\\\"2026-03-10\\\",\\\"num_enregistrement\\\":\\\"REG-2026-69BC0CC8607A3\\\",\\\"affecter\\\":0,\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"is_confidentiel\\\":false,\\\"updated_at\\\":\\\"2026-03-19 14:48:40\\\",\\\"created_at\\\":\\\"2026-03-19 14:48:40\\\",\\\"id\\\":27}\"', 'http://127.0.0.1:8000/courriers', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-19 14:48:40', '2026-03-19 14:48:40'),
+(87, 3, 'updated', 'App\\Models\\Courrier', 27, '\"{\\\"id\\\":27,\\\"num_enregistrement\\\":\\\"REG-2026-69BC0CC8607A3\\\",\\\"affecter\\\":false,\\\"reference\\\":\\\"X02022\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"BHJKKL\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-03-19T00:00:00.000000Z\\\",\\\"date_document_original\\\":\\\"2026-03-10\\\",\\\"expediteur_nom\\\":\\\"CABINET DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1773931720_Projet_de_Note_du_DSESF_au_DG_S\\\\u00e9minaire_Loi_de_r\\\\u00e8glement_18_20_d\\\\u00e9c_2024.pdf\\\",\\\"created_at\\\":\\\"2026-03-19T14:48:40.000000Z\\\",\\\"updated_at\\\":\\\"2026-03-19T14:48:40.000000Z\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', '\"{\\\"id\\\":27,\\\"num_enregistrement\\\":\\\"REG-2026-69BC0CC8607A3\\\",\\\"affecter\\\":1,\\\"reference\\\":\\\"X02022\\\",\\\"type\\\":\\\"Incoming\\\",\\\"objet\\\":\\\"BHJKKL\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-03-19\\\",\\\"date_document_original\\\":\\\"2026-03-10\\\",\\\"expediteur_nom\\\":\\\"CABINET DGI\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"affect\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1773931720_Projet_de_Note_du_DSESF_au_DG_S\\\\u00e9minaire_Loi_de_r\\\\u00e8glement_18_20_d\\\\u00e9c_2024.pdf\\\",\\\"created_at\\\":\\\"2026-03-19 14:48:40\\\",\\\"updated_at\\\":\\\"2026-03-19 14:51:56\\\",\\\"is_confidentiel\\\":0,\\\"code_acces\\\":null,\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', 'http://127.0.0.1:8000/imputations', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-19 14:51:57', '2026-03-19 14:51:57');
+INSERT INTO `audit_logs` (`id`, `user_id`, `event`, `auditable_type`, `auditable_id`, `old_values`, `new_values`, `url`, `method`, `ip_address`, `user_agent`, `created_at`, `updated_at`) VALUES
+(88, 3, 'updated', 'App\\Models\\Courrier', 26, '\"{\\\"id\\\":26,\\\"num_enregistrement\\\":\\\"REG-2026-69BBDB6AAB80B\\\",\\\"affecter\\\":false,\\\"reference\\\":\\\"X02\\\",\\\"type\\\":\\\"Incoming Externe\\\",\\\"objet\\\":\\\"cvfdghg\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-03-19T00:00:00.000000Z\\\",\\\"date_document_original\\\":\\\"2026-03-12\\\",\\\"expediteur_nom\\\":\\\"DIRECTION BUDGET\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1773919082_Note_Service_Objectifs_de_recettes_r\\\\u00e9vis\\\\u00e9s_2025_N\'GUESSAN.pdf\\\",\\\"created_at\\\":\\\"2026-03-19T11:18:02.000000Z\\\",\\\"updated_at\\\":\\\"2026-03-19T11:18:02.000000Z\\\",\\\"is_confidentiel\\\":1,\\\"code_acces\\\":\\\"eyJpdiI6IlEzY0phdHFteFlXMTduRE16dU1uSEE9PSIsInZhbHVlIjoic0JCWldDQ2tseHE2Ynd6UEZOVGVhUT09IiwibWFjIjoiZTg1ZDEyZWQzNTQzZmU2MmM0NWRhOGM3ZWIwYWY4MTEyZjY4ZmM5YzFlY2Q0NDhiNTE4ZTQ2NDZiMjYwM2Q0ZiIsInRhZyI6IiJ9\\\",\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', '\"{\\\"id\\\":26,\\\"num_enregistrement\\\":\\\"REG-2026-69BBDB6AAB80B\\\",\\\"affecter\\\":1,\\\"reference\\\":\\\"X02\\\",\\\"type\\\":\\\"Incoming Externe\\\",\\\"objet\\\":\\\"cvfdghg\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-03-19\\\",\\\"date_document_original\\\":\\\"2026-03-12\\\",\\\"expediteur_nom\\\":\\\"DIRECTION BUDGET\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"DSESF\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"affect\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1773919082_Note_Service_Objectifs_de_recettes_r\\\\u00e9vis\\\\u00e9s_2025_N\'GUESSAN.pdf\\\",\\\"created_at\\\":\\\"2026-03-19 11:18:02\\\",\\\"updated_at\\\":\\\"2026-03-19 14:59:47\\\",\\\"is_confidentiel\\\":1,\\\"code_acces\\\":\\\"eyJpdiI6IlEzY0phdHFteFlXMTduRE16dU1uSEE9PSIsInZhbHVlIjoic0JCWldDQ2tseHE2Ynd6UEZOVGVhUT09IiwibWFjIjoiZTg1ZDEyZWQzNTQzZmU2MmM0NWRhOGM3ZWIwYWY4MTEyZjY4ZmM5YzFlY2Q0NDhiNTE4ZTQ2NDZiMjYwM2Q0ZiIsInRhZyI6IiJ9\\\",\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', 'http://127.0.0.1:8000/imputations', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-19 14:59:47', '2026-03-19 14:59:47'),
+(89, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 06:47:03', '2026-03-23 06:47:03'),
+(90, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-23 06:47:03', '2026-03-23 06:47:03');
 
 -- --------------------------------------------------------
 
@@ -355,7 +368,7 @@ CREATE TABLE IF NOT EXISTS `cache` (
 --
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('laravel-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:8:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"creer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:5;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:18:\"supprimer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:17:\"voir-utilisateurs\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:2;i:2;i:4;i:3;i:5;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"manage-users\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:17:\"modifier articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:5;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:18:\"supprimer articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:11:\"gerer-roles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:17:\"acceder-dashboard\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:3;i:2;i:4;i:3;i:5;}}}s:5:\"roles\";a:5:{i:0;a:3:{s:1:\"a\";i:1;s:1:\"b\";s:5:\"admin\";s:1:\"c\";s:3:\"web\";}i:1;a:3:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"utilisateur\";s:1:\"c\";s:3:\"web\";}i:2;a:3:{s:1:\"a\";i:5;s:1:\"b\";s:11:\"Superviseur\";s:1:\"c\";s:3:\"web\";}i:3;a:3:{s:1:\"a\";i:4;s:1:\"b\";s:2:\"rh\";s:1:\"c\";s:3:\"web\";}i:4;a:3:{s:1:\"a\";i:3;s:1:\"b\";s:7:\"editeur\";s:1:\"c\";s:3:\"web\";}}}', 1773990357);
+('laravel-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:8:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"creer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:5;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:18:\"supprimer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:17:\"voir-utilisateurs\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:2;i:2;i:4;i:3;i:5;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"manage-users\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:17:\"modifier articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:5;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:18:\"supprimer articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:11:\"gerer-roles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:17:\"acceder-dashboard\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:4:{i:0;i:1;i:1;i:3;i:2;i:4;i:3;i:5;}}}s:5:\"roles\";a:5:{i:0;a:3:{s:1:\"a\";i:1;s:1:\"b\";s:5:\"admin\";s:1:\"c\";s:3:\"web\";}i:1;a:3:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"utilisateur\";s:1:\"c\";s:3:\"web\";}i:2;a:3:{s:1:\"a\";i:5;s:1:\"b\";s:11:\"Superviseur\";s:1:\"c\";s:3:\"web\";}i:3;a:3:{s:1:\"a\";i:4;s:1:\"b\";s:2:\"rh\";s:1:\"c\";s:3:\"web\";}i:4;a:3:{s:1:\"a\";i:3;s:1:\"b\";s:7:\"editeur\";s:1:\"c\";s:3:\"web\";}}}', 1774334823);
 
 -- --------------------------------------------------------
 
@@ -424,7 +437,7 @@ CREATE TABLE IF NOT EXISTS `courriers` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `courriers_num_enregistrement_unique` (`num_enregistrement`) USING HASH,
   KEY `courriers_signed_by_foreign` (`signed_by`)
-) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `courriers`
@@ -455,7 +468,8 @@ INSERT INTO `courriers` (`id`, `num_enregistrement`, `affecter`, `reference`, `t
 (23, 'REG-2026-699EFB7E161D0', 1, '1112233', 'Incoming Externe', 'essai', NULL, '2026-02-25', '2026-02-24', 'SAPH', NULL, 'DSESF', NULL, 'signé', 'Non assigné', '1772026750_Liste_MembreSport.pdf', '2026-02-25 13:39:10', '2026-03-12 09:18:11', 1, 'eyJpdiI6Im1CeTRGZmM0czNuZm8rLy9iMFNRR0E9PSIsInZhbHVlIjoiZVVZSTY5dFU5OHYyK3F6YlEvakhvdz09IiwibWFjIjoiMTNmMDNhYWRkNWVkOWI0MzhlYzJiN2QxOWM2YzZjYmQxMWU0MzBlMDk4NWQ2YTI4ODU2MTdmNTAxZTc2ZDBjMSIsInRhZyI6IiJ9', NULL, NULL),
 (24, 'REG-2026-699EFF520BF38', 1, '00112233', 'Incoming', 'essai', NULL, '2026-02-25', '2026-02-24', 'SAPH', NULL, 'S/D GUDEF', NULL, 'affecté', 'Non assigné', '1772027730_Note_au_MFB__Objectif_de_recettes_TOFE_Aout_2025.pdf', '2026-02-25 13:55:30', '2026-03-16 08:10:40', 1, 'eyJpdiI6Im41OU9UUmdxdWZrcUVTbVB5blpLaGc9PSIsInZhbHVlIjoiTzM0S3ZSNmprU1pzbWdFakVtdUQ0QT09IiwibWFjIjoiMTU0ZDJiYTQ2ODEwZWEyMGJjODU4MDA4YjEyMjI0MDRkNWYxY2IwZDNhZWEzOTNiOGU4OGIwODY1NDY3ZmUyMiIsInRhZyI6IiJ9', NULL, NULL),
 (25, 'REG-2026-69BBD9B60F33A', 1, 'X01', 'Incoming', 'juste verifier', NULL, '2026-03-19', '2026-03-11', 'france telecom', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1773918646_Projet_de_Note_du_DSESF_au_DG_Séminaire_Loi_de_règlement_18_20_déc_2024.pdf', '2026-03-19 11:10:46', '2026-03-19 11:11:54', 1, 'eyJpdiI6IjJIU05Jci8yRHNpNkFzVTE5dXBVQ0E9PSIsInZhbHVlIjoiWmMvQko1ZVByUG13UG9SK2M5NDhRZz09IiwibWFjIjoiYjBlOTFkZjYyNGMyNTVkYjQxYjlkNzdjMjkyYTdiMDQwMGExNTJjYjU2M2JjZDFlYmNiNjA1MGJiNzY3M2I3MyIsInRhZyI6IiJ9', NULL, NULL),
-(26, 'REG-2026-69BBDB6AAB80B', 0, 'X02', 'Incoming Externe', 'cvfdghg', NULL, '2026-03-19', '2026-03-12', 'DIRECTION BUDGET', NULL, 'DSESF', NULL, 'reçu', 'Non assigné', '1773919082_Note_Service_Objectifs_de_recettes_révisés_2025_N\'GUESSAN.pdf', '2026-03-19 11:18:02', '2026-03-19 11:18:02', 1, 'eyJpdiI6IlEzY0phdHFteFlXMTduRE16dU1uSEE9PSIsInZhbHVlIjoic0JCWldDQ2tseHE2Ynd6UEZOVGVhUT09IiwibWFjIjoiZTg1ZDEyZWQzNTQzZmU2MmM0NWRhOGM3ZWIwYWY4MTEyZjY4ZmM5YzFlY2Q0NDhiNTE4ZTQ2NDZiMjYwM2Q0ZiIsInRhZyI6IiJ9', NULL, NULL);
+(26, 'REG-2026-69BBDB6AAB80B', 1, 'X02', 'Incoming Externe', 'cvfdghg', NULL, '2026-03-19', '2026-03-12', 'DIRECTION BUDGET', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1773919082_Note_Service_Objectifs_de_recettes_révisés_2025_N\'GUESSAN.pdf', '2026-03-19 11:18:02', '2026-03-19 14:59:47', 1, 'eyJpdiI6IlEzY0phdHFteFlXMTduRE16dU1uSEE9PSIsInZhbHVlIjoic0JCWldDQ2tseHE2Ynd6UEZOVGVhUT09IiwibWFjIjoiZTg1ZDEyZWQzNTQzZmU2MmM0NWRhOGM3ZWIwYWY4MTEyZjY4ZmM5YzFlY2Q0NDhiNTE4ZTQ2NDZiMjYwM2Q0ZiIsInRhZyI6IiJ9', NULL, NULL),
+(27, 'REG-2026-69BC0CC8607A3', 1, 'X02022', 'Incoming', 'BHJKKL', NULL, '2026-03-19', '2026-03-10', 'CABINET DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1773931720_Projet_de_Note_du_DSESF_au_DG_Séminaire_Loi_de_règlement_18_20_déc_2024.pdf', '2026-03-19 14:48:40', '2026-03-19 14:51:56', 0, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -622,7 +636,7 @@ CREATE TABLE IF NOT EXISTS `imputations` (
   KEY `imputations_courrier_id_foreign` (`courrier_id`),
   KEY `imputations_user_id_foreign` (`user_id`),
   KEY `imputations_suivi_par_foreign` (`suivi_par`)
-) ENGINE=MyISAM AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `imputations`
@@ -655,7 +669,11 @@ INSERT INTO `imputations` (`id`, `courrier_id`, `chemin_fichier`, `user_id`, `su
 (34, 24, NULL, 3, NULL, 'autre', 'verif2', '\n[LOG] ADICO Innocent absent (approuvé), redirigé vers l\'intérimaire BEZI Mathurin.', '\"documents\\/imputations\\/annexes\\/1773648640_Note_au_MFB__Objectif_de_recettes_TOFE_Aout_2025.pdf\"', '2026-03-16', NULL, '2026-03-18', 'en_attente', '2026-03-16 08:10:40', '2026-03-16 08:10:40'),
 (35, 24, NULL, 3, NULL, 'autre', 'verif2', '\n[LOG] ADICO Innocent absent (approuvé), redirigé vers l\'intérimaire BEZI Mathurin.', '\"documents\\/imputations\\/annexes\\/1773648640_Note_au_MFB__Objectif_de_recettes_TOFE_Aout_2025.pdf\"', '2026-03-16', NULL, '2026-03-18', 'en_attente', '2026-03-16 08:10:40', '2026-03-16 08:10:40'),
 (36, 16, NULL, 3, NULL, 'autre', 'Verif3', '\n[LOG] ADICO Innocent absent (approuvé), redirigé vers l\'intérimaire BEZI Mathurin.', '\"documents\\/imputations\\/annexes\\/1773650573_Note_au_MFB__Objectif_de_recettes_TOFE_Aout_2025.pdf\"', '2026-03-16', NULL, '2026-03-20', 'en_attente', '2026-03-16 08:42:53', '2026-03-16 08:42:53'),
-(37, 25, NULL, 3, NULL, 'autre', 'fghhjjh', NULL, '\"documents\\/imputations\\/annexes\\/1773918714_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-03-19', NULL, '2026-03-20', 'en_attente', '2026-03-19 11:11:54', '2026-03-19 11:11:54');
+(37, 25, NULL, 3, NULL, 'autre', 'fghhjjh', NULL, '\"documents\\/imputations\\/annexes\\/1773918714_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-03-19', NULL, '2026-03-20', 'en_attente', '2026-03-19 11:11:54', '2026-03-19 11:11:54'),
+(49, 25, NULL, 3, NULL, 'autre', 'nb,j;kklmlkm', NULL, '\"documents\\/imputations\\/annexes\\/1773933838_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-03-19', NULL, '2026-03-21', 'en_attente', '2026-03-19 15:23:58', '2026-03-19 15:23:58'),
+(50, 27, NULL, 3, NULL, 'autre', 'hjkjklkl', NULL, '\"documents\\/imputations\\/annexes\\/1773934120_Note_de_service_DEMANDE_D\'INFORMATIONS_COMITE_COUT_SDEEF.pdf\"', '2026-03-19', NULL, '2026-03-21', 'en_attente', '2026-03-19 15:28:40', '2026-03-19 15:28:40'),
+(48, 27, NULL, 3, NULL, 'autre', 'h,hjjikik', NULL, '\"documents\\/imputations\\/annexes\\/1773933699_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-03-19', NULL, '2026-03-21', 'en_attente', '2026-03-19 15:21:39', '2026-03-19 15:21:39'),
+(47, 26, NULL, 3, NULL, 'autre', 'hb,j,kj;klklmlkm', '\n[LOG] HORO Tiekoura absent (approuvé), redirigé vers l\'intérimaire KEDI Née keita aramata anne elise.', '\"documents\\/imputations\\/annexes\\/1773933627_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-03-19', NULL, '2026-03-21', 'en_attente', '2026-03-19 15:20:27', '2026-03-19 15:20:27');
 
 -- --------------------------------------------------------
 
@@ -957,7 +975,7 @@ CREATE TABLE IF NOT EXISTS `presences` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `presences_agent_id_foreign` (`agent_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=850 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=925 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `presences`
@@ -1690,7 +1708,7 @@ INSERT INTO `presences` (`id`, `agent_id`, `heure_arrivee`, `heure_depart`, `sta
 (724, 2, '2026-03-11 09:26:54', NULL, 'En Retard', 'Pointage automatique (Self-service)', '2026-03-11 09:26:54', '2026-03-11 09:26:54'),
 (725, 1, '2026-03-11 07:33:00', NULL, 'En Retard', 'Pointage automatique (Self-service)', '2026-03-11 09:33:51', '2026-03-19 11:56:51'),
 (726, 1, '2026-03-12 06:54:58', NULL, 'Présent', 'Pointage automatique (Self-service)', '2026-03-12 06:54:58', '2026-03-12 06:54:58'),
-(728, 1, '2026-03-19 06:55:00', NULL, 'Présent', 'Pointage automatique (Self-service)', '2026-03-19 11:49:27', '2026-03-19 11:56:08'),
+(728, 1, '2026-03-19 06:55:00', '2026-03-19 14:31:50', 'Présent', 'Pointage automatique (Self-service)', '2026-03-19 11:49:27', '2026-03-19 14:31:50'),
 (729, 1, '2026-03-10 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-19 11:57:26', '2026-03-19 11:57:26'),
 (730, 2, '2026-03-09 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-19 11:57:26', '2026-03-19 11:57:26'),
 (731, 2, '2026-03-10 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-19 11:57:26', '2026-03-19 11:57:26'),
@@ -1812,7 +1830,82 @@ INSERT INTO `presences` (`id`, `agent_id`, `heure_arrivee`, `heure_depart`, `sta
 (846, 23, '2026-03-13 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-19 11:57:39', '2026-03-19 11:57:39'),
 (847, 25, '2026-03-11 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-19 11:57:39', '2026-03-19 11:57:39'),
 (848, 25, '2026-03-12 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-19 11:57:39', '2026-03-19 11:57:39'),
-(849, 25, '2026-03-13 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-19 11:57:39', '2026-03-19 11:57:39');
+(849, 25, '2026-03-13 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-19 11:57:39', '2026-03-19 11:57:39'),
+(850, 2, '2026-03-19 08:01:00', NULL, 'En Retard', 'Calculé pour Jeudi (Limite: 465m, Arrivée: 481m). ', '2026-03-19 12:01:38', '2026-03-19 12:01:38'),
+(851, 4, '2026-03-19 07:45:00', NULL, 'Présent', 'Calculé pour Jeudi (Limite: 465m, Arrivée: 465m). ', '2026-03-19 12:02:45', '2026-03-19 12:02:45'),
+(852, 1, '2026-03-23 06:47:34', NULL, 'Présent', 'Pointage automatique (Self-service)', '2026-03-23 06:47:34', '2026-03-23 06:47:34'),
+(853, 1, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:48', '2026-03-23 06:48:48'),
+(854, 1, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:48', '2026-03-23 06:48:48'),
+(855, 2, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:48', '2026-03-23 06:48:48'),
+(856, 2, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:48', '2026-03-23 06:48:48'),
+(857, 3, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:48', '2026-03-23 06:48:48'),
+(858, 3, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:48', '2026-03-23 06:48:48'),
+(859, 3, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:48', '2026-03-23 06:48:48'),
+(860, 4, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:48', '2026-03-23 06:48:48'),
+(861, 4, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:48', '2026-03-23 06:48:48'),
+(862, 5, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:48', '2026-03-23 06:48:48'),
+(863, 6, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(864, 6, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(865, 6, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(866, 7, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(867, 7, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(868, 7, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(869, 8, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(870, 8, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(871, 8, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(872, 9, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(873, 9, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(874, 9, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(875, 10, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(876, 10, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(877, 10, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(878, 11, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(879, 11, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(880, 12, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(881, 12, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(882, 12, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(883, 13, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(884, 13, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(885, 13, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(886, 14, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(887, 14, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(888, 14, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(889, 16, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(890, 16, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(891, 17, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(892, 17, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(893, 17, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(894, 18, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(895, 18, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(896, 18, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(897, 19, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(898, 19, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(899, 19, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(900, 20, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(901, 20, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(902, 20, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(903, 21, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(904, 21, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(905, 21, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(906, 22, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(907, 22, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(908, 22, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(909, 23, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(910, 23, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(911, 23, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(912, 24, '2026-03-17 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(913, 24, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(914, 24, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(915, 25, '2026-03-18 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(916, 25, '2026-03-19 08:00:00', NULL, 'Absent', 'Absence hebdomadaire.', '2026-03-23 06:48:49', '2026-03-23 06:48:49'),
+(917, 5, '2026-03-17 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-23 06:49:20', '2026-03-23 06:49:20'),
+(918, 5, '2026-03-18 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-23 06:49:20', '2026-03-23 06:49:20'),
+(919, 11, '2026-03-19 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-23 06:49:20', '2026-03-23 06:49:20'),
+(920, 15, '2026-03-17 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-23 06:49:20', '2026-03-23 06:49:20'),
+(921, 15, '2026-03-18 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-23 06:49:20', '2026-03-23 06:49:20'),
+(922, 15, '2026-03-19 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-23 06:49:20', '2026-03-23 06:49:20'),
+(923, 16, '2026-03-19 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-23 06:49:20', '2026-03-23 06:49:20'),
+(924, 25, '2026-03-17 08:00:00', NULL, 'Absence Justifiée', 'Justifié: ', '2026-03-23 06:49:20', '2026-03-23 06:49:20');
 
 -- --------------------------------------------------------
 
