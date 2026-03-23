@@ -120,10 +120,11 @@
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <h6 class="mb-0 fw-bold"><i class="fas fa-filter me-2"></i>Critères de Recherche</h6>
 
-            <button onclick="window.print()" class="btn btn-sm shadow-sm fw-bold border-0 px-3"
-                    style="background: linear-gradient(135s, #f8f9fa 0%, #e9ecef 100%); color: #212529; transition: 0.3s;">
+           <button onclick="window.print()" class="btn btn-sm shadow-sm fw-bold border-0 px-3"
+                    style="background: #ffffff; color: #212529; border-radius: 4px; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2) !important;">
                 <i class="fas fa-print me-2 text-primary"></i>IMPRIMER L'ÉTAT
             </button>
+
 
         </div>
         <div class="card-body">
