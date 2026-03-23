@@ -43,7 +43,7 @@
                     <th class="text-start" style="cursor:pointer"><i class="fas fa-layer-group me-2"></i>Services</th>
                     <th class="text-center" style="cursor:pointer; color: #2ecc71;"><i class="fas fa-check-circle me-1"></i> Présents</th>
                     <th class="text-center" style="cursor:pointer; color: #f1c40f;"><i class="fas fa-clock me-1"></i> Retards</th>
-                    <th class="text-center" style="cursor:pointer; color: #e74c3c;"><i class="fas fa-user-times me-1"></i> Injustifiées</th>
+                    <th class="text-center" style="cursor:pointer; color: #e74c3c;"><i class="fas fa-user-times me-1"></i> Absences</th>
                     <th class="text-center" style="cursor:pointer; color: #3498db;"><i class="fas fa-file-medical me-1"></i> Justifiées</th>
                     <th class="text-center" style="cursor:pointer"><i class="fas fa-chart-line me-2"></i>Taux</th>
                     <th class="text-center no-export"><i class="fas fa-cog"></i></th>
