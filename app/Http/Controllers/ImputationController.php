@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\File;  // <--- INDISPENSABLE pour File::exists
 
 class ImputationController extends Controller
 {
- public function index(Request $request)
+public function index(Request $request)
 {
     // 1. Initialisation de la requête
     $query = Imputation::with(['courrier', 'agents.service', 'auteur']);
@@ -45,10 +45,8 @@ class ImputationController extends Controller
         });
     }
 
-    // --- NOUVEAU : CALCUL DES STATISTIQUES (Basé sur la requête filtrée) ---
-    // On clone la requête pour ne pas interférer avec la pagination
+    // --- CALCUL DES STATISTIQUES ---
     $statsQuery = clone $query;
-
     $stats = [
         'total'      => $statsQuery->count(),
         'en_cours'   => (clone $statsQuery)->where('statut', 'en_cours')->count(),
@@ -57,17 +55,21 @@ class ImputationController extends Controller
                                            ->whereDate('echeancier', '<', now())
                                            ->count(),
     ];
-    // -----------------------------------------------------------------------
 
-    // 3. Finalisation : Tri et Pagination
-    $imputations = $query->latest()->paginate(25)->appends($request->query());
+    // 3. GESTION DE L'IMPRESSION vs PAGINATION
+    // Si le paramètre 'print' est présent, on récupère tout sans limite
+    if ($request->has('print')) {
+        $imputations = $query->latest()->get();
+    } else {
+        $imputations = $query->latest()->paginate(25)->appends($request->query());
+    }
 
     // 4. Données pour les menus déroulants
     $allAgents = Agent::orderBy('last_name')->get();
 
-    // 5. Retour à la vue avec la variable $stats en plus
     return view('Imputations.index', compact('imputations', 'allAgents', 'stats'));
 }
+
 
 
 
