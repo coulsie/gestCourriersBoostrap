@@ -10,6 +10,16 @@
                     <h5 class="mb-0"><i class="fas fa-calendar-plus me-2 text-warning"></i>Nouvelle Demande d'Absence</h5>
                     <a href="{{ route('absences.index') }}" class="btn btn-sm btn-outline-light">Retour</a>
                 </div>
+                @if(session('conflit_absence'))
+                    <div class="alert alert-danger border-0 shadow-lg fade show p-4 mb-4" role="alert" style="border-left: 8px solid #dc3545 !important; border-radius: 12px; background-color: #fff;">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="text-dark">
+                                {!! session('conflit_absence') !!}
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>
+                @endif
 
                 <div class="card-body p-4 bg-light-subtle">
                     {{-- Note : enctype obligatoire pour le champ document_justificatif --}}
@@ -54,16 +64,16 @@
                             {{-- Dates (Vert) --}}
                             <div class="col-md-6">
                                 <label for="date_debut" class="form-label fw-bold text-success">Date de début</label>
-                                <input type="date" name="date_debut" id="date_debut" 
-                                       class="form-control border-success @error('date_debut') is-invalid @enderror" 
+                                <input type="date" name="date_debut" id="date_debut"
+                                       class="form-control border-success @error('date_debut') is-invalid @enderror"
                                        value="{{ old('date_debut') }}" required>
                                 @error('date_debut') <div class="text-danger small">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="col-md-6">
                                 <label for="date_fin" class="form-label fw-bold text-success">Date de fin</label>
-                                <input type="date" name="date_fin" id="date_fin" 
-                                       class="form-control border-success @error('date_fin') is-invalid @enderror" 
+                                <input type="date" name="date_fin" id="date_fin"
+                                       class="form-control border-success @error('date_fin') is-invalid @enderror"
                                        value="{{ old('date_fin') }}" required>
                                 @error('date_fin') <div class="text-danger small">{{ $message }}</div> @enderror
                             </div>
@@ -72,7 +82,7 @@
                             <div class="col-12">
                                 <label for="document_justificatif" class="form-label fw-bold text-warning">Document Justificatif (Scan PDF/JPG)</label>
                                 <div class="input-group">
-                                    <input type="file" name="document_justificatif" id="document_justificatif" 
+                                    <input type="file" name="document_justificatif" id="document_justificatif"
                                            class="form-control border-warning @error('document_justificatif') is-invalid @enderror">
                                     <label class="input-group-text bg-warning-subtle text-dark border-warning" for="document_justificatif">
                                         <i class="fas fa-upload me-1"></i> Upload

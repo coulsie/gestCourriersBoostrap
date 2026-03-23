@@ -2,6 +2,7 @@
 
 @section('content')
 <div class="container-fluid py-4 text-sm">
+
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800 fw-bold">
             <i class="fas fa-users-cog text-primary me-2"></i>Autorisation d'Absence Groupée
@@ -10,6 +11,25 @@
             <i class="fas fa-arrow-left fa-sm me-1"></i> Retour
         </a>
     </div>
+        {{-- --- INSERTION DU BLOC DE MESSAGES ICI --- --}}
+        @if(session('conflit_absence'))
+                    <div class="alert alert-danger border-0 shadow-lg fade show p-4 mb-4" role="alert" style="border-left: 8px solid #dc3545 !important; border-radius: 12px; background-color: #fff;">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="text-dark">
+                                {!! session('conflit_absence') !!}
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    </div>
+                @endif
+        @if(session('success'))
+            <div class="alert alert-success border-0 shadow-lg fade show p-3 d-flex align-items-center mb-4" role="alert" style="border-left: 8px solid #198754 !important; border-radius: 12px; background-color: #fff;">
+                <i class="fas fa-check-circle fa-2x me-3 text-success"></i>
+                <div class="fw-bold text-dark">{!! session('success') !!}</div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        {{-- --- FIN DE L'INSERTION --- --}}
 
     <form action="{{ route('absences.storeGrouped') }}" method="POST" enctype="multipart/form-data">
         @csrf
@@ -55,7 +75,7 @@
                             @endforeach
                         </div>
                     </div>
-                    
+
                     <div class="card-footer bg-primary text-white d-flex justify-content-between align-items-center py-2">
                         <small class="fw-bold text-uppercase">Total sélectionné :</small>
                         <span class="badge bg-light text-primary px-3 py-2 shadow-sm" id="count-selected" style="min-width: 40px; font-size: 0.9rem;">

@@ -49,30 +49,54 @@ class AbsenceController extends Controller
         'date_debut' => 'required|date',
         'date_fin' => 'required|date|after_or_equal:date_debut',
         'document_justificatif' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-        // On retire 'approuvee' de la validation stricte ou on utilise 'boolean'
         'approuvee' => 'nullable',
     ]);
 
-    // FORCE LA VALEUR : Si la case n'est pas cochée, on met 0
+    // 1. VÉRIFICATION DE CHEVAUCHEMENT (Même logique que storeGrouped)
+    $conflit = \App\Models\Absence::where('agent_id', $request->agent_id)
+        ->where(function ($query) use ($request) {
+            $query->whereBetween('date_debut', [$request->date_debut, $request->date_fin])
+                  ->orWhereBetween('date_fin', [$request->date_debut, $request->date_fin])
+                  ->orWhere(function ($q) use ($request) {
+                      $q->where('date_debut', '<=', $request->date_debut)
+                        ->where('date_fin', '>=', $request->date_fin);
+                  });
+        })->first();
+
+    if ($conflit) {
+        $agent = \App\Models\Agent::find($request->agent_id);
+
+        $message = '<div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-exclamation-triangle fa-lg me-2 text-danger"></i>
+                        <strong class="text-danger">Action Interrompue !</strong>
+                    </div>
+                    <p class="small mb-2 border-bottom pb-1">Cet agent possède déjà une autorisation sur cette période :</p>
+                    <ul class="list-group list-group-flush rounded-3 mb-2 shadow-sm" style="font-size: 0.85rem;">
+                        <li class="list-group-item list-group-item-danger py-1 px-2">
+                            <i class="fas fa-user-clock me-1"></i> <strong>' . $agent->last_name . ' ' . $agent->first_name . '</strong>
+                            est déjà autorisé du ' . \Carbon\Carbon::parse($conflit->date_debut)->format('d/m/Y') . '
+                            au ' . \Carbon\Carbon::parse($conflit->date_fin)->format('d/m/Y') . '
+                        </li>
+                    </ul>
+                    <p class="mb-0 small text-muted italic"><i class="fas fa-info-circle me-1"></i> Veuillez modifier les dates ou choisir un autre agent.</p>';
+
+        // Utilisation de la clé personnalisée 'conflit_absence' pour éviter le message brut en haut
+        return back()->withInput()->with('conflit_absence', $message);
+    }
+
+    // 2. CRÉATION SI PAS DE CONFLIT
     $validatedData['approuvee'] = $request->has('approuvee') ? 1 : 0;
 
-    // Gestion du fichier (comme vu précédemment)
     if ($request->hasFile('document_justificatif')) {
         $file = $request->file('document_justificatif');
-
-        // Générer un nom unique
         $fileName = time() . '_' . $file->getClientOriginalName();
-
-        // Déplacer le fichier dans public/JustificatifAbsences
         $file->move(public_path('JustificatifAbsences'), $fileName);
-
-        // Enregistrer seulement le nom du fichier en base de données
         $validatedData['document_justificatif'] = $fileName;
     }
 
-    Absence::create($validatedData);
+    \App\Models\Absence::create($validatedData);
 
-    return redirect()->route('absences.index')->with('success', 'Absence enregistrée.');
+    return redirect()->route('absences.index')->with('success', 'Absence enregistrée avec succès.');
 }
 
     /**
@@ -251,9 +275,9 @@ public function createListe()
     $agents = \App\Models\Agent::orderBy('last_name', 'asc')
                                ->orderBy('first_name', 'asc')
                                ->get();
-                               
+
     $typeAbsences = \App\Models\TypeAbsence::orderBy('nom_type')->get();
-    
+
     // Assurez-vous que le nom du fichier correspond (create_admin.blade.php)
     return view('absences.create_admin', compact('agents', 'typeAbsences'));
 }
@@ -263,66 +287,85 @@ public function storeGrouped(Request $request)
 {
     $request->validate([
         'agent_ids' => 'required|array|min:1',
-        'agent_ids.*' => 'exists:agents,id',
         'type_absence_id' => 'required|exists:type_absences,id',
         'date_debut' => 'required|date',
         'date_fin' => 'required|date|after_or_equal:date_debut',
         'document_justificatif' => 'nullable|file|mimes:pdf,jpg,png,docx|max:8192',
     ]);
 
+    // 1. PHASE DE VÉRIFICATION GLOBALE (Avant toute création)
+    $conflits = [];
+    foreach ($request->agent_ids as $id) {
+        $check = \App\Models\Absence::where('agent_id', $id)
+            ->where(function ($query) use ($request) {
+                $query->whereBetween('date_debut', [$request->date_debut, $request->date_fin])
+                      ->orWhereBetween('date_fin', [$request->date_debut, $request->date_fin])
+                      ->orWhere(function ($q) use ($request) {
+                          $q->where('date_debut', '<=', $request->date_debut)
+                            ->where('date_fin', '>=', $request->date_fin);
+                      });
+            })->first();
+
+        if ($check) {
+            $agent = \App\Models\Agent::find($id);
+            $conflits[] = "<strong>{$agent->last_name} {$agent->first_name}</strong> est déjà autorisé du " .
+                          \Carbon\Carbon::parse($check->date_debut)->format('d/m/Y') . " au " .
+                          \Carbon\Carbon::parse($check->date_fin)->format('d/m/Y');
+        }
+    }
+
+    // 2. SI CONFLIT : On arrête tout et on renvoie l'erreur
+
+
+        if (count($conflits) > 0) {
+        $message = '<div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-exclamation-triangle fa-lg me-2 text-danger"></i>
+                        <strong class="text-danger">Action Interrompue !</strong>
+                    </div>
+                    <p class="small mb-2 border-bottom pb-1">Les agents suivants sont déjà autorisés sur cette période :</p>
+                    <ul class="list-group list-group-flush rounded-3 mb-2 shadow-sm" style="font-size: 0.85rem;">';
+
+        foreach ($conflits as $conflit) {
+            $message .= '<li class="list-group-item list-group-item-danger py-1 px-2">
+                            <i class="fas fa-user-clock me-1"></i> ' . $conflit . '
+                        </li>';
+        }
+
+        $message .= '</ul>
+                    <p class="mb-0 small text-muted italic"><i class="fas fa-info-circle me-1"></i> Retirez ces agents ou modifiez les dates.</p>';
+
+       
+        return back()->withInput()->with('conflit_absence', $message);
+    }
+
+
+
+
+    // 3. PHASE DE CRÉATION (Seulement si 0 conflit)
     return \DB::transaction(function () use ($request) {
         $fileName = null;
-
-        // --- Gestion du fichier personnalisée ---
         if ($request->hasFile('document_justificatif')) {
             $file = $request->file('document_justificatif');
             $fileName = time() . '_' . $file->getClientOriginalName();
-            // Déplacement physique dans public/JustificatifAbsences
             $file->move(public_path('JustificatifAbsences'), $fileName);
         }
 
-        $crees = 0;
-        $ignores = 0;
-
         foreach ($request->agent_ids as $id) {
-            // Vérification de chevauchement
-            $dejaAbsent = \App\Models\Absence::where('agent_id', $id)
-                ->where(function ($query) use ($request) {
-                    $query->whereBetween('date_debut', [$request->date_debut, $request->date_fin])
-                          ->orWhereBetween('date_fin', [$request->date_debut, $request->date_fin])
-                          ->orWhere(function ($q) use ($request) {
-                              $q->where('date_debut', '<=', $request->date_debut)
-                                ->where('date_fin', '>=', $request->date_fin);
-                          });
-                })->exists();
-
-            if ($dejaAbsent) {
-                $ignores++;
-                continue;
-            }
-
-            // Création de l'absence
             \App\Models\Absence::create([
                 'agent_id' => $id,
                 'type_absence_id' => $request->type_absence_id,
                 'date_debut' => $request->date_debut,
                 'date_fin' => $request->date_fin,
                 'motif' => $request->motif,
-                'document_justificatif' => $fileName, // On stocke uniquement le nom du fichier
-                'status' => 'validé',
+                'document_justificatif' => $fileName,
+                'approuvee' => 0, // En attente d'approbation
             ]);
-
-            $crees++;
-        }
-
-        $message = "$crees autorisations enregistrées.";
-        if ($ignores > 0) {
-            $message .= " Attention : $ignores agent(s) ignorés (déjà absents sur cette période).";
         }
 
         return redirect()->route('absences.index')
-            ->with($ignores > 0 ? 'warning' : 'success', $message);
+            ->with('success', count($request->agent_ids) . " demandes d'absences groupées créées avec succès (En attente).");
     });
 }
+
 
 }
