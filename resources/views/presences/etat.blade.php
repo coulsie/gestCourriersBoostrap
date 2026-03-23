@@ -64,24 +64,31 @@
     }
 
     /* 6. Configuration de l'impression */
-    @media print {
-        .no-print, .btn, .card-header, .form-control, .form-select, .pagination, .page-item {
-            display: none !important;
-        }
-        .card { border: none !important; box-shadow: none !important; }
-        .container { width: 100% !important; max-width: 100% !important; margin: 0; padding: 0; }
-        .table { width: 100% !important; border-collapse: collapse !important; }
-        .table th, .table td { border: 1px solid #dee2e6 !important; padding: 5px !important; font-size: 10pt; }
-        .table-responsive { max-height: none !important; overflow: visible !important; }
-        .badge { border: 1px solid #000 !important; color: #000 !important; background: transparent !important; }
-        .print-only { display: block !important; }
-
-        /* Forcer les couleurs à l'impression */
-        .text-success { color: #28a745 !important; font-weight: bold; }
-        .text-warning { color: #f39c12 !important; font-weight: bold; }
-        .text-danger  { color: #dc3545 !important; font-weight: bold; }
-        .text-info    { color: #17a2b8 !important; font-weight: bold; }
+   @media print {
+    /* Cache tout ce qui n'est pas le tableau ou l'en-tête d'impression */
+    .no-print, .btn, .card-header, .form-control, .form-select, .pagination, nav {
+        display: none !important;
     }
+
+    /* Supprime les bordures de cartes et les ombres */
+    .card { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+    .container { width: 100% !important; max-width: 100% !important; margin: 0; padding: 0; }
+
+    /* Force l'affichage du tableau sur toute la page sans ascenseur */
+    .table-responsive {
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    /* Assure que l'en-tête du tableau n'est pas "sticky" sur le papier */
+    .sticky-top { position: static !important; background-color: #f8f9fa !important; }
+
+    /* Ajuste la taille de police pour faire tenir plus de colonnes */
+    table { font-size: 10pt !important; width: 100% !important; }
+
+    /* Saut de page intelligent pour ne pas couper une ligne au milieu */
+    tr { page-break-inside: avoid; }
+}
 
     /* 7. Utilitaires */
     .print-only { display: none; }
@@ -112,9 +119,12 @@
     <div class="card shadow-sm border-0 mb-4 no-print">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <h6 class="mb-0 fw-bold"><i class="fas fa-filter me-2"></i>Critères de Recherche</h6>
-            <button onclick="window.print()" class="btn btn-light btn-sm shadow-sm">
-                <i class="fas fa-print me-1"></i> Imprimer l'état
+
+            <button onclick="window.print()" class="btn btn-sm shadow-sm fw-bold border-0 px-3"
+                    style="background: linear-gradient(135s, #f8f9fa 0%, #e9ecef 100%); color: #212529; transition: 0.3s;">
+                <i class="fas fa-print me-2 text-primary"></i>IMPRIMER L'ÉTAT
             </button>
+
         </div>
         <div class="card-body">
             <form action="{{ route('presences.etat') }}" method="GET" class="row g-3 align-items-end">
@@ -152,7 +162,7 @@
     <!-- Information Jours Ouvrables -->
     @if($mois)
     <div class="row mb-3">
-    
+
     <div class="col-12">
     <div class="card shadow-sm border-0 bg-light">
         <div class="card-body py-2 d-flex justify-content-between align-items-center">
@@ -284,5 +294,19 @@
         </div>
     </div>
 </div>
-
+<div class="print-only mt-5">
+    <div class="d-flex justify-content-between">
+        <div class="text-center" style="width: 200px;">
+            <p class="mb-5 small fw-bold">L'Agent RH</p>
+            <div style="border-bottom: 1px solid #ccc; height: 50px;"></div>
+        </div>
+        <div class="text-center" style="width: 200px;">
+            <p class="mb-5 small fw-bold">La Direction</p>
+            <div style="border-bottom: 1px solid #ccc; height: 50px;"></div>
+        </div>
+    </div>
+    <div class="text-center mt-4">
+        <small class="text-muted">Document généré le {{ now()->format('d/m/Y à H:i') }}</small>
+    </div>
+</div>
 @endsection
