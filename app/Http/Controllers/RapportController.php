@@ -31,12 +31,18 @@ public function mensuel(Request $request)
     }])->orderBy('last_name', 'asc')->get();
 
     // 3. Calculer les jours ouvrables (pour le taux et le badge uniquement)
+   // 2. Récupérer les jours fériés du mois (format Y-m-d)
+    $feries = \App\Models\Holiday::whereYear('holiday_date', $annee)
+                    ->whereMonth('holiday_date', $mois)
+                    ->pluck('holiday_date')
+                    ->map(fn($d) => \Carbon\Carbon::parse($d)->format('Y-m-d'))
+                    ->toArray();
+
+    // 3. Calculer les jours ouvrables réels (Hors weekends ET hors fériés)
     $joursOuvrablesMois = 0;
     $tempDate = $date->copy()->startOfMonth();
     $finMois = $date->copy()->endOfMonth();
-    $feries = \App\Models\Holiday::whereYear('holiday_date', $annee)
-                ->whereMonth('holiday_date', $mois)
-                ->pluck('holiday_date')->toArray();
+
 
     while ($tempDate <= $finMois) {
         if (!$tempDate->isWeekend() && !in_array($tempDate->format('Y-m-d'), $feries)) {

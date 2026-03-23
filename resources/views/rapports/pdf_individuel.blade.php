@@ -40,7 +40,7 @@
 <body>
     <div class="header">
         <h1 style="margin: 0; color: #4e73df;">BILAN DE PRÉSENCE MENSUEL</h1>
-        <h3 style="margin: 5px 0;">Mois : {{ strtoupper($nomMois) }} {{ $annee ?? '' }}</h3>
+        <h3 style="margin: 5px 0;">Mois : {{ strtoupper($nomMois) }}   </h3>
     </div>
 
     <div class="info-agent">
