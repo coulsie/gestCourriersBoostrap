@@ -219,7 +219,7 @@
                                 <i class="fas fa-archive me-2"></i> Archives
                             </a>
                             <a class="collapse-item fw-bold text-info" href="{{ route('imputations.index') }}">
-                                <i class="fas fa-share-square me-2"></i> Toutes Imputations
+                                <i class="fas fa-share-square me-2"></i> Toutes les Imputations
                             </a>
                         @endhasanyrole
 

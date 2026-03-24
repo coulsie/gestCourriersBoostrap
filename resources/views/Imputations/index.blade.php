@@ -160,9 +160,11 @@
         </h4>
         <div class="d-flex gap-2 no-print">
 
-           <button onclick="window.print()" class="btn btn-outline-light btn-lg fw-bold shadow-sm px-4">
-                    <i class="fas fa-print me-1"></i> IMPRIMER
-            </button>
+           <a href="{{ request()->fullUrlWithQuery(['print' => 1]) }}"
+            class="btn btn-outline-light btn-lg fw-bold shadow-sm px-4">
+                <i class="fas fa-print me-1"></i> IMPRIMER TOUT
+            </a>
+
             <a href="{{ route('imputations.create') }}" class="btn btn-warning btn-lg fw-bold shadow-sm px-4">
                 <i class="fas fa-plus-circle me-1"></i> NOUVELLE IMPUTATION
             </a>
@@ -171,6 +173,18 @@
 
     <div class="card-body p-0">
         <div class="table-responsive">
+            <div class="d-none d-print-block mb-3 p-3 bg-light border-start border-4 border-warning">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="mb-0 fw-bold text-dark">Rapport d'Imputations</h5>
+                        <small class="text-muted">Généré le {{ now()->translatedFormat('d F Y à H:i') }}</small>
+                    </div>
+                    <div class="col-6 text-end">
+                        <span class="fs-5 fw-bold text-primary">Total : {{ $stats['total'] }} dossiers</span>
+                    </div>
+                </div>
+            </div>
+
             <table class="table table-hover align-middle mb-0 fs-5">
                 <thead class="table-secondary">
                     <tr class="text-uppercase fw-black">
@@ -352,39 +366,74 @@
 
     </div>
 </div>
-<!-- Style spécifique pour l'impression (à mettre dans votre stack CSS ou en haut du fichier) -->
 <style>
     @media print {
-        /* Masquer tout le reste de la page (menus, sidebar, etc.) */
+        /* Masquer tout le reste */
         body * { visibility: hidden; }
 
-        /* Afficher uniquement la carte des imputations */
+        /* Afficher uniquement la carte */
         #printableCard, #printableCard * { visibility: visible; }
 
-        /* Positionner la zone d'impression en haut à gauche */
         #printableCard {
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
             box-shadow: none !important;
-            border: 1px solid #dee2e6 !important;
+            border: none !important;
         }
 
-        /* Masquer les boutons et la colonne Actions */
-        .btn, .no-print, th:last-child, td:last-child {
+        /* Masquer boutons, colonnes d'actions et pagination web */
+        .btn, .no-print, th:last-child, td:last-child, .card-footer {
             display: none !important;
         }
 
-        /* Forcer l'affichage des couleurs de fond (badges, barres de progression) */
+        /* Configuration de la page (Pagination et Date/Heure) */
+        @page {
+            size: A4 landscape; /* Optionnel : force le mode paysage pour les grands tableaux */
+            margin: 1.5cm;
+        }
+
+        /* Forcer les couleurs et fonds */
         * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
         }
 
-        /* Ajuster la taille du texte pour l'impression */
-        .table { font-size: 12px !important; }
+        /* Répéter l'en-tête du tableau sur chaque page */
+        thead { display: table-header-group; }
+        tr { page-break-inside: avoid; }
+
+        /* Ajout d'un pied de page personnalisé via CSS */
+        #printableCard::after {
+            content: "Imprimé le : {{ now()->format('d/m/Y H:i') }}  " ;
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            font-size: 10px;
+            color: #555;
+            visibility: visible;
+        }
     }
 </style>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('print')) {
+            // Petit délai pour laisser le temps au navigateur de rendre le tableau complet
+            setTimeout(function() {
+                window.print();
+
+                // Optionnel : rediriger vers la page normale (sans le paramètre print) après impression
+                window.onafterprint = function() {
+                    const cleanUrl = window.location.href.split('&print=1')[0].split('?print=1')[0];
+                    window.location.href = cleanUrl;
+                };
+            }, 500);
+        }
+    });
+</script>
+
+
 @endsection
 
