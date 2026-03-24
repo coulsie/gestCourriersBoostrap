@@ -299,7 +299,7 @@
                             <div class="dropdown-divider" style="border-top: 1px dashed #2ed573; opacity: 0.2;"></div>
 
                             <a class="collapse-item text-muted fw-bold small" href="{{ route('typeabsences.index') }}">Types d'Autorisations</a>
-                            <a class="collapse-item text-muted fw-bold small" href="{{ route('absences.index') }}">Demandes d'Autorisation d'absence</a>
+                            <a class="collapse-item text-muted fw-bold small" href="{{ route('absences.index') }}">Liste des Autorisations d'absence</a>
                             <a class="collapse-item text-secondary fw-bold" href="{{ route('absences.createListe') }}">
                                 <i class="fas fa-users-cog me-2"></i>Demande Autorisation d'Absence Groupée
                             </a>

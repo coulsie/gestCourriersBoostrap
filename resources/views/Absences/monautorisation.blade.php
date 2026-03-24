@@ -2,28 +2,69 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    <!-- En-tête de page -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800 fw-bold">
-            <i class="fas fa-calendar-check text-primary me-2"></i>Demande de Congés & Permissions
-        </h1>
-        <a href="{{ route('absences.index') }}" class="btn btn-outline-secondary btn-sm shadow-sm fw-bold">
-            <i class="fas fa-arrow-left fa-sm me-1"></i> Retour à la liste
-        </a>
+        <!-- En-tête de page : Titre centré et Bouton à droite sans chevauchement -->
+    <div class="row align-items-center mb-4">
+        <!-- Colonne GAUCHE : Bouton Fermer (Visible par tous) -->
+        <div class="col-md-3 text-start mt-3 mt-md-0">
+            <a href="{{ url('/home') }}" class="btn btn-outline-secondary btn-sm shadow-sm fw-bold"
+            onclick="return confirm('Voulez-vous vraiment quitter ? Les données non enregistrées seront perdues.')">
+                <i class="fas fa-arrow-left fa-sm me-1"></i> Retour à l'accueil
+            </a>
+        </div>
+
+        <!-- Colonne CENTRALE : Titre -->
+        <div class="col-md-6 text-center">
+            <h1 class="h4 h3-md mb-0 text-gray-800 fw-bold">
+                <i class="fas fa-calendar-check text-primary me-2"></i>Demande de Congés & Permissions
+            </h1>
+        </div>
+
+        <!-- Colonne DROITE : Retour à la liste (Seulement Admin/Superviseur/DRH) -->
+        <div class="col-md-3 text-end mt-3 mt-md-0">
+            @hasanyrole('admin|Superviseur|drh|DRH')
+                <a href="{{ route('absences.index') }}" class="btn btn-outline-secondary btn-sm shadow-sm fw-bold">
+                    <i class="fas fa-arrow-left fa-sm me-1"></i> Retour à la liste
+                </a>
+            @endhasanyrole
+        </div>
     </div>
+
+
 
     <div class="row justify-content-center">
         <div class="col-lg-8">
             <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-                <!-- Header avec dégradé -->
-                <div class="card-header bg-gradient-primary py-3 border-0">
-                    <h6 class="m-0 font-weight-bold text-white text-uppercase tracking-wide">
-                        <i class="fas fa-edit me-2"></i>Nouveau Formulaire d'Absence
-                    </h6>
-                </div>
+                <!-- Header avec dégradé et Bouton Fermer intégré -->
+                    <div class="card-header bg-gradient-primary py-3 border-0 d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-white text-uppercase tracking-wide">
+                            <i class="fas fa-edit me-2"></i>Nouveau Formulaire d'Absence
+                        </h6>
+
+                        <!-- Bouton Fermer blanc et discret pour le dégradé -->
+                        <a href="{{ url('/home') }}" class="btn btn-sm btn-light fw-bold shadow-sm px-3 text-primary"
+                        onclick="return confirm('Voulez-vous vraiment quitter ? Les données non enregistrées seront perdues.')">
+                            <i class="fas fa-times me-1"></i> FERMER
+                        </a>
+                    </div>
 
                 <div class="card-body p-5 bg-white">
-                    <form action="{{ route('absences.monstore') }}" method="POST" enctype="multipart/form-data">
+                    <!-- 1. PLACER LE CODE ICI (Messages d'erreur de session) -->
+                    <!-- ZONE POUR LES ERREURS DÉTECTÉES EN TEMPS RÉEL (JS) -->
+                        <div id="dynamicError"></div>
+                        @if(session('error'))
+                            <div class="alert alert-danger border-start border-4 border-danger shadow-sm mb-4 fw-bold">
+                                <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
+                            </div>
+                        @endif
+
+                        <!-- 2. PLACER LE CODE DE SUCCÈS AUSSI (Optionnel mais recommandé) -->
+                        @if(session('success'))
+                            <div class="alert alert-success border-start border-4 border-success shadow-sm mb-4 fw-bold">
+                                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                            </div>
+                        @endif
+                    <form id="absenceForm" action="{{ route('absences.monstore') }}" method="POST" enctype="multipart/form-data">
+
                         @csrf
 
                         <!-- Bloc Agent : INFO (Bleu) -->
@@ -120,46 +161,162 @@
 
                         <!-- Boutons d'action -->
                         <div class="d-grid gap-3">
-                            <button type="submit" class="btn btn-primary btn-lg fw-black shadow-lg py-3 text-uppercase" style="letter-spacing: 1px;">
-                                <i class="fas fa-paper-plane me-2"></i> Envoyer la demande à la DRH
+
+                            <button type="button" onclick="validerEtEnregistrer()" class="btn btn-primary btn-lg fw-black shadow-lg py-3 text-uppercase w-100">
+                                <i class="fas fa-file-pdf me-2"></i> ENREGISTRER & GÉNÉRER LE PDF
                             </button>
+
+
                             <button type="reset" class="btn btn-light btn-sm text-muted fw-bold">
                                 <i class="fas fa-undo me-1"></i> Effacer les saisies
                             </button>
+
                         </div>
                     </form>
-                    <div class="d-flex justify-content-center mt-4 mb-3">
-                        {{ $absences->links() }}
-                    </div>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+
+
+
 <style>
+    /* --- Vos styles existants (Interface Web) --- */
     .border-indigo { border-color: #6610f2 !important; }
     .text-indigo { color: #6610f2 !important; }
     .bg-indigo-subtle { background-color: #e7d1ff !important; }
     .fw-black { font-weight: 900; }
     .bg-gradient-primary { background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); }
+
+    /* --- NOUVEAU : Masquer le document administratif sur l'écran --- */
+    #absenceDocument {
+        display: none !important;
+    }
+
+    /* --- Configuration Impression (Uniquement sur papier) --- */
+    @media print {
+        /* Tout masquer par défaut */
+        body * { visibility: hidden; }
+
+        /* Rendre visible UNIQUEMENT le document d'autorisation */
+        #absenceDocument, #absenceDocument * {
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        #absenceDocument {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 0 !important;
+            color: #000 !important;
+            background-color: white !important;
+        }
+
+        /* Nettoyage pour le rendu papier */
+        .card, .shadow-lg {
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        /* Paramètres de la page A4 */
+        @page {
+            size: A4 portrait;
+            margin: 2cm;
+        }
+
+        /* Forcer l'impression des bordures du tableau officiel */
+        .table-bordered {
+            border: 1px solid #000 !important;
+        }
+        .table-bordered th, .table-bordered td {
+            border: 1px solid #000 !important;
+        }
+    }
 </style>
-@if(session('success'))
-    <script>
-        // On affiche d'abord une alerte de confirmation propre (optionnel)
-        alert("{{ session('success') }}");
 
-        // Délai de 1 seconde puis fermeture
-        setTimeout(function() {
-            // Si c'est une fenêtre surgissante (popup)
-            window.close();
 
-            // Si window.close() échoue (sécurité navigateurs), on redirige
-            if (!window.closed) {
-                window.location.href = "{{ route('home') }}"; // Redirection de secours
+<script>
+/**
+ * 1. FONCTION DE VALIDATION ET D'ENREGISTREMENT
+ */
+async function validerEtEnregistrer() {
+    const form = document.getElementById('absenceForm');
+    const select = document.querySelector('select[name="type_absence_id"]');
+    const debut = document.querySelector('input[name="date_debut"]');
+    const fin = document.querySelector('input[name="date_fin"]');
+    const dynamicError = document.getElementById('dynamicError');
+
+    if (dynamicError) dynamicError.innerHTML = '';
+
+    if (!select || !select.value || !debut.value || !fin.value) {
+        alert("⚠️ Veuillez remplir le motif et les dates avant de continuer.");
+        return;
+    }
+
+    try {
+        const response = await fetch("{{ route('absences.checkOverlap') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                date_debut: debut.value,
+                date_fin: fin.value
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.conflict) {
+            if (dynamicError) {
+                dynamicError.innerHTML = `
+                    <div class="alert alert-danger border-start border-4 border-danger shadow-sm mb-4 fw-bold">
+                        <i class="fas fa-exclamation-triangle me-2"></i> ${data.message}
+                    </div>
+                `;
             }
-        }, 1000);
-    </script>
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return;
+        }
+    } catch (error) {
+        console.error("Erreur de vérification", error);
+    }
+
+    // Soumission du formulaire
+    form.submit();
+}
+
+/**
+ * 2. GESTION DU SUCCÈS ET TÉLÉCHARGEMENT DU PDF
+ */
+@if(session('success'))
+    // Affichage du message de succès
+    alert("{{ session('success') }}");
+
+    @if(session('pdf_url'))
+        // METHODE DU LIEN INVISIBLE : Évite le blocage popup
+        const downloadLink = document.createElement("a");
+        downloadLink.href = "{{ session('pdf_url') }}";
+        downloadLink.target = "_self"; // On reste sur la page actuelle pour le téléchargement
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    @endif
 @endif
+
+@if(session('error'))
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+@endif
+</script>
+
+
+
+
 
 @endsection

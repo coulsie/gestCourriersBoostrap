@@ -9,7 +9,7 @@ use App\Models\Agent;
 use App\Models\TypeAbsence;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AbsenceController extends Controller
 {
@@ -230,42 +230,104 @@ public function approuver(Request $request, $id)
 
 public function monstore(Request $request)
 {
-    // 1. Validation identique à votre fonction store qui marche
+    // 1. Validation (Date de fin >= Date de début)
     $validatedData = $request->validate([
         'type_absence_id' => 'required|exists:type_absences,id',
         'date_debut' => 'required|date',
         'date_fin' => 'required|date|after_or_equal:date_debut',
-        'document_justificatif' => 'nullable|file|mimes:pdf,jpg,png|max:8192', // Augmenté à 8Mo comme demandé
+        'document_justificatif' => 'nullable|file|mimes:pdf,jpg,png,doc,docx|max:8192',
     ]);
 
-    // 2. Récupération de l'agent lié à l'utilisateur connecté
+    // 2. Récupération de l'agent
     $agent = auth::user()->agent;
     if (!$agent) {
         return redirect()->back()->with('error', 'Profil agent introuvable.');
     }
 
-    // 3. On prépare les données pour la création
-    $validatedData['agent_id'] = $agent->id;
-    $validatedData['approuvee'] = 0; // Toujours 0 pour une demande d'agent
+    // --- NOUVEAU : VÉRIFICATION DU CHEVAUCHEMENT ---
+    $debut = $request->date_debut;
+    $fin = $request->date_fin;
 
-    // 4. Gestion du fichier (Logique identique à votre fonction store)
+    $conflit = \App\Models\Absence::where('agent_id', $agent->id)
+        ->where(function ($query) use ($debut, $fin) {
+            $query->where(function ($q) use ($debut, $fin) {
+                $q->where('date_debut', '<=', $fin)
+                  ->where('date_fin', '>=', $debut);
+            });
+        })
+        ->first();
+
+    if ($conflit) {
+        $msg = "Erreur : Vous avez déjà une absence enregistrée du " .
+               \Carbon\Carbon::parse($conflit->date_debut)->format('d/m/Y') .
+               " au " . \Carbon\Carbon::parse($conflit->date_fin)->format('d/m/Y') . ".";
+
+        return redirect()->back()->withInput()->with('error', $msg);
+    }
+    // -----------------------------------------------
+
+    // 3. Préparation des données
+    $validatedData['agent_id'] = $agent->id;
+    $validatedData['approuvee'] = 0;
+
+    // 4. Gestion du fichier
     if ($request->hasFile('document_justificatif')) {
         $file = $request->file('document_justificatif');
-
-        // Générer un nom unique
         $fileName = time() . '_' . $file->getClientOriginalName();
-
-        // Déplacer le fichier dans public/JustificatifAbsences (crée le dossier s'il n'existe pas)
         $file->move(public_path('JustificatifAbsences'), $fileName);
-
-        // Enregistrer le nom du fichier
         $validatedData['document_justificatif'] = $fileName;
     }
 
-    // 5. Création
-    \App\Models\Absence::create($validatedData);
+       // 5. Création
+    $absence = \App\Models\Absence::create($validatedData);
 
-    return redirect()->back()->with('success', 'Votre demande d\'absence a été enregistrée avec succès !');
+    // On prépare le message de succès et l'URL de téléchargement du PDF
+    return redirect()->back()->with([
+        'success' => 'Votre demande d\'absence a été enregistrée avec succès ! Le document PDF va être généré.',
+        'pdf_url' => route('absences.genererPdf', $absence->id) // Assurez-vous que cette route existe
+    ]);
+
+
+}
+
+
+
+    public function checkOverlap(Request $request) {
+        $agentId = auth::user()->agent->id;
+        $conflit = \App\Models\Absence::where('agent_id', $agentId)
+            ->where(function ($q) use ($request) {
+                $q->where('date_debut', '<=', $request->date_fin)
+                ->where('date_fin', '>=', $request->date_debut);
+            })->first();
+
+        if ($conflit) {
+
+            return response()->json([
+                'conflict' => true,
+                'message' => "Vous avez déjà une absence du " .
+                            \Carbon\Carbon::parse($conflit->date_debut)->format('d/m/Y') . " au " .
+                            \Carbon\Carbon::parse($conflit->date_fin)->format('d/m/Y') .
+                            ". Veuillez reconsidérer les dates."
+            ]);
+
+
+        }
+
+        return response()->json(['conflict' => false]);
+    }
+
+
+
+public function genererPdf($id)
+{
+    $absence = Absence::with(['agent', 'type'])->findOrFail($id);
+    $agent = $absence->agent;
+
+    $pdf = Pdf::loadView('Absences.pdf_autorisation', compact('absence', 'agent'));
+    
+
+    // Pour télécharger le fichier :
+    return $pdf->download('autorisation_absence_'.$agent->last_name.'.pdf');
 }
 
 
@@ -334,7 +396,7 @@ public function storeGrouped(Request $request)
         $message .= '</ul>
                     <p class="mb-0 small text-muted italic"><i class="fas fa-info-circle me-1"></i> Retirez ces agents ou modifiez les dates.</p>';
 
-       
+
         return back()->withInput()->with('conflit_absence', $message);
     }
 

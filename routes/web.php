@@ -189,6 +189,11 @@ Route::middleware(['auth'])->group(function () {
 
     // --- GESTION DES ABSENCES (LOGIQUE DE RÔLES) ---
     // Espace Agent (Tout utilisateur)
+
+    Route::post('/absences/check-overlap', [AbsenceController::class, 'checkOverlap'])->name('absences.checkOverlap');
+    Route::get('/absences/pdf/{id}', [AbsenceController::class, 'genererPdf'])->name('absences.genererPdf');
+
+
     Route::get('/mon-autorisation-absence', [AbsenceController::class, 'monautorisation'])->name('absences.monautorisation');
     Route::post('/absences/monstore', [AbsenceController::class, 'monstore'])->name('absences.monstore');
 
@@ -256,7 +261,7 @@ Route::middleware(['auth'])->group(function () {
 
 
         // --- PRÉSENCES & POINTAGES ---
-        
+
         Route::prefix('presences')->name('presences.')->group(function () {
             Route::get('/mon-pointage', [PresenceController::class, 'monPointage'])->name('monPointage');
             Route::post('/mon-pointage/enregistrer', [PresenceController::class, 'enregistrerPointage'])->name('enregistrerPointage');
