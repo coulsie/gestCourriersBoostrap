@@ -51,18 +51,7 @@
                     <!-- 1. PLACER LE CODE ICI (Messages d'erreur de session) -->
                     <!-- ZONE POUR LES ERREURS DÉTECTÉES EN TEMPS RÉEL (JS) -->
                         <div id="dynamicError"></div>
-                        @if(session('error'))
-                            <div class="alert alert-danger border-start border-4 border-danger shadow-sm mb-4 fw-bold">
-                                <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
-                            </div>
-                        @endif
-
-                        <!-- 2. PLACER LE CODE DE SUCCÈS AUSSI (Optionnel mais recommandé) -->
-                        @if(session('success'))
-                            <div class="alert alert-success border-start border-4 border-success shadow-sm mb-4 fw-bold">
-                                <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-                            </div>
-                        @endif
+                        
                     <form id="absenceForm" action="{{ route('absences.monstore') }}" method="POST" enctype="multipart/form-data">
 
                         @csrf
