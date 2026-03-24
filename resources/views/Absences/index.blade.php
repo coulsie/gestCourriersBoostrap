@@ -40,24 +40,40 @@
                                     <tr>
                                         <td class="fw-bold text-muted">#{{ $absence->id }}</td>
                                         <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-sm bg-primary-subtle text-primary rounded-circle p-2 me-2 text-center" style="width: 35px; height: 35px;">
-                                                    <i class="fas fa-user small"></i>
+                                            <div class="p-1">
+                                                <!-- NOM ET PRÉNOM : Texte Noir Intense -->
+                                                <div class="fw-black text-dark fs-5 mb-1" style="letter-spacing: -0.2px;">
+                                                    @if($absence->agent)
+                                                        <span class="text-primary"><i class="fas fa-user-circle me-1"></i></span>
+                                                        {{ strtoupper($absence->agent->last_name) }} {{ $absence->agent->first_name }}
+                                                    @else
+                                                        <span class="badge bg-danger shadow-sm">
+                                                            <i class="fas fa-exclamation-triangle me-1"></i> ID #{{ $absence->agent_id }} INCONNU
+                                                        </span>
+                                                    @endif
                                                 </div>
-                                                <div>
-                                                    <div class="fw-bold text-dark">
-                                                        @if($absence->agent)
-                                                            {{ $absence->agent->last_name }} {{ $absence->agent->first_name }}
-                                                        @else
-                                                            <span class="badge bg-danger">ID #{{ $absence->agent_id }} non trouvé</span>
-                                                        @endif
-                                                    </div>
-                                                    <small class="text-muted">
-                                                        {{-- On utilise l'opérateur null-safe (?->) pour éviter l'erreur --}}
-                                                        {{ $absence->agent?->service?->nom ?? 'Service non défini' }}
-                                                    </small>
+
+                                                <!-- SERVICE : Couleurs Éclatantes (Dégradé de Bleu/Violet) -->
+                                                <div class="mt-1">
+                                                    @if($absence->agent?->service)
+                                                        <span class="badge shadow-sm border-0 px-3 py-2"
+                                                            style="background: linear-gradient(135deg, #6610f2 0%, #0d6efd 100%);
+                                                                    color: white;
+                                                                    font-weight: 800;
+                                                                    font-size: 0.8rem;
+                                                                    letter-spacing: 0.5px;
+                                                                    border-radius: 8px;">
+                                                            <i class="fas fa-building me-2"></i>{{ strtoupper($absence->agent->service->name) }}
+                                                        </span>
+                                                    @else
+                                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 fw-bold">
+                                                            <i class="fas fa-question-circle me-1"></i> SERVICE NON DÉFINI
+                                                        </span>
+                                                    @endif
                                                 </div>
                                             </div>
+
+
                                         </td>
                                         <td>
                                             <!-- Type d'absence avec fallback sécurisé -->
