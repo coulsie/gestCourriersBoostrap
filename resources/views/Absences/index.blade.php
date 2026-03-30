@@ -54,7 +54,7 @@
                                                     </div>
                                                     <small class="text-muted">
                                                         {{-- On utilise l'opérateur null-safe (?->) pour éviter l'erreur --}}
-                                                        {{ $absence->agent?->service?->nom ?? 'Service non défini' }}
+                                                        {{ $absence->agent?->service?->name ?? 'Service non défini' }}
                                                     </small>
                                                 </div>
                                             </div>

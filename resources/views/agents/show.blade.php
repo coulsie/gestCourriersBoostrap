@@ -85,6 +85,7 @@
                                 <h5 class="text-success fw-bold mb-4 border-bottom border-2 pb-2 text-uppercase">
                                     <i class="fas fa-address-book me-2"></i> Coordonnées
                                 </h5>
+                                <p class="mb-3"><strong><i class="fas fa-envelope me-2 text-success"></i> Email Professionnel :</strong> <span class="text-dark">{{ $agent->email_professionnel }}</span></p>
                                 <p class="mb-3"><strong><i class="fas fa-envelope me-2 text-success"></i> Email :</strong> <span class="text-dark">{{ $agent->email }}</span></p>
                                 <p class="mb-3"><strong><i class="fas fa-phone me-2 text-success"></i> Téléphone :</strong> <span class="text-dark fw-bold">{{ $agent->phone_number }}</span></p>
                                 <p class="mb-0"><strong><i class="fas fa-map-marker-alt me-2 text-success"></i> Adresse :</strong> <span class="text-dark">{{ $agent->address }}</span></p>

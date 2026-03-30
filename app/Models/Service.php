@@ -32,6 +32,15 @@ class Service extends Model
         return $this->belongsTo(Direction::class);
     }
 
+    // Le "head_id" pointe vers un ID d'agent (ou de user, à vérifier selon votre FK)
+    public function chef()
+    {
+        return $this->belongsTo(Agent::class, 'head_id');
+    }
+
+
+
+
     /**
      * Définit la relation : un Service a plusieurs Agents.
      * C'est la relation inverse de Agent::belongsTo(Service).
@@ -48,5 +57,19 @@ class Service extends Model
     public function head(): BelongsTo
     {
         return $this->belongsTo(Agent::class, 'head_id');
+    }
+    // App\Models\Service.php
+
+    public function responsable()
+    {
+        // On cherche l'agent du service qui a un statut de direction
+        return $this->hasOne(Agent::class)
+            ->whereIn('status', [
+                'Chef de service',
+                'Sous-directeur',
+                'Directeur',
+                'Conseiller Technique',
+                'Conseiller Spécial'
+            ]);
     }
 }

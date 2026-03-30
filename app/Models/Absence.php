@@ -24,8 +24,13 @@ class Absence extends Model
         'date_fin',
         'approuvee', // <-- DOIT ÊTRE ÉCRIT EXACTEMENT COMME ÇA
         'document_justificatif',
-        'notes'
+        'notes',
+        'statut_autorisation_absence',
+        'comment_absence_chef'
     ];
+
+
+
 
     // Conversion automatique des types de données
     protected $casts = [
@@ -33,8 +38,9 @@ class Absence extends Model
         'date_fin'   => 'date',
         'Approuvee' => 'boolean', // Convertit 0/1 ou false/true en booléen PHP
     ];
+   
 
-    
+
     // --- Relations Eloquent ---
 
     /**

@@ -52,6 +52,24 @@ class Agent extends Model
         return $this->belongsTo(Service::class);
     }
 
+    public function estResponsable()
+    {
+        return in_array($this->status, [
+            'Chef de service',
+            'Sous-directeur',
+            'Directeur',
+            'Conseiller Technique',
+            'Conseiller Spécial'
+        ]);
+    }
+
+
+    // App\Models\Agent.php
+    public function estChef()
+    {
+        return \App\Models\Service::where('head_id', $this->id)->exists();
+    }
+
 
 
     /**

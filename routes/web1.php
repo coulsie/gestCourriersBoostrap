@@ -2,12 +2,29 @@
 
 use Illuminate\Support\Facades\{Auth, Route};
 use App\Http\Controllers\{
-    HomeController, AdminController, UserController, ProfileController,
-    AgentController, CourrierController,
-    DirectionController, ServiceController,PresenceController, AbsenceController, TypeAbsenceController,
-    AnnonceController, AgentServiceController, ImputationController,
-    StatistiqueController, ReponseController, PostController, RoleController,ExtractionController, HolidayController,
-     RapportController,AuditLogController,InterimController
+    HomeController,
+    AdminController,
+    UserController,
+
+    AgentController,
+    CourrierController,
+    DirectionController,
+    ServiceController,
+    PresenceController,
+    AbsenceController,
+    TypeAbsenceController,
+    AnnonceController,
+    AgentServiceController,
+    ImputationController,
+    StatistiqueController,
+    ReponseController,
+    PostController,
+    RoleController,
+    ExtractionController,
+    HolidayController,
+    RapportController,
+    AuditLogController,
+    InterimController
 };
 
 use App\Http\Controllers\Auth\PasswordSetupController;
@@ -15,13 +32,19 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Models\ScriptExtraction;
 
 
+// Dans routes/web.php
 
+Route::middleware(['auth'])->group(
+    function () {
+        // C'est ici que l'utilisateur arrive juste après s'être connecté
+        Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
 | 1. ACCÈS PUBLICS & AUTHENTIFICATION DE BASE
 |--------------------------------------------------------------------------
 */
+
 Route::get('/', function () {
     return view('welcome-login');
 })->middleware('guest');
@@ -49,9 +72,6 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-// Mot de passe oublié
-Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 
 Route::resource('holidays', HolidayController::class);
 
@@ -80,10 +100,6 @@ Route::delete('/admin/logs-clear', [App\Http\Controllers\AuditLogController::cla
 Route::get('/admin/logs', [AuditLogController::class, 'journalLogs'])->name('admin.logs.index');
 
 
-Route::get('/profile/signature', [ProfileController::class, 'editSignature'])->name('profile.signature.edit');
-Route::post('/profile/signature', [ProfileController::class, 'updateSignature'])->name('profile.signature.update');
-
-
 
 
 Route::middleware(['auth'])->group(function () {
@@ -105,19 +121,7 @@ Route::post('/imputations/check-interim', [ImputationController::class, 'checkIn
 | 2. ESPACE SÉCURISÉ (Authentification requise)
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth'])->group(function () {
-    // ... vos autres routes
-    Route::get('/profile/signature', [App\Http\Controllers\ProfileController::class, 'signature'])->name('profile.signature');
-});
 
-// Dans routes/web.php
-Route::middleware(['auth'])->group(function () {
-    // La route pour afficher la page de modification de la signature
-    Route::get('/profile/signature/edit', [App\Http\Controllers\ProfileController::class, 'editSignature'])->name('profile.signature.edit');
-
-    // N'oubliez pas la route POST pour enregistrer l'image après l'upload
-    Route::post('/profile/signature/update', [App\Http\Controllers\ProfileController::class, 'updateSignature'])->name('profile.signature.update');
-});
 
 
 
@@ -148,7 +152,6 @@ Route::middleware(['auth'])->group(function () {
 
     // 8. Suppression définitive (supprime aussi l'absence liée)
     Route::delete('/interims/{id}', [InterimController::class, 'destroy'])->name('interims.destroy');
-
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -166,19 +169,18 @@ Route::middleware(['auth'])->group(function () {
     // 3. Exportation des résultats vers Excel (POST)
     Route::post('/extraction/export', [ExtractionController::class, 'export'])
         ->name('extraction.export');
-
 });
-Route::get('/extraction/execute', function() {
+Route::get('/extraction/execute', function () {
     return redirect()->route('extraction.index');
 });
 
 // Route pour charger les données d'un script en JSON au clic
-Route::get('/extraction/scripts/{id}', function($id) {
+Route::get('/extraction/scripts/{id}', function ($id) {
     return \App\Models\ScriptExtraction::findOrFail($id);
 })->name('scripts.json');
 
 // Cette route permet au JS de récupérer les données du script
-Route::get('/extraction/scripts/{id}', function($id) {
+Route::get('/extraction/scripts/{id}', function ($id) {
     return ScriptExtraction::findOrFail($id);
 });
 Route::delete('/extraction/scripts/{id}', [ExtractionController::class, 'destroy'])->name('scripts.destroy');
@@ -186,10 +188,7 @@ Route::delete('/extraction/scripts/{id}', [ExtractionController::class, 'destroy
 
 Route::middleware(['auth'])->group(function () {
 
-    // --- CONFIGURATION INITIALE (HORS FORCE.PASSWORD) ---
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::get('/password/setup', [PasswordSetupController::class, 'show'])->name('password.setup');
-    Route::post('/password/setup', [PasswordSetupController::class, 'update'])->name('password.setup.update');
+
 
     // --- ADMINISTRATION SYSTÈME & RÔLES ---
     Route::middleware(['can:manage-users'])->group(function () {
@@ -228,13 +227,6 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-    // Utilisez un nom de route différent de 'password.update'
-    Route::post('/user/change-password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])
-        ->name('user.password.custom.update')
-        ->middleware('auth');
-
-    Route::patch('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-
     /*
     |--------------------------------------------------------------------------
     | 3. ESPACE MÉTIER (Authentification + Changement de mot de passe forcé)
@@ -244,12 +236,7 @@ Route::middleware(['auth'])->group(function () {
 
         // --- DASHBOARDS & PROFIL ---
         Route::get('/tableau-de-bord', [AgentController::class, 'dashb'])->name('agent.dashboard');
-        Route::prefix('profile')->name('profile.')->group(function () {
-            Route::get('/', [ProfileController::class, 'show'])->name('show');
-            Route::get('/edit', [ProfileController::class, 'edit'])->name('edit');
-            Route::get('/create', [ProfileController::class, 'create'])->name('create');
-            Route::match(['put', 'post'], '/update', [ProfileController::class, 'update'])->name('update');
-        });
+
 
 
 
@@ -266,7 +253,7 @@ Route::middleware(['auth'])->group(function () {
             Route::match(['get', 'post'], '/par-service/recherche', [AgentServiceController::class, 'recherche'])->name('par.service.recherche');
         });
 
-                // Si vous utilisez une route ressource (recommandé)
+        // Si vous utilisez une route ressource (recommandé)
         Route::resource('agents', AgentController::class);
 
         // OU si vous déclarez manuellement
@@ -289,7 +276,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/mon-pointage/enregistrer', [PresenceController::class, 'enregistrerPointage'])->name('enregistrerPointage');
             Route::get('/mon-historique', [PresenceController::class, 'monHistorique'])->name('monHistorique');
             Route::get('/liste-filtree', [PresenceController::class, 'listeFiltree'])->name('listeFiltree');
-
         });
 
 
@@ -298,73 +284,71 @@ Route::middleware(['auth'])->group(function () {
 
 
         // --- GESTION DES COURRIERS & AFFECTATIONS ---
-            Route::prefix('courriers')->name('courriers.')->group(function () {
-                Route::get('/visualiser/{id}', [CourrierController::class, 'visualiserDocument'])->name('visualiser');
-                Route::get('/recherche', [CourrierController::class, 'RechercheAffichage'])->name('RechercheAffichage');
-                Route::get('/recherche/resultats', [CourrierController::class, 'Recherche'])->name('Recherche');
-                Route::get('/archives', [CourrierController::class, 'archives'])->name('archives');
-                Route::post('/{courrier}/unlock', [CourrierController::class, 'unlock'])->name('unlock');
-            });
+        Route::prefix('courriers')->name('courriers.')->group(function () {
+            Route::get('/visualiser/{id}', [CourrierController::class, 'visualiserDocument'])->name('visualiser');
+            Route::get('/recherche', [CourrierController::class, 'RechercheAffichage'])->name('RechercheAffichage');
+            Route::get('/recherche/resultats', [CourrierController::class, 'Recherche'])->name('Recherche');
+            Route::get('/archives', [CourrierController::class, 'archives'])->name('archives');
+            Route::post('/{courrier}/unlock', [CourrierController::class, 'unlock'])->name('unlock');
+        });
 
-                // Route pour signer un courrier spécifique
-                Route::post('/courriers/{id}/sign', [CourrierController::class, 'signCourrier'])->name('courriers.sign');
+        // Route pour signer un courrier spécifique
+        Route::post('/courriers/{id}/sign', [CourrierController::class, 'signCourrier'])->name('courriers.sign');
 
-                // Route pour l'envoi du mail
-                Route::post('/courriers/{id}/send-mail', [CourrierController::class, 'sendMail'])->name('courriers.send-mail');
+        // Route pour l'envoi du mail
+        Route::post('/courriers/{id}/send-mail', [CourrierController::class, 'sendMail'])->name('courriers.send-mail');
 
-            Route::resource('courriers', CourrierController::class);
+        Route::resource('courriers', CourrierController::class);
 
-            // --- RESSOURCES HUMAINES (Présences & Absences) ---
-            Route::prefix('presences')->name('presences.')->group(function () {
-                // Interfaces de Contrôle & Validation
-                Route::get('/validation-hebdo', [PresenceController::class, 'indexValidationHebdo'])->name('validation-hebdo');
-                Route::post('/valider-hebdo', [PresenceController::class, 'storeValidationHebdo'])->name('valider-hebdo');
-                Route::get('/etat', [PresenceController::class, 'statsPresences'])->name('etat');
-                Route::get('/stats', [PresenceController::class, 'stats'])->name('etatperiodique');
+        // --- RESSOURCES HUMAINES (Présences & Absences) ---
+        Route::prefix('presences')->name('presences.')->group(function () {
+            // Interfaces de Contrôle & Validation
+            Route::get('/validation-hebdo', [PresenceController::class, 'indexValidationHebdo'])->name('validation-hebdo');
+            Route::post('/valider-hebdo', [PresenceController::class, 'storeValidationHebdo'])->name('valider-hebdo');
+            Route::get('/etat', [PresenceController::class, 'statsPresences'])->name('etat');
+            Route::get('/stats', [PresenceController::class, 'stats'])->name('etatperiodique');
 
-                // Interfaces Agent
-                Route::get('/mon-pointage', [PresenceController::class, 'monPointage'])->name('monPointage');
-                Route::post('/mon-pointage/enregistrer', [PresenceController::class, 'enregistrerPointage'])->name('enregistrerPointage');
-                Route::get('/mon-historique', [PresenceController::class, 'monHistorique'])->name('monHistorique');
-                Route::get('/liste-filtree', [PresenceController::class, 'listeFiltree'])->name('listeFiltree');
-            });
+            // Interfaces Agent
+            Route::get('/mon-pointage', [PresenceController::class, 'monPointage'])->name('monPointage');
+            Route::post('/mon-pointage/enregistrer', [PresenceController::class, 'enregistrerPointage'])->name('enregistrerPointage');
+            Route::get('/mon-historique', [PresenceController::class, 'monHistorique'])->name('monHistorique');
+            Route::get('/liste-filtree', [PresenceController::class, 'listeFiltree'])->name('listeFiltree');
+        });
 
-            // Rapports & Ressources (Hors préfixe pour correspondre à vos noms de routes existants)
-                Route::get('/rapports/presences/periodique', [PresenceController::class, 'rapport'])->name('rapports.presences.periodique');
+        // Rapports & Ressources (Hors préfixe pour correspondre à vos noms de routes existants)
+        Route::get('/rapports/presences/periodique', [PresenceController::class, 'rapport'])->name('rapports.presences.periodique');
 
-                Route::resource('presences', PresenceController::class);
-                Route::resource('absences', AbsenceController::class);
-                Route::resource('typeabsences', TypeAbsenceController::class);
+        Route::resource('presences', PresenceController::class);
+        Route::resource('absences', AbsenceController::class);
+        Route::resource('typeabsences', TypeAbsenceController::class);
 
-                // --- GESTION DES AGENTS (Rappel) ---
-                Route::prefix('agents')->name('agents.')->group(function () {
-                    Route::get('/nouveau', [AgentController::class, 'nouveau'])->name('nouveau');
-                    Route::post('/enregistrer', [AgentController::class, 'Enr'])->name('enregistrer');
-                    Route::match(['get', 'post'], '/par-service', [AgentServiceController::class, 'listeParService'])->name('par.service');
-                });
-                Route::resource('agents', AgentController::class)->except(['create', 'store']);
+        // --- GESTION DES AGENTS (Rappel) ---
+        Route::prefix('agents')->name('agents.')->group(function () {
+            Route::get('/nouveau', [AgentController::class, 'nouveau'])->name('nouveau');
+            Route::post('/enregistrer', [AgentController::class, 'Enr'])->name('enregistrer');
+            Route::match(['get', 'post'], '/par-service', [AgentServiceController::class, 'listeParService'])->name('par.service');
+        });
+        Route::resource('agents', AgentController::class)->except(['create', 'store']);
 
-                // --- GESTION DES IMPUTATIONS & RÉPONSES ---
-                Route::prefix('imputations')->name('imputations.')->group(function () {
-                    Route::get('/mes-imputations', [ImputationController::class, 'mesImputations'])->name('mes_imputations');
-                });
-                Route::resource('imputations', ImputationController::class);
-                Route::post('/reponses/store', [ReponseController::class, 'store'])->name('reponses.store');
-                // Ajoutez cette ligne dans votre fichier de routes
-                Route::post('/reponses/{id}/valider', [ReponseController::class, 'valider'])->name('reponses.valider');
+        // --- GESTION DES IMPUTATIONS & RÉPONSES ---
+        Route::prefix('imputations')->name('imputations.')->group(function () {
+            Route::get('/mes-imputations', [ImputationController::class, 'mesImputations'])->name('mes_imputations');
+        });
+        Route::resource('imputations', ImputationController::class);
+        Route::post('/reponses/store', [ReponseController::class, 'store'])->name('reponses.store');
+        // Ajoutez cette ligne dans votre fichier de routes
+        Route::post('/reponses/{id}/valider', [ReponseController::class, 'valider'])->name('reponses.valider');
 
-                // --- TACHES & ANNONCES ---
-                Route::resource('annonces', AnnonceController::class);
+        // --- TACHES & ANNONCES ---
+        Route::resource('annonces', AnnonceController::class);
 
-                // --- STATISTIQUES ---
-                Route::prefix('statistiques')->name('statistiques.')->group(function () {
-                    Route::get('/', [StatistiqueController::class, 'index'])->name('index');
-                    Route::get('/dashboard', [StatistiqueController::class, 'dashboard'])->name('dashboard');
-                });
+        // --- STATISTIQUES ---
+        Route::prefix('statistiques')->name('statistiques.')->group(function () {
+            Route::get('/', [StatistiqueController::class, 'index'])->name('index');
+            Route::get('/dashboard', [StatistiqueController::class, 'dashboard'])->name('dashboard');
+        });
 
-                // --- GESTION DES POSTS ---
-                Route::delete('/post/{id}', [PostController::class, 'destroy'])->middleware('can:supprimer-articles');
-
-
+        // --- GESTION DES POSTS ---
+        Route::delete('/post/{id}', [PostController::class, 'destroy'])->middleware('can:supprimer-articles');
     }); // Fin middleware force.password
 }); // Fin middleware auth

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+
 class AbsenceController extends Controller
 {
     /**
@@ -23,6 +24,104 @@ class AbsenceController extends Controller
 
         // Renvoie les données à une vue Blade (par ex. resources/views/absences/index.blade.php)
         return view('Absences.index', compact('absences'));
+    }
+
+
+    public function indexAutorisation()
+    {
+        $absences = Auth::user()->agent->absences()
+            ->with('typeAbsence') // <--- AJOUTEZ CECI
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('absences.agentAutorisation', compact('absences'));
+    }
+
+
+
+    public function indexChef()
+    {
+        $agent = auth::user()->agent;
+
+        // 1. Liste des statuts autorisés à valider
+        $rolesResponsables = [
+            'Chef de service',
+            'Sous-directeur',
+            'Directeur',
+            'Conseiller Technique',
+            'Conseiller Spécial'
+        ];
+
+        // 2. Vérification si l'agent connecté a l'un de ces statuts
+        if (!in_array($agent->status, $rolesResponsables)) {
+            return back()->with('error', "Accès refusé : votre statut actuel (" . $agent->status . ") ne vous permet pas de valider des absences.");
+        }
+
+        // 3. Récupérer les absences des agents du MÊME service
+        // (Exclure l'agent connecté lui-même pour qu'il ne valide pas sa propre demande)
+        $demandes = \App\Models\Absence::whereHas('agent', function ($query) use ($agent) {
+            $query->where('service_id', $agent->service_id)
+                ->where('id', '!=', $agent->id);
+        })
+            ->where('statut_autorisation_absence', 'en_attente')
+            ->with('agent')
+            ->get();
+
+        return view('Absences.chef_validation', compact('demandes'));
+    }
+
+
+    public function valider(Request $request, $id)
+    {
+        $responsable = auth::user()->agent;
+        $absence = \App\Models\Absence::findOrFail($id);
+
+        $rolesResponsables = ['Chef de service', 'Sous-directeur', 'Directeur', 'Conseiller Technique', 'Conseiller Spécial'];
+
+        // Sécurité : Statut autorisé ET même service
+        if (!in_array($responsable->status, $rolesResponsables) || $absence->agent->service_id !== $responsable->service_id) {
+            abort(403, "Vous n'avez pas les droits pour valider cette demande.");
+        }
+
+        $absence->update([
+            'statut_autorisation_absence' => 'valide_chef',
+            'approuvee' => 2,
+            'comment_absence_chef' => $request->commentaire,
+        ]);
+
+
+
+        return redirect()->back()->with('success', "Demande validée par le " . $responsable->status);
+    }
+
+
+    public function rejeter(Request $request, $id)
+    {
+        $absence = \App\Models\Absence::findOrFail($id);
+
+        $absence->update([
+            'statut_autorisation_absence' => 'rejete',
+            'approuvee' => 0, // Ou une autre valeur signifiant "Refusé" selon votre logique
+            'comment_absence_chef' => $request->commentaire ?? 'Demande rejetée par le responsable.'
+        ]);
+
+        return redirect()->back()->with('success', "La demande de {$absence->agent->first_name} a été rejetée.");
+    }
+
+
+    public function print(Absence $absence)
+    {
+        // On charge les relations nécessaires pour éviter les erreurs dans la vue
+        $absence->load(['agent.service.chef.user', 'typeAbsence']);
+
+        // Vérification de sécurité
+        if ($absence->statut_autorisation_absence !== 'valide_chef') {
+            return back()->with('error', "Cette demande n'est pas encore validée.");
+        }
+
+        $pdf = Pdf::loadView('absences.pdf', compact('absence'));
+
+        return $pdf->stream('Autorisation_Absence_' . $absence->agent->matricule . '.pdf');
     }
 
 
@@ -41,70 +140,103 @@ class AbsenceController extends Controller
     /**
      * Stocke une nouvelle ressource dans la base de données.
      */
- public function store(Request $request)
-{
-    $validatedData = $request->validate([
-        'agent_id' => 'required|exists:agents,id',
-        'type_absence_id' => 'required|exists:type_absences,id',
-        'date_debut' => 'required|date',
-        'date_fin' => 'required|date|after_or_equal:date_debut',
-        'document_justificatif' => 'nullable|file|mimes:pdf,jpg,png|max:2048',
-        'approuvee' => 'nullable',
-    ]);
+    public function store(Request $request)
+    {
+        // 1. Validation : On récupère les données nettoyées dans $validated
+        $validated = $request->validate([
+            'agent_id' => 'required|exists:agents,id',
+            'type_absence_id' => 'required|exists:type_absences,id',
+            'date_debut' => 'required|date',
+            'date_fin' => 'required|date|after_or_equal:date_debut',
+            'document_justificatif' => 'nullable|file|mimes:pdf,jpg,png,doc,docx|max:8192',
+        ]);
 
-    // 1. VÉRIFICATION DE CHEVAUCHEMENT (Même logique que storeGrouped)
-    $conflit = \App\Models\Absence::where('agent_id', $request->agent_id)
-        ->where(function ($query) use ($request) {
-            $query->whereBetween('date_debut', [$request->date_debut, $request->date_fin])
-                  ->orWhereBetween('date_fin', [$request->date_debut, $request->date_fin])
-                  ->orWhere(function ($q) use ($request) {
-                      $q->where('date_debut', '<=', $request->date_debut)
-                        ->where('date_fin', '>=', $request->date_fin);
-                  });
-        })->first();
+        // 2. Vérification du chevauchement (On utilise $validated['agent_id'])
+        $conflit = \App\Models\Absence::where('agent_id', $validated['agent_id'])
+            ->where(function ($query) use ($validated) {
+                $query->where('date_debut', '<=', $validated['date_fin'])
+                    ->where('date_fin', '>=', $validated['date_debut']);
+            })->first();
 
-    if ($conflit) {
-        $agent = \App\Models\Agent::find($request->agent_id);
+        if ($conflit) {
+            $agent = \App\Models\Agent::findOrFail($validated['agent_id']);
+            $msg = "Erreur : {$agent->last_name} a déjà une absence du " .
+                \Carbon\Carbon::parse($conflit->date_debut)->format('d/m/Y') .
+                " au " . \Carbon\Carbon::parse($conflit->date_fin)->format('d/m/Y') . ".";
 
-        $message = '<div class="d-flex align-items-center mb-2">
-                        <i class="fas fa-exclamation-triangle fa-lg me-2 text-danger"></i>
-                        <strong class="text-danger">Action Interrompue !</strong>
-                    </div>
-                    <p class="small mb-2 border-bottom pb-1">Cet agent possède déjà une autorisation sur cette période :</p>
-                    <ul class="list-group list-group-flush rounded-3 mb-2 shadow-sm" style="font-size: 0.85rem;">
-                        <li class="list-group-item list-group-item-danger py-1 px-2">
-                            <i class="fas fa-user-clock me-1"></i> <strong>' . $agent->last_name . ' ' . $agent->first_name . '</strong>
-                            est déjà autorisé du ' . \Carbon\Carbon::parse($conflit->date_debut)->format('d/m/Y') . '
-                            au ' . \Carbon\Carbon::parse($conflit->date_fin)->format('d/m/Y') . '
-                        </li>
-                    </ul>
-                    <p class="mb-0 small text-muted italic"><i class="fas fa-info-circle me-1"></i> Veuillez modifier les dates ou choisir un autre agent.</p>';
+            return redirect()->back()->withInput()->with('error', $msg);
+        }
 
-        // Utilisation de la clé personnalisée 'conflit_absence' pour éviter le message brut en haut
-        return back()->withInput()->with('conflit_absence', $message);
+        // 3. Préparation des statuts (Logique : 0=Attente, 1=Rejeté, 2=Approuvé)
+        if ($request->has('approuvee')) {
+            // Si l'admin coche la case "Approuver immédiatement"
+            $validated['approuvee'] = 2;
+            $validated['statut_autorisation_absence'] = 'valide_chef';
+        } else {
+            // PAR DÉFAUT : L'absence est créée "En attente" pour le chef
+            $validated['approuvee'] = 0;
+            $validated['statut_autorisation_absence'] = 'en_attente';
+        }
+
+        // Initialiser le commentaire du chef à vide à la création
+        $validated['comment_absence_chef'] = null;
+
+
+        // 4. Gestion du fichier
+        if ($request->hasFile('document_justificatif')) {
+            $file = $request->file('document_justificatif');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('JustificatifAbsences'), $fileName);
+            $validated['document_justificatif'] = $fileName;
+        }
+
+        // 5. CRÉATION : On utilise uniquement le tableau $validated
+        // Cela empêche toute interférence avec auth()->id()
+        $absence = \App\Models\Absence::create($validated);
+
+        return redirect()->route('absences.index')->with([
+            'success' => 'L\'absence a été enregistrée avec succès pour l\'agent sélectionné !',
+        ]);
     }
 
-    // 2. CRÉATION SI PAS DE CONFLIT
-    $validatedData['approuvee'] = $request->has('approuvee') ? 1 : 0;
 
-    if ($request->hasFile('document_justificatif')) {
-        $file = $request->file('document_justificatif');
-        $fileName = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('JustificatifAbsences'), $fileName);
-        $validatedData['document_justificatif'] = $fileName;
-    }
 
-    \App\Models\Absence::create($validatedData);
-
-    return redirect()->route('absences.index')->with('success', 'Absence enregistrée avec succès.');
-}
 
     /**
      * Met à jour la ressource spécifiée dans la base de données.
      */
 
 
-public function update(Request $request, Absence $absence): RedirectResponse
+    public function storeAutorisationAbsence(Request $request)
+    {
+        // 1. Validation : On utilise le nom EXACT du champ de votre formulaire
+        $request->validate([
+            'type_absence_id' => 'required|exists:type_absences,id',
+            'date_debut'      => 'required|date|after_or_equal:today',
+            'date_fin'        => 'required|date|after_or_equal:date_debut',
+        ]);
+
+        $agent = auth::user()->agent;
+
+        // 2. Création : On utilise la valeur validée
+        \App\Models\Absence::create([
+            'agent_id'                    => $agent->id,
+            'type_absence_id'             => $request->type_absence_id, // <--- C'est ici que c'était NULL
+            'date_debut'                  => $request->date_debut,
+            'date_fin'                    => $request->date_fin,
+            'approuvee'                   => 0,
+            'statut_autorisation_absence' => 'en_attente',
+        ]);
+
+        return redirect()->route('absences.indexAutorisation')
+            ->with('success', 'Votre demande a été envoyée avec succès.');
+    }
+
+
+
+
+
+    public function update(Request $request, Absence $absence): RedirectResponse
 {
     // 1. Validation rigoureuse
     $validatedData = $request->validate([
@@ -281,14 +413,13 @@ public function monstore(Request $request)
        // 5. Création
     $absence = \App\Models\Absence::create($validatedData);
 
-    // On prépare le message de succès et l'URL de téléchargement du PDF
-    return redirect()->back()->with([
-        'success' => 'Votre demande d\'absence a été enregistrée avec succès ! Le document PDF va être généré.',
-        'pdf_url' => route('absences.genererPdf', $absence->id) // Assurez-vous que cette route existe
-    ]);
-
-
-}
+        // On prépare le message de succès et l'URL de téléchargement du PDF
+        // Ajoutez le "->" avant le "with"
+        return redirect()->route('absences.indexAutorisation')->with([
+            'success' => 'Votre demande d\'absence a été enregistrée avec succès ! ',
+            // 'pdf_url' => route('absences.genererPdf', $absence->id)
+        ]);
+    }
 
 
 
@@ -324,7 +455,7 @@ public function genererPdf($id)
     $agent = $absence->agent;
 
     $pdf = Pdf::loadView('Absences.pdf_autorisation', compact('absence', 'agent'));
-    
+
 
     // Pour télécharger le fichier :
     return $pdf->download('autorisation_absence_'.$agent->last_name.'.pdf');

@@ -46,7 +46,7 @@
     <div class="info-agent">
         <strong>Agent :</strong> {{ strtoupper($agent->last_name) }} {{ $agent->first_name }} <br>
         <strong>Matricule :</strong> {{ $agent->matricule }} |
-        <strong>Service :</strong> {{ $agent->service->libelle ?? 'N/A' }}
+        <strong>Service :</strong> {{ $agent->service->name ?? 'N/A' }}
     </div>
 
     <!-- Remplacer la section stats-container par celle-ci -->

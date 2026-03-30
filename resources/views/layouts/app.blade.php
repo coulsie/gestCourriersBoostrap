@@ -273,8 +273,10 @@
                         <a class="collapse-item text-dark fw-bold transition-hover" href="{{ route('presences.monHistorique') }}">
                             <i class="fas fa-history me-2" style="color: #2ed573;"></i> Mon Historique
                         </a>
-                        <a class="collapse-item text-dark fw-bold" href="{{ route('absences.monautorisation') }}">
-                            <i class="fas fa-calendar-check me-2" style="color: #ffa502;"></i> Congés & Permissions
+
+
+                        <a class="collapse-item text-dark fw-bold" href="{{ route('absences.indexAutorisation') }}">
+                            <i class="fas fa-calendar-check me-2" style="color: #ffa502;"></i> Mes demandes de Congés & Permissions
                         </a>
 
                         {{-- ACCÈS CONTRÔLE ET RH : AMBRE & VERT SOMBRE --}}
@@ -291,8 +293,8 @@
                                 <i class="fas fa-stopwatch me-2"></i>Enregistrement pointage
                             </a>
 
-                            <a class="collapse-item text-secondary fw-bold" href="{{ route('presences.validation-hebdo') }}">
-                                <i class="fas fa-check-double me-2"></i>Validation hebdo.
+                            <a class="collapse-item text-secondary fw-bold" href="{{ route('chef.absences.index') }}">
+                                <i class="fas fa-check-double me-2"></i>Validation Absences.
                             </a>
 
 
@@ -306,6 +308,13 @@
                             <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mt-1" href="{{ route('absences.validation_liste') }}" style="background-color: #ffa502;">
                                 <i class="fas fa-tasks me-2"></i> Validation Autorisation d'Absence
                             </a>
+                            <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mt-1"
+                                href="{{ route('presences.validation-hebdo') }}"
+                                style="background-color: #27ae60;">
+                                <i class="fas fa-tasks me-2"></i> Validation hebdomadaire de présences
+                            </a>
+
+
 
                             {{-- RAPPORTS : BLEU NUIT --}}
                             <div class="dropdown-divider" style="border-top: 2px solid #2ed573; opacity: 0.15;"></div>

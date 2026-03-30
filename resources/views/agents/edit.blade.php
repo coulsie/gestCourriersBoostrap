@@ -140,9 +140,29 @@
 
             {{-- Email Professionnel (Login) --}}
             <div class="col-md-6">
-                <label class="form-label fw-bold text-dark fs-6 mb-1">EMAIL PROFESSIONNEL *</label>
+                <label class="form-label fw-bold text-dark fs-6 mb-1">EMAIL *</label>
                 <input type="email" name="email" class="form-control border-2 shadow-sm bg-light" value="{{ old('email', $agent->user->email ?? '') }}" required>
             </div>
+            {{-- Email Professionnel (Login) --}}
+            <div class="col-md-6">
+                <label for="email" class="form-label fw-bold text-dark fs-6 mb-1">
+                    <i class="fas fa-envelope me-1 text-primary"></i> EMAIL PROFESSIONNEL *
+                </label>
+                <input type="email"
+                    name="email_professionnel"
+                    id="email"
+                    class="form-control border-2 shadow-sm bg-light @error('email_professionnel') is-invalid @enderror"
+                    value="{{ old('email_professionnel', $agent->email_professionnel ?? '') }}"
+                    placeholder="exemple@domaine.ci"
+                    required>
+
+                @error('email_professionnel')
+                    <div class="invalid-feedback fw-bold">{{ $message }}</div>
+                @enderror
+                <small class="text-muted">Cet email servira d'identifiant de connexion.</small>
+
+            </div>
+
 
             {{-- Date de Prise de Service --}}
             <div class="col-md-6">

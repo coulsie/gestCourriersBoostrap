@@ -1,0 +1,85 @@
+<?php
+
+use Illuminate\Support\Facades\{Auth, Route};
+use App\Http\Controllers\{
+    ProfileController, AbsenceController, PresenceController,
+    HolidayController, RapportController, AuditLogController,
+    InterimController, ExtractionController, Auth\ForgotPasswordController
+};
+use App\Models\ScriptExtraction;
+
+/*
+
+|--------------------------------------------------------------------------
+| ACCÈS PUBLICS & AUTHENTIFICATION
+|--------------------------------------------------------------------------
+*/
+Route::get('/', function () {
+    return view('welcome-login');
+})->middleware('guest');
+
+Auth::routes();
+
+// Mot de passe oublié
+Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+/*
+
+|--------------------------------------------------------------------------
+| ESPACE SÉCURISÉ (Authentification requise)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+
+    // --- ABSENCES & CONGÉS ---
+    Route::prefix('absences')->group(function () {
+        Route::post('/admin-store', [AbsenceController::class, 'store'])->name('absences.store');
+        Route::post('/ma-demande', [AbsenceController::class, 'storeAutorisationAbsence'])->name('absences.storeAutorisation');
+        Route::get('/mes-absences', [AbsenceController::class, 'indexAutorisation'])->name('absences.indexAutorisation');
+        Route::get('/imprimer/{absence}', [AbsenceController::class, 'print'])->name('absences.print');
+        Route::get('/admin/create', [AbsenceController::class, 'createListe'])->name('absences.createListe');
+        Route::post('/store-grouped', [AbsenceController::class, 'storeGrouped'])->name('absences.storeGrouped');
+    });
+
+    // --- VALIDATIONS CHEF ---
+    Route::prefix('chef')->name('chef.')->group(function () {
+        Route::get('/validations', [AbsenceController::class, 'indexChef'])->name('absences.index');
+        Route::post('/valider/{absence}', [AbsenceController::class, 'valider'])->name('absences.valider');
+        Route::post('/rejeter/{id}', [AbsenceController::class, 'rejeter'])->name('absences.rejeter');
+    });
+
+    // --- PRÉSENCES & RAPPORTS ---
+    Route::get('/validation-hebdo', [PresenceController::class, 'indexValidationHebdo'])->name('validation-hebdo');
+    Route::resource('holidays', HolidayController::class);
+    Route::get('/rapport-mensuel', [RapportController::class, 'mensuel'])->name('rapports.mensuel');
+    Route::get('/rapports/export-pdf/{agent_id}/{periode}', [RapportController::class, 'exportPDF'])->name('rapports.export.pdf');
+
+    // --- ADMINISTRATION & LOGS ---
+    Route::middleware(['role:admin|Superviseur'])->prefix('admin/logs')->name('admin.logs.')->group(function () {
+        Route::get('/', [AuditLogController::class, 'journalLogs'])->name('index');
+        Route::delete('/clear', [AuditLogController::class, 'clearAll'])->name('clear');
+        Route::delete('/{id}', [AuditLogController::class, 'destroy'])->name('destroy');
+        Route::delete('/{id}/ajax', [AuditLogController::class, 'destroy'])->name('destroy.ajax');
+    });
+
+    // --- PROFIL & SIGNATURE ---
+    Route::prefix('profile/signature')->name('profile.signature.')->group(function () {
+        Route::get('/', [ProfileController::class, 'editSignature'])->name('edit');
+        Route::post('/update', [ProfileController::class, 'updateSignature'])->name('update');
+    });
+
+    // --- INTÉRIMS ---
+    Route::resource('interims', InterimController::class);
+    Route::patch('/interims/{interim}/stop', [InterimController::class, 'stop'])->name('interims.stop');
+    Route::post('/imputations/check-interim', [App\Http\Controllers\ImputationController::class, 'checkInterim'])->name('imputations.check-interim');
+
+    // --- EXTRACTION DE DONNÉES ---
+    Route::prefix('extraction')->name('extraction.')->group(function () {
+        Route::get('/', [ExtractionController::class, 'index'])->name('index');
+        Route::post('/execute', [ExtractionController::class, 'execute'])->name('execute');
+        Route::post('/export', [ExtractionController::class, 'export'])->name('export');
+        Route::get('/scripts/{id}', function($id) { return ScriptExtraction::findOrFail($id); })->name('scripts.json');
+        Route::delete('/scripts/{id}', [ExtractionController::class, 'destroy'])->name('scripts.destroy');
+    });
+});
