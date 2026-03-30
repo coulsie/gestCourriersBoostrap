@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{ProfileController, HomeController};
+use App\Http\Controllers\{ProfileController};
 use App\Http\Controllers\Auth\{PasswordSetupController, ForgotPasswordController};
 
 /*
@@ -10,7 +10,6 @@ use App\Http\Controllers\Auth\{PasswordSetupController, ForgotPasswordController
 | ROUTES PUBLIQUES / INVITÉS (GUEST)
 |--------------------------------------------------------------------------
 */
-
 Route::middleware('guest')->group(function () {
     // Mot de passe oublié
     Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
@@ -29,10 +28,11 @@ Route::middleware('guest')->group(function () {
 */
 Route::middleware(['auth'])->group(function () {
 
-    // Page d'accueil après connexion
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    // --- CETTE ROUTE DOIT AVOIR CE NOM PRÉCIS POUR VOTRE MODAL ---
+    Route::post('/profile/change-password', [ProfileController::class, 'updatePassword'])
+        ->name('user.password.custom.update');
 
-    // GROUPE PROFIL (Toutes les routes commencent par /profile)
+    // GROUPE PROFIL
     Route::prefix('profile')->name('profile.')->group(function () {
 
         // Gestion de base du profil
@@ -45,8 +45,5 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/signature', [ProfileController::class, 'signature'])->name('signature');
         Route::get('/signature/edit', [ProfileController::class, 'editSignature'])->name('signature.edit');
         Route::post('/signature/update', [ProfileController::class, 'updateSignature'])->name('signature.update');
-
-        // Changement de mot de passe (lié au profil)
-        Route::post('/change-password', [ProfileController::class, 'updatePassword'])->name('password.custom.update');
     });
 });

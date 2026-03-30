@@ -11,6 +11,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Str;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Agent extends Model
 {
@@ -159,6 +160,33 @@ public function getStatutActuelAttribute()
     return $this->status; // Retourne son propre statut sinon
 }
 
+ /**
+     * Réunions où l'agent est l'animateur.
+     */
+    public function meetingsAnimees(): HasMany
+    {
+        return $this->hasMany(Meeting::class, 'animateur_id');
+    }
 
+    /**
+     * Réunions où l'agent est le rédacteur.
+     */
+    public function meetingsRedigees(): HasMany
+    {
+        return $this->hasMany(Meeting::class, 'redacteur_id');
+    }
+
+    /**
+     * Réunions auxquelles l'agent participe (en tant que simple participant).
+     */
+    public function participations(): BelongsToMany
+    {
+        return $this->belongsToMany(Meeting::class, 'meeting_participants');
+    }
+    
+    public function getNomCompletAttribute()
+    {
+        return "{$this->last_name} {$this->first_name}";
+    }
 
 }

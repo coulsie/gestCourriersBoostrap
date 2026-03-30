@@ -119,6 +119,7 @@
                                 <i class="fas fa-user-shield me-1"></i> GESTION SYSTÈME
                             </h6>
 
+
                             {{-- LISTE UTILISATEURS --}}
                             <a class="collapse-item fw-bold text-dark transition-hover" href="{{ route('users.index') }}">
                                 <i class="fas fa-users-cog me-2" style="color: #ff9f43;"></i> Liste Utilisateurs
@@ -153,8 +154,15 @@
                             <div class="px-3 py-1">
                                 <a class="collapse-item fw-bold small text-indigo p-0" href="{{ route('agents.nouveau') }}"><i class="fas fa-plus-circle me-1"></i> Nouveau Compte</a>
                                 <a class="collapse-item fw-bold small text-success p-0" href="{{ route('agents.index') }}"><i class="fas fa-user-tie me-1"></i> Ressources Humaines</a>
+
+                                <!-- AJOUT DU SUIVI DES RÉUNIONS ICI -->
+                                <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('reunions.hebdo') }}">
+                                    <i class="fas fa-calendar-alt me-1"></i> Suivi des Réunions
+                                </a>
+
                                 <a class="collapse-item fw-bold small text-secondary p-0" href="{{ route('extraction.index') }}"><i class="fas fa-download me-1"></i> Extraction</a>
                             </div>
+
                         @endhasanyrole
 
                         {{-- BLOC CONSULTATION --}}

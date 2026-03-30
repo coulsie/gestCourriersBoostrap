@@ -22,6 +22,8 @@ namespace App\Models{
  * @property string|null $document_justificatif
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string $statut_autorisation_absence
+ * @property string|null $comment_absence_chef
  * @property-read \App\Models\Agent|null $agent
  * @property-read \App\Models\TypeAbsence|null $type
  * @property-read \App\Models\TypeAbsence|null $typeAbsence
@@ -30,11 +32,13 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereAgentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereApprouvee($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereCommentAbsenceChef($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereDateDebut($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereDateFin($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereDocumentJustificatif($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereStatutAutorisationAbsence($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereTypeAbsenceId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Absence whereUpdatedAt($value)
  */
@@ -82,6 +86,7 @@ namespace App\Models{
  * @property-read int|null $affectations_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Direction> $directionsResponsable
  * @property-read int|null $directions_responsable_count
+ * @property-read mixed $statut_actuel
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Imputation> $imputations
  * @property-read int|null $imputations_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtache
@@ -159,10 +164,36 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property int $id
+ * @property int|null $user_id
+ * @property string $event
+ * @property string $auditable_type
+ * @property int|null $auditable_id
+ * @property array<array-key, mixed>|null $old_values
+ * @property array<array-key, mixed>|null $new_values
+ * @property string|null $url
+ * @property string|null $method
+ * @property string|null $ip_address
+ * @property string|null $user_agent
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereAuditableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereAuditableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereEvent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereIpAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereMethod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereNewValues($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereOldValues($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereUrl($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereUserAgent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|AuditLog whereUserId($value)
  */
 	class AuditLog extends \Eloquent {}
 }
@@ -189,7 +220,10 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property int $is_confidentiel
  * @property string|null $code_acces
+ * @property int|null $signed_by
+ * @property string|null $signed_at
  * @property-read \App\Models\Imputation|null $imputation
+ * @property-read \App\Models\User|null $signataire
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier query()
@@ -210,6 +244,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier whereNumEnregistrement($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier whereObjet($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier whereReference($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier whereSignedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier whereSignedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier whereStatut($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Courrier whereUpdatedAt($value)
@@ -339,6 +375,38 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Imputation whereUserId($value)
  */
 	class Imputation extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $agent_id
+ * @property int $interimaire_id
+ * @property int|null $user_id
+ * @property \Illuminate\Support\Carbon $date_debut
+ * @property \Illuminate\Support\Carbon $date_fin
+ * @property string|null $motif
+ * @property bool $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Agent|null $agent
+ * @property-read \App\Models\Agent|null $interimaire
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereAgentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereDateDebut($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereDateFin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereInterimaireId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereMotif($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereUserId($value)
+ */
+	class Interim extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -547,8 +615,10 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Agent> $agents
  * @property-read int|null $agents_count
+ * @property-read \App\Models\Agent|null $chef
  * @property-read \App\Models\Direction|null $direction
  * @property-read \App\Models\Agent|null $head
+ * @property-read \App\Models\Agent|null $responsable
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service query()
@@ -605,6 +675,7 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $bio
  * @property string|null $profile_picture
+ * @property string|null $signature_path
  * @property \App\Enums\UserRole $role
  * @property-read \App\Models\Affectation|null $affectation
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Affectation> $affectations
@@ -637,6 +708,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User wherePasswordChangedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereProfilePicture($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereRememberToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereSignaturePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutPermission($permissions)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutRole($roles, $guard = null)
