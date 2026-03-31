@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     DirectionController, ServiceController, AgentServiceController,
-    CourrierController, ImputationController
+    CourrierController, ImputationController, ActivityController
 };
 
 // --- 1. AFFECTATIONS & SERVICES (À METTRE EN HAUT DU FICHIER) ---
@@ -50,3 +50,37 @@ Route::prefix('imputations')->name('imputations.')->group(function () {
 
 // 2. Toutes les routes standards (index, create, store, show, edit, update, destroy)
 Route::resource('imputations', ImputationController::class);
+
+
+// Page d'accueil (Redirection)
+Route::get('/', function () {
+    return redirect()->route('activities.index');
+});
+
+// --- Groupe des Activités (CRUD) ---
+Route::prefix('activites')->name('activities.')->group(function () {
+
+    // Liste des saisies récentes (Index)
+    Route::get('/', [ActivityController::class, 'index'])->name('index');
+
+    // Formulaire de création
+    Route::get('/saisie', [ActivityController::class, 'create'])->name('create');
+
+    // Enregistrement
+    Route::post('/', [ActivityController::class, 'store'])->name('store');
+
+    // Consultation détaillée d'une activité spécifique (SHOW)
+    Route::get('/{activity}', [ActivityController::class, 'show'])->name('show');
+
+    // Edition d'une saisie existante
+    Route::get('/{activity}/modifier', [ActivityController::class, 'edit'])->name('edit');
+
+    // Mise à jour (Update)
+    Route::put('/{activity}', [ActivityController::class, 'update'])->name('update');
+
+    // Suppression
+    Route::delete('/{activity}', [ActivityController::class, 'destroy'])->name('destroy');
+});
+
+// --- Groupe des Rapports & Synthèses ---
+Route::get('/synthese', [ActivityController::class, 'synthese'])->name('activities.synthese');

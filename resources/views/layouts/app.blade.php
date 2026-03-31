@@ -162,9 +162,22 @@
                                 <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('reunions.etat') }}">
                                     <i class="fas fa-file-alt me-1"></i> État des Réunions
                                 </a>
+                                <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('activities.index') }}">
+                                    <i class="fas fa-calendar-alt me-1"></i> Saisie des activités
+                                </a>
+
+
+                                    <!-- AJOUT DU SUIVI DES ACTIVITES ICI -->
+                                <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('activities.synthese') }}">
+                                    <i class="fas fa-calendar-alt me-1"></i> Suivi des activités
+                                </a>
 
                                 <a class="collapse-item fw-bold small text-secondary p-0" href="{{ route('extraction.index') }}"><i class="fas fa-download me-1"></i> Extraction</a>
+                                <!-- AJOUT DU SUIVI DES ACTIVITES ICI -->
+
+
                             </div>
+
 
                         @endhasanyrole
 
@@ -431,8 +444,8 @@
     <script src="{{ asset('template/js/sb-admin-2.min.js') }}"></script>
 
 
- @stack('scripts')
- <script src="https://googleapis.com"></script>
 
+ <script src="https://googleapis.com"></script>
+    @stack('scripts')
 </body>
 </html>

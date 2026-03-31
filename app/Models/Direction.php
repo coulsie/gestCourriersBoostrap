@@ -40,6 +40,15 @@ class Direction extends Model
     }
 
 
+
+    public function activities() { return $this->hasMany(Activity::class); }
+
+    // Pour voir toutes les activités de la direction + ses services
+    public function allActivities() {
+        return Activity::where('direction_id', $this->id)->get();
+    }
+
+
     }
 
 

@@ -47,6 +47,31 @@ namespace App\Models{
 
 namespace App\Models{
 /**
+ * @property int $id
+ * @property int $service_id
+ * @property \Illuminate\Support\Carbon $report_date
+ * @property string $content
+ * @property int $progress
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Service|null $service
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity forPeriod(string $type)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereContent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereProgress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereReportDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereServiceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereUpdatedAt($value)
+ */
+	class Activity extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
  * @property-read \App\Models\Agent|null $agent
  * @property-read \App\Models\Courrier|null $courrier
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Affectation newModelQuery()
@@ -86,13 +111,20 @@ namespace App\Models{
  * @property-read int|null $affectations_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Direction> $directionsResponsable
  * @property-read int|null $directions_responsable_count
+ * @property-read mixed $nom_complet
  * @property-read mixed $statut_actuel
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Imputation> $imputations
  * @property-read int|null $imputations_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Meeting> $meetingsAnimees
+ * @property-read int|null $meetings_animees_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Meeting> $meetingsRedigees
+ * @property-read int|null $meetings_redigees_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtache
  * @property-read int|null $notificationtache_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtaches
  * @property-read int|null $notificationtaches_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Meeting> $participations
+ * @property-read int|null $participations_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Presence> $presences
@@ -262,6 +294,8 @@ namespace App\Models{
  * @property int|null $head_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \App\Models\Agent|null $head
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Service> $services
  * @property-read int|null $services_count
@@ -407,6 +441,47 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Interim whereUserId($value)
  */
 	class Interim extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property string $objet
+ * @property \Illuminate\Support\Carbon $date_heure
+ * @property int $duree_minutes
+ * @property string $lieu
+ * @property int $animateur_id
+ * @property int $redacteur_id
+ * @property string|null $ordre_du_jour
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property array<array-key, mixed>|null $externes
+ * @property string $status
+ * @property string|null $presence_file
+ * @property string|null $report_file
+ * @property-read \App\Models\Agent|null $animateur
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Agent> $participants
+ * @property-read int|null $participants_count
+ * @property-read \App\Models\Agent|null $redacteur
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereAnimateurId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereDateHeure($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereDureeMinutes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereExternes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereLieu($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereObjet($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereOrdreDuJour($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting wherePresenceFile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereRedacteurId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereReportFile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Meeting whereUpdatedAt($value)
+ */
+	class Meeting extends \Eloquent {}
 }
 
 namespace App\Models{
@@ -613,6 +688,8 @@ namespace App\Models{
  * @property int|null $head_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Activity> $activities
+ * @property-read int|null $activities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Agent> $agents
  * @property-read int|null $agents_count
  * @property-read \App\Models\Agent|null $chef

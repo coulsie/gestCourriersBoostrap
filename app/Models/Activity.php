@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
+use Carbon\Carbon;
+
+class Activity extends Model
+{
+    protected $fillable = [
+        'service_id',
+        'report_date',
+        'content',
+        'observation' // Optionnel : pour les notes de synthèse
+    ];
+
+    protected $casts = [
+        'report_date' => 'date',
+    ];
+
+    /**
+     * Relation avec le service
+     */
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
+    }
+
+    /**
+     * Filtre par période dynamique (Hebdo, Mensuel, Trimestriel...)
+     */
+    public function scopeForPeriod(Builder $query, string $type): void
+    {
+        $now = Carbon::now();
+
+        match ($type) {
+            'daily'     => $query->whereDate('report_date', $now),
+            'weekly'    => $query->whereBetween('report_date', [$now->startOfWeek(), $now->endOfWeek()]),
+            'monthly'   => $query->whereMonth('report_date', $now->month)->whereYear('report_date', $now->year),
+            'quarterly' => $query->whereBetween('report_date', [$now->startOfQuarter(), $now->endOfQuarter()]),
+            'semester'  => $this->scopeForSemester($query, $now),
+            'yearly'    => $query->whereYear('report_date', $now->year),
+            default     => $query
+        };
+    }
+
+    /**
+     * Logique spécifique pour le semestre
+     */
+    private function scopeForSemester($query, $now)
+    {
+        if ($now->month <= 6) {
+            return $query->whereBetween('report_date', [$now->startOfYear(), $now->copy()->month(6)->endOfMonth()]);
+        }
+        return $query->whereBetween('report_date', [$now->copy()->month(7)->startOfMonth(), $now->endOfYear()]);
+    }
+
+    
+}

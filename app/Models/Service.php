@@ -38,6 +38,9 @@ class Service extends Model
         return $this->belongsTo(Agent::class, 'head_id');
     }
 
+    
+    public function activities() { return $this->hasMany(Activity::class); }
+
 
 
 
