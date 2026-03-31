@@ -21,17 +21,23 @@ Route::resource('services', ServiceController::class);
 
 // --- 3. FLUX DE TRAVAIL (COURRIERS & IMPUTATIONS) ---
 // --- GESTION DES FLUX (COURRIERS) ---
+// --- GESTION DES FLUX (COURRIERS) ---
 Route::prefix('courriers')->name('courriers.')->group(function () {
     Route::get('/', [CourrierController::class, 'index'])->name('index');
     Route::get('/create', [CourrierController::class, 'create'])->name('create');
     Route::post('/', [CourrierController::class, 'store'])->name('store');
 
-    // --- LES ROUTES SPÉCIFIQUES APPELÉES PAR VOTRE MENU ---
+    // --- ROUTES SPÉCIFIQUES ---
+    Route::post('/{courrier}/unlock', [CourrierController::class, 'unlock'])->name('unlock');
+
+    // --- AJOUT DE LA ROUTE D'ENVOI MAIL ICI ---
+    Route::post('/{courrier}/send-mail', [CourrierController::class, 'sendMail'])->name('send-mail');
+
     Route::get('/archives', [CourrierController::class, 'archives'])->name('archives');
     Route::get('/recherche-avancee', [CourrierController::class, 'RechercheAffichage'])->name('RechercheAffichage');
 });
 
-// Gardez le resource pour les autres actions (show, edit, update, destroy)
+// Gardez le resource pour les autres actions
 Route::resource('courriers', CourrierController::class)->except(['index', 'create', 'store']);
 
 

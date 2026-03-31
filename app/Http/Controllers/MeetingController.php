@@ -2,25 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Agent;
 use Illuminate\Http\Request;
 use App\Models\Meeting;
 
 
 class MeetingController extends Controller
 {
-    public function hebdo() {
-    $debutSemaine = now()->startOfWeek();
-    $finSemaine = now()->endOfWeek();
+    public function hebdo()
+    {
+        // Définition de la plage de la semaine actuelle
+        $debutSemaine = now()->startOfWeek();
+        $finSemaine = now()->endOfWeek();
 
-    $reunions = Meeting::with(['animateur', 'redacteur', 'participants'])
-        ->whereBetween('date_heure', [$debutSemaine, $finSemaine])
-        ->orderBy('date_heure')
-        ->get();
+        // 1. Réunions de la semaine (ton code actuel)
+        $reunions = Meeting::with(['animateur', 'redacteur', 'participants'])
+            ->whereBetween('date_heure', [$debutSemaine, $finSemaine])
+            ->orderBy('date_heure')
+            ->get();
 
-    return view('Reunions.hebdo', compact('reunions'));
-}
+        // 2. Réunions hors-semaine (passées et futures)
+        $autresReunions = Meeting::with(['animateur', 'redacteur'])
+            ->whereNotBetween('date_heure', [$debutSemaine, $finSemaine])
+            ->orderBy('date_heure', 'desc') // Les plus récentes en premier
+            ->get();
 
-public function create()
+        // On envoie les deux variables à la vue
+        return view('Reunions.hebdo', compact('reunions', 'autresReunions'));
+    }
+
+
+    public function create()
 {
     // On trie par le nom de famille (last_name)
     $agents = \App\Models\Agent::orderBy('last_name', 'asc')->get();
@@ -77,43 +89,65 @@ public function store(Request $request)
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Meeting $reunion)
     {
-        //
+        return view('reunions.show', compact('reunion'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Formulaire d'édition
      */
-    public function edit(string $id)
+    public function edit(Meeting $reunion)
     {
-        //
+        $agents = Agent::orderBy('last_name')->get();
+        return view('reunions.edit', compact('reunion', 'agents'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Mise à jour
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Meeting $reunion)
     {
-        //
-    }
+        $validated = $request->validate([
+            'objet' => 'required|string|max:255',
+            'date_heure' => 'required',
+            'animateur_id' => 'required|exists:agents,id',
+            'redacteur_id' => 'required|exists:agents,id',
+            'externes_simple' => 'nullable|string',
+        ]);
 
+        $externes = null;
+        if ($request->filled('externes_simple')) {
+            $externes = array_map('trim', explode(',', $request->externes_simple));
+        }
+
+        $reunion->update([
+            'objet' => $request->objet,
+            'date_heure' => $request->date_heure,
+            'animateur_id' => $request->animateur_id,
+            'redacteur_id' => $request->redacteur_id,
+            'ordre_du_jour' => $request->ordre_du_jour,
+            'externes' => $externes,
+        ]);
+
+        // Sync synchronise la table pivot (ajoute les nouveaux, retire les absents)
+        $reunion->participants()->sync($request->participants ?? []);
+
+        return redirect()->route('reunions.hebdo')->with('success', 'Mise à jour effectuée.');
+    }
     /**
-     * Remove the specified resource from storage.
+     * Supprimer la réunion
      */
-    public function destroy(string $id)
+    public function destroy(Meeting $reunion)
     {
-        //
+        // 1. Détacher d'abord les participants dans la table pivot (sécurité)
+        $reunion->participants()->detach();
+
+        // 2. Supprimer la réunion de la base de données
+        $reunion->delete();
+
+        // 3. Rediriger avec un message de succès éclatant
+        return redirect()->route('reunions.hebdo')
+            ->with('success', 'La réunion a été supprimée avec succès.');
     }
-
-
-
 }

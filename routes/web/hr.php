@@ -58,4 +58,5 @@ Route::middleware(['role:admin|rh|Superviseur'])->group(function () {
 Route::resource('absences', AbsenceController::class);
 Route::resource('typeabsences', TypeAbsenceController::class);
 Route::resource('holidays', HolidayController::class);
+Route::patch('/interims/{interim}/stop', [InterimController::class, 'stop'])->name('interims.stop');
 Route::resource('interims', InterimController::class);
