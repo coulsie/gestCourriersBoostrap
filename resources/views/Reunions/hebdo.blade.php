@@ -15,24 +15,21 @@
    <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-dark fw-bolder">🗓️ Programmation Hebdomadaire</h1>
         <div class="d-flex gap-2 flex-wrap">
-
-            @php
-                // On utilise une URL réelle pour éviter le blocage de sécurité du localhost
-                $urlPartage = "https://google.com";
-                $texteWA = urlencode("Bonjour Monsieur le Directeur, voici le programme des réunions : " . $urlPartage);
-            @endphp
-
-            <!-- WHATSAPP : URL OFFICIELLE /send?text= -->
-            <a href="https://whatsapp.com{{ $texteWA }}"
-            class="btn btn-success shadow-sm px-3 py-2 rounded-pill border-0 fw-bold no-print">
+            <!-- BOUTON WHATSAPP DIRECT (Prod) -->
+            <button type="button" onclick="shareDirect('WA')" class="btn btn-success shadow-sm px-3 py-2 rounded-pill border-0 fw-bold no-print">
                 <i class="fab fa-whatsapp me-1"></i> WhatsApp
-            </a>
+            </button>
 
-            <!-- MESSENGER : URL OFFICIELLE /sharer.php?u= -->
-            <a href="https://facebook.com{{ urlencode($urlPartage) }}"
-            class="btn btn-primary shadow-sm px-3 py-2 rounded-pill border-0 fw-bold no-print">
+            <!-- BOUTON MESSENGER DIRECT (Prod) -->
+            <button type="button" onclick="shareDirect('FB')" class="btn btn-primary shadow-sm px-3 py-2 rounded-pill border-0 fw-bold no-print">
                 <i class="fab fa-facebook-messenger me-1"></i> Messenger
-            </a>
+            </button>
+
+
+          <!-- BOUTON COPIER POUR WHATSAPP (S'affiche en vert) -->
+            <button type="button" onclick="copyProgramToClipboard()" class="btn btn-success shadow-sm px-4 py-2 rounded-pill border-0 fw-bold">
+                <i class="fas fa-copy me-2"></i> Copier pour WhatsApp
+            </button>
 
             <!-- VOS AUTRES BOUTONS -->
             <a href="javascript:void(0)" onclick="window.print();" class="btn btn-dark shadow-sm px-3 py-2 rounded-pill border-0 fw-bold no-print">
@@ -47,6 +44,11 @@
             <a href="{{ route('reunions.create') }}" class="btn shadow-lg px-4 py-2 rounded-pill border-0 text-white fw-bold no-print" style="background: linear-gradient(45deg, #6366f1, #a855f7);">
                 <i class="fas fa-plus-circle me-1"></i> Nouvelle Réunion
             </a>
+
+                        <!-- Message de confirmation discret -->
+            <div id="copy-status" class="badge bg-dark text-white p-2 mt-2 d-none" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999;">
+                ✅ Programme copié ! Collez-le (Ctrl+V) au Directeur.
+            </div>
         </div>
     </div>
 
@@ -279,60 +281,118 @@
 {{-- CHARGEMENT FORCÉ DES SCRIPTS --}}
 {{-- CHARGEMENT DES BIBLIOTHÈQUES (LIENS COMPLETS) --}}
 <!-- 1. JQUERY -->
+<!-- 1. Importations réelles (INDISPENSABLE) -->
 <script src="https://jquery.com"></script>
-
-<!-- 2. BOOTSTRAP 5 (Bundle avec Popper inclus pour le modal) -->
 <script src="https://jsdelivr.net"></script>
+<!-- Fichiers réels indispensables -->
+
 
 <script>
-    $(document).ready(function () {
-        console.log("Système prêt.");
+$(document).ready(function () {
+    console.log("Système prêt.");
 
-        // FIX MODAL : Initialisation manuelle si data-bs-toggle échoue
-        var modalEl = document.getElementById('modalAutresReunions');
-        if (modalEl) {
-            var myModal = new bootstrap.Modal(modalEl);
-            $('[data-bs-target="#modalAutresReunions"]').on('click', function(e) {
-                e.preventDefault();
-                myModal.show();
-            });
+    // GESTION DU MODAL
+    var modalEl = document.getElementById('modalAutresReunions');
+    if (modalEl) {
+        var myModal = new bootstrap.Modal(modalEl);
+        $('[data-bs-target="#modalAutresReunions"]').on('click', function(e) {
+            e.preventDefault();
+            myModal.show();
+        });
+    }
+});
+
+// FONCTION DE PARTAGE DU TABLEAU
+function shareProgram() {
+    let message = "*🗓️ PROGRAMME DES RÉUNIONS*\n\n";
+    const rows = document.querySelectorAll('table tbody tr');
+
+    if (rows.length === 0) {
+        alert("Aucune réunion à partager.");
+        return;
+    }
+
+    rows.forEach((row) => {
+        // On vérifie que la ligne a assez de colonnes
+        if (row.cells.length >= 3) {
+            const date = row.cells[0]?.innerText.trim() || "";
+            const objet = row.cells[1]?.innerText.trim() || "";
+            const lieu = row.cells[2]?.innerText.trim() || "";
+
+            if (objet && objet !== "" && objet !== "Aucune réunion trouvée") {
+                message += `🔹 *${date}*\n📌 ${objet}\n📍 ${lieu}\n\n`;
+            }
         }
-
-        // FIX PARTAGE : On évite about:blank en restant dans le même onglet
-        window.partagerWhatsApp = function() {
-            let msg = "Bonjour Monsieur le Directeur, voici le programme : " + window.location.href;
-            window.location.href = "https://whatsapp.com" + encodeURIComponent(msg);
-        };
-
-        window.partagerMessenger = function() {
-            let url = window.location.href;
-            window.location.href = "https://facebook.com" + encodeURIComponent(url);
-        };
     });
-</script>
-<script>
-function copyToClipboard(type) {
-    const url = window.location.href; // L'URL de votre programme
-    const message = (type === 'WA')
-        ? "Bonjour Monsieur le Directeur, voici le programme hebdomadaire : " + url
-        : url;
 
-    // Utilisation de l'API moderne du presse-papier
-    navigator.clipboard.writeText(message).then(() => {
-        // Affichage du message de succès
-        const toast = document.getElementById('copy-toast');
-        toast.classList.remove('d-none');
-        setTimeout(() => toast.classList.add('d-none'), 3000);
+    message += "--------------------------\n_Généré via GestCourrier_";
 
-        // Optionnel : Ouvrir quand même WhatsApp si le navigateur le permet enfin
-        if(confirm("Message copié ! Voulez-vous quand même essayer d'ouvrir WhatsApp ?")) {
-            window.location.assign("https://whatsapp.com" + encodeURIComponent(message));
-        }
-    }).catch(err => {
-        alert("Erreur lors de la copie. Veuillez copier l'URL manuellement.");
-    });
+    // URL OFFICIELLE : Correction de l'adresse WhatsApp
+    const waUrl = "https://whatsapp.com" + encodeURIComponent(message);
+
+    // Navigation directe pour éviter le blocage "about:blank"
+    window.location.href = waUrl;
 }
 </script>
+
+<script>
+function copyProgramToClipboard() {
+        // 1. Construction du texte à partir du tableau
+        let text = "*🗓️ PROGRAMME HEBDOMADAIRE DES RÉUNIONS*\n";
+        text += "------------------------------------------\n\n";
+
+        const rows = document.querySelectorAll('table tbody tr');
+
+        if (rows.length === 0) {
+            alert("Aucune réunion à copier.");
+            return;
+        }
+
+        rows.forEach((row) => {
+            const date = row.cells[0]?.innerText.trim() || "";
+            const objet = row.cells[1]?.innerText.trim() || "";
+            const lieu = row.cells[2]?.innerText.trim() || "";
+
+            if (objet && objet !== "" && objet !== "Aucune réunion") {
+                text += `🔹 *${date}*\n📌 *OBJET :* ${objet}\n📍 *LIEU :* ${lieu}\n\n`;
+            }
+        });
+
+        text += "------------------------------------------\n_Généré via GestCourrier_";
+
+        // 2. Commande de copie au presse-papier (Inbloquable par about:blank)
+        navigator.clipboard.writeText(text).then(() => {
+            // Affichage de la petite bulle de confirmation
+            const status = document.getElementById('copy-status');
+            status.classList.remove('d-none');
+            setTimeout(() => status.classList.add('d-none'), 4000);
+
+            // Alerte classique en cas de doute
+            alert("Le programme a été copié ! Allez sur WhatsApp et faites 'Coller' (Ctrl+V) dans la discussion du Directeur.");
+        }).catch(err => {
+            alert("Erreur lors de la copie. Essayez de sélectionner le texte manuellement.");
+        });
+    }
+    function shareDirect(plateforme) {
+        const urlCourante = window.location.href;
+        const texteBase = "*🗓️ PROGRAMME HEBDOMADAIRE DES RÉUNIONS*\n\nVoici le planning de la semaine : " + urlCourante;
+
+        let targetUrl = "";
+
+        if (plateforme === 'WA') {
+            // Lien de partage WhatsApp (Texte + Lien)
+            targetUrl = "https://whatsapp.com" + encodeURIComponent(texteBase);
+        } else {
+            // Lien de partage Messenger/Facebook (URL brute pour l'aperçu)
+            targetUrl = "https://facebook.com" + encodeURIComponent(urlCourante);
+        }
+
+        // Ouverture en mode "Prod" (Fonctionnera sans blocage en HTTPS)
+        window.open(targetUrl, '_blank');
+    }
+
+</script>
+
 
 <style>
     .fw-black { font-weight: 900; }
@@ -392,4 +452,6 @@ function copyToClipboard(type) {
 }
 </style>
 
-@endsectiON
+
+
+@endsection
