@@ -159,6 +159,9 @@
                                 <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('reunions.hebdo') }}">
                                     <i class="fas fa-calendar-alt me-1"></i> Suivi des Réunions
                                 </a>
+                                <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('reunions.etat') }}">
+                                    <i class="fas fa-file-alt me-1"></i> État des Réunions
+                                </a>
 
                                 <a class="collapse-item fw-bold small text-secondary p-0" href="{{ route('extraction.index') }}"><i class="fas fa-download me-1"></i> Extraction</a>
                             </div>
@@ -429,5 +432,7 @@
 
 
  @stack('scripts')
+ <script src="https://googleapis.com"></script>
+
 </body>
 </html>

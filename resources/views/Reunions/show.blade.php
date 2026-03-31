@@ -40,13 +40,16 @@
                             <p class="text-muted small text-uppercase fw-bold mb-1">Heure & Durée</p>
                             <h5 class="fw-bold text-danger">
                                 <i class="far fa-clock me-2"></i>{{ \Carbon\Carbon::parse($reunion->date_heure)->format('H:i') }}
-                                <span class="badge bg-soft-danger text-danger fs-6 ms-1" style="background: #fff1f2;">({{ $reunion->duree_minutes }} min)</span>
+                                <span class="badge bg-soft-danger text-danger fs-6 ms-1" style="background: #fff1f2;">({{ $reunion->duree_minutes ?? '60' }} min)</span>
                             </h5>
                         </div>
                         <div class="col-md-4">
                             <p class="text-muted small text-uppercase fw-bold mb-1">Lieu / Emplacement</p>
                             <h5 class="fw-bold text-dark">
-                                <i class="fas fa-map-marker-alt me-2 text-info"></i>{{ $reunion->lieu }}
+                                <i class="fas fa-map-marker-alt me-2 text-info"></i>
+                                <a href="https://google.com{{ urlencode($reunion->lieu) }}" target="_blank" class="text-dark text-decoration-none" title="Localiser sur Google Maps">
+                                    {{ $reunion->lieu ?? 'Non spécifié' }}
+                                </a>
                             </h5>
                         </div>
                     </div>
@@ -73,11 +76,11 @@
                     <div class="row">
                         <!-- Internes -->
                         <div class="col-md-6 mb-4">
-                            <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Agents Internes</label>
+                            <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Agents Internes DSESF</label>
                             <div class="d-flex flex-wrap gap-2">
                                 @forelse($reunion->participants as $participant)
                                     <span class="badge rounded-pill px-3 py-2 border text-dark bg-white shadow-sm">
-                                        <i class="fas fa-user-circle me-1 text-primary"></i>
+                                        <i class="fas fa-user-circle me-1 text-danger"></i>
                                         {{ strtoupper($participant->last_name) }} {{ $participant->first_name }}
                                     </span>
                                 @empty
@@ -87,7 +90,7 @@
                         </div>
                         <!-- Externes -->
                         <div class="col-md-6 mb-4">
-                            <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Personnes Externes</label>
+                            <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Personnes Externes DSESF</label>
                             <div class="d-flex flex-wrap gap-2">
                                 @php $externes = is_string($reunion->externes) ? json_decode($reunion->externes, true) : $reunion->externes; @endphp
                                 @forelse($externes ?? [] as $externe)
@@ -111,14 +114,14 @@
                     <div class="p-4 bg-primary text-white">
                         <h6 class="text-uppercase small fw-bold opacity-75 mb-3">Rôles de la séance</h6>
                         <div class="d-flex align-items-center mb-3">
-                            <div class="bg-white rounded-circle p-2 me-3"><i class="fas fa-microphone text-primary"></i></div>
+                            <div class="bg-white rounded-circle p-2 d-flex align-items-center justify-content-center me-3" style="width:40px; height:40px;"><i class="fas fa-microphone text-primary"></i></div>
                             <div>
                                 <small class="d-block opacity-75">Animateur</small>
                                 <span class="fw-bold fs-5">{{ strtoupper($reunion->animateur->last_name) }} {{ $reunion->animateur->first_name }}</span>
                             </div>
                         </div>
                         <div class="d-flex align-items-center">
-                            <div class="bg-white rounded-circle p-2 me-3"><i class="fas fa-pen-nib text-success"></i></div>
+                            <div class="bg-white rounded-circle p-2 d-flex align-items-center justify-content-center me-3" style="width:40px; height:40px;"><i class="fas fa-pen-nib text-success"></i></div>
                             <div>
                                 <small class="d-block opacity-75">Rédacteur</small>
                                 <span class="fw-bold fs-5">{{ strtoupper($reunion->redacteur->last_name) }} {{ $reunion->redacteur->first_name }}</span>
@@ -126,7 +129,7 @@
                         </div>
                     </div>
                     <div class="p-4 bg-white">
-                        <div class="d-flex justify-content-between mb-2">
+                        <div class="d-flex justify-content-between mb-2 border-bottom pb-2">
                             <span class="text-muted small">Créé le :</span>
                             <span class="small fw-bold">{{ $reunion->created_at->format('d/m/Y H:i') }}</span>
                         </div>
@@ -137,28 +140,15 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Carte Info Rapide -->
-            <div class="alert bg-white border-0 shadow-sm rounded-4 p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="fas fa-info-circle fa-2x text-info me-3"></i>
-                    <h6 class="m-0 fw-bold">Note administrative</h6>
-                </div>
-                <p class="small text-muted mb-0">
-                    Cette programmation est visible par tous les membres de l'organisation. Assurez-vous que l'ordre du jour est définitif avant l'impression.
-                </p>
-            </div>
         </div>
     </div>
 </div>
 
 <style>
-    .fw-black { font-weight: 900; }
-    .min-vh-25 { min-height: 150px; }
     @media print {
-        .no-print, .btn, .breadcrumb { display: none !important; }
-        .card { border: 1px solid #ddd !important; shadow: none !important; }
-        body { background: white !important; }
+        .no-print { display: none !important; }
+        body { background-color: white !important; }
+        .card { shadow: none !important; border: 1px solid #ddd !important; }
     }
 </style>
 @endsection

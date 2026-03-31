@@ -39,6 +39,29 @@
                         <input type="datetime-local" name="date_heure" class="form-control border-0 shadow-sm text-danger fw-bold" required style="background-color: #fff1f2;">
                     </div>
 
+                    <!-- Lieu de la réunion -->
+                    <div class="col-12">
+                        <label class="form-label fw-black text-dark text-uppercase small">Lieu de la réunion</label>
+                        <div class="input-group shadow-sm">
+                            <span class="input-group-text bg-light border-end-0 text-secondary">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </span>
+
+                            <input type="text" name="lieu" id="lieu_reunion"
+                                class="form-control border-start-0 ps-0 bg-light fw-bold"
+                                placeholder="ex: Bouaké Belleville..." required>
+
+                            <!-- UTILISATION D'UN SPAN (INBLOQUABLE) AU LIEU D'UN BUTTON -->
+                            <span class="btn btn-outline-danger bg-white border-start-0 d-flex align-items-center"
+                                style="cursor: pointer !important; opacity: 1 !important; pointer-events: auto !important;"
+                                onclick="openGoogleMaps()">
+                                <i class="fab fa-google text-danger me-1"></i> Maps
+                            </span>
+                        </div>
+                    </div>
+
+
+
                     <!-- Animateur -->
                     <div class="col-md-6">
                         <div class="p-3 rounded-4" style="background-color: #eef2ff; border-left: 5px solid #6366f1;">
@@ -120,4 +143,61 @@
         border-radius: 10px;
     }
 </style>
+
+<script>
+    function openGoogleMaps() {
+        const input = document.getElementById('lieu_reunion');
+
+        if (input && input.value.trim() !== "") {
+            // URL OFFICIELLE : Notez le "/maps/search/" et le "?api=1&query="
+            const url = "https://google.com/maps/search/?api=1&query=" + encodeURIComponent(input.value);
+
+            window.open(url, '_blank');
+        } else {
+            alert("Veuillez saisir un lieu (ex: Bouaké Belleville) avant de cliquer sur Maps.");
+        }
+    }
+</script>
+<script>
+    function initAutocomplete() {
+        const input = document.getElementById('lieu_reunion');
+
+        // Options pour limiter la recherche (ex: Côte d'Ivoire)
+        const options = {
+            componentRestrictions: { country: "CI" },
+            fields: ["name", "address_components", "formatted_address"],
+        };
+
+        const autocomplete = new google.maps.places.Autocomplete(input, options);
+
+        // Se déclenche quand l'utilisateur clique sur une suggestion
+        autocomplete.addListener("place_changed", () => {
+            const place = autocomplete.getPlace();
+
+            if (!place.name) return;
+
+            // Extraire la ville des composants de l'adresse
+            let city = "";
+            if (place.address_components) {
+                for (const component of place.address_components) {
+                    if (component.types.includes("locality")) {
+                        city = component.long_name;
+                        break;
+                    }
+                }
+            }
+
+            // Formater le texte final : "Nom du lieu, Ville"
+            const finalAddress = city ? `${place.name}, ${city}` : place.name;
+
+            // Remplir le champ avec le résultat
+            input.value = finalAddress;
+        });
+    }
+
+    // Lancer l'initialisation au chargement de la page
+    google.maps.event.addDomListener(window, 'load', initAutocomplete);
+</script>
+
 @endsection
+

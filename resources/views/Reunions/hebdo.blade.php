@@ -1,34 +1,61 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container-fluid py-4" style="background-color: #f0f2f5;">
 
     {{-- Message d'information --}}
     <div class="alert alert-info border-0 shadow-sm rounded-3 d-flex align-items-center mb-4">
         <i class="fas fa-info-circle fa-lg me-3"></i>
         <div>
-            <strong>Astuce :</strong> Maintenez <kbd class="bg-dark text-white">Ctrl</kbd> pour sélectionner plusieurs participants.
+            <strong>Astuce :</strong> Les réunions terminées affichent désormais les icônes de téléchargement pour la liste de présence et le rapport.
         </div>
     </div>
 
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+   <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-dark fw-bolder">🗓️ Programmation Hebdomadaire</h1>
-        <div class="d-flex gap-2">
-            {{-- Bouton corrigé --}}
-            <button type="button" class="btn btn-outline-dark shadow-sm px-4 py-2 rounded-pill border-2 fw-bold bg-white"
+        <div class="d-flex gap-2 flex-wrap">
+
+            @php
+                // On utilise une URL réelle pour éviter le blocage de sécurité du localhost
+                $urlPartage = "https://google.com";
+                $texteWA = urlencode("Bonjour Monsieur le Directeur, voici le programme des réunions : " . $urlPartage);
+            @endphp
+
+            <!-- WHATSAPP : URL OFFICIELLE /send?text= -->
+            <a href="https://whatsapp.com{{ $texteWA }}"
+            class="btn btn-success shadow-sm px-3 py-2 rounded-pill border-0 fw-bold no-print">
+                <i class="fab fa-whatsapp me-1"></i> WhatsApp
+            </a>
+
+            <!-- MESSENGER : URL OFFICIELLE /sharer.php?u= -->
+            <a href="https://facebook.com{{ urlencode($urlPartage) }}"
+            class="btn btn-primary shadow-sm px-3 py-2 rounded-pill border-0 fw-bold no-print">
+                <i class="fab fa-facebook-messenger me-1"></i> Messenger
+            </a>
+
+            <!-- VOS AUTRES BOUTONS -->
+            <a href="javascript:void(0)" onclick="window.print();" class="btn btn-dark shadow-sm px-3 py-2 rounded-pill border-0 fw-bold no-print">
+                <i class="fas fa-print me-1 text-warning"></i> Imprimer
+            </a>
+
+            <button type="button" class="btn btn-outline-dark shadow-sm px-3 py-2 rounded-pill border-2 fw-bold bg-white no-print"
                     data-bs-toggle="modal" data-bs-target="#modalAutresReunions">
-                <i class="fas fa-calendar-alt me-2 text-primary"></i> Hors-semaine
+                <i class="fas fa-calendar-alt me-1 text-primary"></i> Hors-semaine
             </button>
 
-            <a href="{{ route('reunions.create') }}" class="btn shadow-lg px-4 py-2 rounded-pill border-0 text-white fw-bold" style="background: linear-gradient(45deg, #6366f1, #a855f7);">
-                <i class="fas fa-plus-circle me-2"></i> Nouvelle Réunion
+            <a href="{{ route('reunions.create') }}" class="btn shadow-lg px-4 py-2 rounded-pill border-0 text-white fw-bold no-print" style="background: linear-gradient(45deg, #6366f1, #a855f7);">
+                <i class="fas fa-plus-circle me-1"></i> Nouvelle Réunion
             </a>
         </div>
     </div>
 
+
+
+
     {{-- Tableau de la semaine --}}
     <div class="card shadow-lg mb-4 border-0 rounded-4 overflow-hidden">
-        <div class="card-header py-3 bg-white border-0">
+        <div class="card-header py-3 bg-white border-0 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold" style="color: #6366f1;">
                 <i class="fas fa-bolt me-2 text-warning"></i>Semaine du {{ \Carbon\Carbon::now()->startOfWeek()->format('d/m') }} au {{ \Carbon\Carbon::now()->endOfWeek()->format('d/m/Y') }}
             </h6>
@@ -39,15 +66,16 @@
                     <thead style="background: #1e293b; color: #f8fafc;">
                         <tr class="text-uppercase small fw-bold">
                             <th class="ps-4 py-3">Jour & Heure</th>
-                            <th>Objet & Détails</th>
+                            <th>Objet & Lieu</th>
                             <th>Rôles Maîtres</th>
-                            <th>Équipe</th>
+                            <th>Équipe / Documents</th>
                             <th class="text-center no-print pe-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($reunions as $reunion)
                         <tr>
+                            {{-- 1. DATE ET HEURE --}}
                             <td class="ps-4">
                                 <span class="badge rounded-pill px-3 py-2 mb-1 shadow-sm" style="background-color: #22d3ee; color: #083344;">
                                     {{ \Carbon\Carbon::parse($reunion->date_heure)->translatedFormat('l d F') }}
@@ -56,107 +84,312 @@
                                     {{ \Carbon\Carbon::parse($reunion->date_heure)->format('H:i') }}
                                 </span>
                             </td>
+
+                            {{-- 2. OBJET, STATUT ET LIEU --}}
                             <td>
-                                <h6 class="fw-bold mb-1 text-dark">{{ $reunion->objet }}</h6>
-                                <small class="text-muted">{{ $reunion->ordre_du_jour ?? '---' }}</small>
-                            </td>
-                            <td>
-                                <div class="small">
-                                    <i class="fas fa-microphone text-primary me-1"></i> {{ $reunion->animateur->last_name }}<br>
-                                    <i class="fas fa-pen text-success me-1"></i> {{ $reunion->redacteur->last_name }}
+                                <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                                    <h6 class="fw-bold mb-0 text-dark">{{ $reunion->objet }}</h6>
+
+                                    @if($reunion->status == 'terminee')
+                                        <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #10b981; font-size: 0.75rem;">
+                                            <i class="fas fa-check-circle me-1"></i>EXÉCUTÉE
+                                        </span>
+                                    @elseif($reunion->status == 'annulee')
+                                        <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #4b5563; font-size: 0.75rem;">
+                                            <i class="fas fa-times-circle me-1"></i>ANNULÉE
+                                        </span>
+                                    @elseif(\Carbon\Carbon::parse($reunion->date_heure)->isPast())
+                                        <span class="badge shadow-sm text-white px-2 py-1 animate__animated animate__flash animate__infinite" style="background-color: #ef4444; font-size: 0.75rem;">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>À CLÔTURER
+                                        </span>
+                                    @else
+                                        <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #3b82f6; font-size: 0.75rem;">
+                                            <i class="fas fa-clock me-1"></i>PROGRAMMÉE
+                                        </span>
+                                    @endif
                                 </div>
-                            </td>
-                            <td>
-                                @foreach($reunion->participants as $participant)
-                                    <span class="badge shadow-sm border-0 mb-1 fw-normal px-2 py-1 text-white"
-                                        style="background: linear-gradient(45deg, #6366f1, #8b5cf6);">
-                                        {{ substr($participant->last_name, 0, 1) }}. {{ $participant->first_name }}
-                                    </span>
-                                @endforeach
+
+                                {{-- URL Google Maps DÉFINITIVEMENT CORRIGÉE --}}
+                                <div class="mb-1 small">
+                                    <a href="https://google.com{{ urlencode($reunion->lieu) }}"
+                                        target="_blank" class="text-primary fw-bold text-decoration-none" title="Localiser sur Google Maps">
+                                        <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                                        {{ $reunion->lieu ?? 'Lieu non défini' }}
+                                    </a>
+                                </div>
+                                <small class="text-muted d-block italic">{{ $reunion->ordre_du_jour ?? '---' }}</small>
                             </td>
 
+                            {{-- 3. RÔLES MAÎTRES --}}
+                            <td>
+                                <div class="small">
+                                    <div class="mb-1 text-nowrap">
+                                        <i class="fas fa-microphone text-indigo me-1"></i>
+                                        <strong>Animateur:</strong> {{ strtoupper($reunion->animateur->last_name) }} {{ $reunion->animateur->first_name }}
+                                    </div>
+                                    <div class="text-nowrap">
+                                        <i class="fas fa-pen-nib text-success me-1"></i>
+                                        <strong>Rédacteur:</strong> {{ strtoupper($reunion->redacteur->last_name) }} {{ $reunion->redacteur->first_name }}
+                                    </div>
+                                </div>
+                            </td>
+
+                            {{-- 4. ÉQUIPE ET DOCUMENTS --}}
+                            <td>
+                                {{-- 1. Participants Internes (Blanc sur Vert Éclatant) --}}
+                                <div class="mb-2">
+                                    @foreach($reunion->participants as $participant)
+                                        <span class="badge shadow-sm text-white mb-1 px-2 py-1"
+                                            style="background-color: #10b981; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.2);">
+                                            <i class="fas fa-user-tie fa-xs me-1"></i>
+                                            {{ strtoupper(substr($participant->last_name, 0, 1)) }}. {{ $participant->first_name }}
+                                        </span>
+                                    @endforeach
+                                </div>
+
+                                {{-- 2. Participants Externes (Affichage de tous les noms - Blanc sur Orange) --}}
+                                @if($reunion->externes)
+                                    @php
+                                        $externes = is_string($reunion->externes) ? json_decode($reunion->externes, true) : $reunion->externes;
+                                    @endphp
+                                    @if(is_array($externes) && count($externes) > 0)
+                                        <div class="border-top pt-2 mt-1 d-flex flex-wrap gap-1">
+                                            @foreach($externes as $externe)
+                                                <span class="badge shadow-sm text-white mb-1 px-2 py-1"
+                                                    style="background-color: #f59e0b; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.2);">
+                                                    <i class="fas fa-external-link-alt fa-xs me-1"></i> {{ $externe }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    @endif
+                                @endif
+
+                                {{-- 3. Fichiers joints (Archives) --}}
+                                <div class="d-flex align-items-center gap-2 mt-2">
+                                    @if($reunion->presence_file)
+                                        <a href="{{ asset('Rapport_Reunions/' . $reunion->presence_file) }}" target="_blank" class="btn btn-sm btn-light border shadow-sm text-primary" title="Liste de présence">
+                                            <i class="fas fa-clipboard-check"></i>
+                                        </a>
+                                    @endif
+                                    @if($reunion->report_file)
+                                        <a href="{{ asset('Rapport_Reunions/' . $reunion->report_file) }}" target="_blank" class="btn btn-sm btn-light border shadow-sm text-success" title="Compte-rendu">
+                                            <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+
+
+                            {{-- 5. ACTIONS --}}
                             <td class="text-center pe-4">
-                                <div class="btn-group shadow-sm rounded-pill border bg-white">
-                                    <a href="{{ route('reunions.show', $reunion->id) }}" class="btn btn-sm text-primary"><i class="fas fa-eye"></i></a>
-                                    <a href="{{ route('reunions.edit', $reunion->id) }}" class="btn btn-sm text-warning"><i class="fas fa-magic"></i></a>
-                                    <form action="{{ route('reunions.destroy', $reunion->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ?');">
+                                <div class="btn-group shadow-sm rounded-pill border bg-white overflow-hidden">
+                                    <a href="{{ route('reunions.show', $reunion->id) }}" class="btn btn-sm text-primary px-2" title="Voir"><i class="fas fa-eye"></i></a>
+                                    <a href="{{ route('reunions.edit', $reunion->id) }}" class="btn btn-sm text-warning px-2" title="Modifier/Clôturer"><i class="fas fa-magic"></i></a>
+                                    <form action="{{ route('reunions.destroy', $reunion->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer définitivement ?');">
                                         @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-sm text-danger"><i class="fas fa-trash-alt"></i></button>
+                                        <button type="submit" class="btn btn-sm text-danger px-2"><i class="fas fa-trash-alt"></i></button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                         @empty
-                        <tr><td colspan="5" class="text-center py-5 text-muted">Aucune réunion cette semaine.</td></tr>
+                        <tr><td colspan="5" class="text-center py-5 text-muted">Aucune réunion programmée cette semaine.</td></tr>
                         @endforelse
+
+
+                        <!-- À mettre avant la fin de votre </body> -->
+                        <script src="https://jsdelivr.net"></script>
+
                     </tbody>
+
                 </table>
             </div>
         </div>
     </div>
 
-    {{-- STRUCTURE DU MODAL (INDISPENSABLE) --}}
-        {{-- STRUCTURE DU MODAL (Assurez-vous qu'elle est bien AVANT le @endsection) --}}
-    <div class="modal fade shadow-lg" id="modalAutresReunions" tabindex="-1" aria-hidden="true" style="z-index: 9999;">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content border-0 rounded-4">
-                <div class="modal-header bg-dark text-white border-0">
-                    <h5 class="modal-title fw-bold"><i class="fas fa-history me-2 text-warning"></i> Autres Réunions</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-0">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light text-uppercase small fw-bold">
-                            <tr>
-                                <th class="ps-4 py-3">Date</th>
-                                <th>Objet</th>
-                                <th>Animateur</th>
-                                <th class="text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($autresReunions as $autre)
-                            <tr>
-                                <td class="ps-4 fw-bold text-primary">{{ \Carbon\Carbon::parse($autre->date_heure)->format('d/m/Y') }}</td>
-                                <td class="fw-bold">{{ $autre->objet }}</td>
-                                <td>{{ $autre->animateur->last_name }}</td>
-                                <td class="text-center"><a href="{{ route('reunions.show', $autre->id) }}" class="btn btn-sm btn-primary rounded-pill">Consulter</a></td>
-                            </tr>
-                            @empty
-                            <tr><td colspan="4" class="text-center py-4 text-muted">Aucun historique disponible.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+    {{-- STRUCTURE DU MODAL --}}
+    <div class="modal fade" id="modalAutresReunions" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header bg-dark text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-history me-2 text-warning"></i> HORS-SEMAINE</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
+            <div class="modal-body p-0">
+                {{-- Vérification de sécurité --}}
+                @if(isset($autresReunions) && $autresReunions->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
+                                <tr class="small fw-bold text-uppercase">
+                                    <th class="ps-4">Date</th>
+                                    <th>Objet & Lieu</th>
+                                    <th>Animateur</th>
+                                    <th class="text-center">Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($autresReunions as $r)
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold">{{ \Carbon\Carbon::parse($r->date_heure)->format('d/m/Y') }}</span><br>
+                                        <small class="text-danger fw-bold">{{ \Carbon\Carbon::parse($r->date_heure)->format('H:i') }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold text-dark">{{ $r->objet }}</div>
+                                        <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>{{ $r->lieu }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="small">{{ strtoupper($r->animateur->last_name ?? 'N/A') }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        {{-- Style blanc sur couleur vive pour le statut --}}
+                                        @if($r->status == 'terminee')
+                                            <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #10b981; font-size: 0.7rem;">EXÉCUTÉE</span>
+                                        @else
+                                            <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #3b82f6; font-size: 0.7rem;">PROGRAMMÉE</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="p-5 text-center">
+                        <i class="fas fa-folder-open fa-3x text-light mb-3"></i>
+                        <p class="text-muted fw-bold">Aucune réunion archivée ou hors-semaine.</p>
+                    </div>
+                @endif
+            </div>
+            <div class="modal-footer bg-light p-3">
+                {{-- On utilise data-bs-dismiss pour FERMER --}}
+
+                <button type="button" class="btn btn-secondary fw-bold shadow-sm" data-bs-dismiss="modal" data-dismiss="modal">FERMER</button>
+            </div>
+
         </div>
     </div>
-</div> {{-- Fermeture du container-fluid --}}
+</div>
+
+
+</div>
+{{-- Fermeture du container-fluid --}}
 
 {{-- CHARGEMENT FORCÉ DES SCRIPTS --}}
-<script src="https://code.jquery.com"></script>
-<script src="https://cdn.jsdelivr.net"></script>
+{{-- CHARGEMENT DES BIBLIOTHÈQUES (LIENS COMPLETS) --}}
+<!-- 1. JQUERY -->
+<script src="https://jquery.com"></script>
+
+<!-- 2. BOOTSTRAP 5 (Bundle avec Popper inclus pour le modal) -->
+<script src="https://jsdelivr.net"></script>
 
 <script>
-    // Script de secours si le bouton ne répond pas nativement
-    document.addEventListener('DOMContentLoaded', function () {
-        var btnHorsSemaine = document.querySelector('[data-bs-target="#modalAutresReunions"]');
+    $(document).ready(function () {
+        console.log("Système prêt.");
+
+        // FIX MODAL : Initialisation manuelle si data-bs-toggle échoue
         var modalEl = document.getElementById('modalAutresReunions');
-
-        if (btnHorsSemaine && modalEl) {
-            var bsModal = new bootstrap.Modal(modalEl);
-
-            btnHorsSemaine.addEventListener('click', function (e) {
+        if (modalEl) {
+            var myModal = new bootstrap.Modal(modalEl);
+            $('[data-bs-target="#modalAutresReunions"]').on('click', function(e) {
                 e.preventDefault();
-                console.log("Clic détecté - Ouverture forcée du modal");
-                bsModal.show();
+                myModal.show();
             });
         }
+
+        // FIX PARTAGE : On évite about:blank en restant dans le même onglet
+        window.partagerWhatsApp = function() {
+            let msg = "Bonjour Monsieur le Directeur, voici le programme : " + window.location.href;
+            window.location.href = "https://whatsapp.com" + encodeURIComponent(msg);
+        };
+
+        window.partagerMessenger = function() {
+            let url = window.location.href;
+            window.location.href = "https://facebook.com" + encodeURIComponent(url);
+        };
     });
+</script>
+<script>
+function copyToClipboard(type) {
+    const url = window.location.href; // L'URL de votre programme
+    const message = (type === 'WA')
+        ? "Bonjour Monsieur le Directeur, voici le programme hebdomadaire : " + url
+        : url;
+
+    // Utilisation de l'API moderne du presse-papier
+    navigator.clipboard.writeText(message).then(() => {
+        // Affichage du message de succès
+        const toast = document.getElementById('copy-toast');
+        toast.classList.remove('d-none');
+        setTimeout(() => toast.classList.add('d-none'), 3000);
+
+        // Optionnel : Ouvrir quand même WhatsApp si le navigateur le permet enfin
+        if(confirm("Message copié ! Voulez-vous quand même essayer d'ouvrir WhatsApp ?")) {
+            window.location.assign("https://whatsapp.com" + encodeURIComponent(message));
+        }
+    }).catch(err => {
+        alert("Erreur lors de la copie. Veuillez copier l'URL manuellement.");
+    });
+}
 </script>
 
 <style>
     .fw-black { font-weight: 900; }
-    .btn:hover { transform: translateY(-2px); }
+    .btn:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s;
+    }
+    /* Correction pour l'affichage du modal sur mobile */
+    .modal-backdrop { z-index: 1040 !important; }
+    .modal { z-index: 1050 !important; }
 </style>
+
+<style>
+    @media print {
+        /* Masquer tout sauf le contenu principal */
+        .no-print,
+        .sidebar,
+        .navbar,
+        .btn,
+        .alert,
+        .modal-trigger,
+        footer {
+            display: none !important;
+        }
+
+        /* Étendre le tableau sur toute la largeur de la page */
+        .container-fluid, .card, .card-body {
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Forcer l'affichage des couleurs des badges à l'impression */
+        .badge {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            border: 1px solid #ccc !important;
+        }
+
+        h1 {
+            font-size: 18pt !important;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            font-size: 10pt !important;
+            border-collapse: collapse !important;
+        }
+    }
+</style>
+<style>
+@media print {
+    .no-print { display: none !important; }
+}
+</style>
+
 @endsectiON

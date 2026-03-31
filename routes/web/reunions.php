@@ -1,11 +1,17 @@
 <?php
+
 use App\Http\Controllers\MeetingController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
-    // Vue calendrier ou liste hebdomadaire
+
+    // 1. État des réunions sur une période (Recherche et Filtres)
+    // Placé avant le resource pour éviter que 'etat' ne soit confondu avec un ID
+    Route::get('/reunions/etat', [MeetingController::class, 'etat'])->name('reunions.etat');
+
+    // 2. Vue calendrier ou liste hebdomadaire
     Route::get('/reunions/hebdo', [MeetingController::class, 'hebdo'])->name('reunions.hebdo');
 
-    // Ressources standards (create, store, etc.)
+    // 3. Ressources standards (index, create, store, show, edit, update, destroy)
     Route::resource('reunions', MeetingController::class);
 });

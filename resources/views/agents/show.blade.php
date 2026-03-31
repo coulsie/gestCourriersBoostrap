@@ -178,6 +178,11 @@
                             <input type="date" name="date_fin" id="date_fin" class="form-control shadow-sm" required>
                         </div>
                     </div>
+                    <!-- Motif de l'intérim -->
+                    <div class="mt-3">
+                        <label class="form-label fw-bold small text-uppercase">Motif de l'intérim</label>
+                        <textarea name="motif" id="motif" class="form-control shadow-sm border-primary" rows="2" placeholder="Ex: Congés annuels, Mission, Maladie..." required></textarea>
+                    </div>
                 </div>
 
                 <div class="modal-footer bg-light border-0">

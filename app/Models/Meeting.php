@@ -7,16 +7,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Meeting extends Model
 {
-    protected $fillable = [
-        'objet',
-        'date_heure',
-        'duree_minutes',
-        'lieu',
-        'animateur_id',
-        'redacteur_id',
-        'ordre_du_jour',
-        'externes'
-    ];
+   
+protected $fillable = [
+    'objet', 'date_heure', 'lieu', 'animateur_id', 'redacteur_id',
+    'participants', 'externes', 'ordre_du_jour',
+    'status', 'presence_file', 'report_file' // Nouveaux champs
+];
+
 
     /**
      * Casts pour Laravel 12.

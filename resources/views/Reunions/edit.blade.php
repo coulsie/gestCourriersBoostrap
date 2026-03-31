@@ -22,9 +22,10 @@
         </div>
 
         <div class="card-body p-4 bg-white">
-            <form action="{{ route('reunions.update', $reunion->id) }}" method="POST">
+            {{-- ATTENTION : Ajout de enctype pour les fichiers --}}
+            <form action="{{ route('reunions.update', $reunion->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                @method('PUT') {{-- Indispensable pour la mise à jour --}}
+                @method('PUT')
 
                 <div class="row g-4">
                     <!-- Objet -->
@@ -38,6 +39,21 @@
                         <label class="form-label fw-bold text-danger text-uppercase small">Date et Heure</label>
                         <input type="datetime-local" name="date_heure" class="form-control border-0 shadow-sm text-danger fw-bold"
                                value="{{ \Carbon\Carbon::parse($reunion->date_heure)->format('Y-m-d\TH:i') }}" required style="background-color: #fff1f2;">
+                    </div>
+
+                    <!-- Lieu de la réunion -->
+                    <div class="col-12">
+                        <label class="form-label fw-bold text-dark text-uppercase small">Lieu de la réunion</label>
+                        <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                            <button type="button" class="input-group-text bg-white border-0 text-danger"
+                                    onclick="ouvrirMaCarte()" title="Localiser sur Google Maps">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </button>
+                            <input type="text" name="lieu" id="input-lieu-edit"
+                                class="form-control border-0 bg-light fw-bold"
+                                value="{{ $reunion->lieu }}"
+                                placeholder="ex: Hôtel de Ville, Bouaké..." required>
+                        </div>
                     </div>
 
                     <!-- Animateur -->
@@ -96,6 +112,34 @@
                         <label class="form-label fw-bold text-dark">Ordre du jour / Notes</label>
                         <textarea name="ordre_du_jour" class="form-control border-0 shadow-sm bg-light" rows="4">{{ $reunion->ordre_du_jour }}</textarea>
                     </div>
+
+                    <hr class="my-4">
+
+                    <!-- SECTION CLÔTURE (FICHIERS) -->
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-dark text-uppercase small">Statut de la réunion</label>
+                        <select name="status" class="form-select border-0 shadow-sm fw-bold {{ $reunion->status == 'terminee' ? 'text-success' : 'text-primary' }}" style="background-color: #f8fafc;">
+                            <option value="programmee" {{ $reunion->status == 'programmee' ? 'selected' : '' }}>📅 Programmée</option>
+                            <option value="terminee" {{ $reunion->status == 'terminee' ? 'selected' : '' }}>✅ Terminée / Exécutée</option>
+                            <option value="annulee" {{ $reunion->status == 'annulee' ? 'selected' : '' }}>❌ Annulée</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-primary text-uppercase small">Liste de présence (PDF/Scan)</label>
+                        <input type="file" name="presence_file" class="form-control border-0 bg-light">
+                        @if($reunion->presence_file)
+                            <small class="text-success"><i class="fas fa-check"></i> Fichier actuel enregistré</small>
+                        @endif
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-success text-uppercase small">Rapport / Compte-rendu</label>
+                        <input type="file" name="report_file" class="form-control border-0 bg-light">
+                        @if($reunion->report_file)
+                            <small class="text-success"><i class="fas fa-check"></i> Rapport déjà déposé</small>
+                        @endif
+                    </div>
                 </div>
 
                 <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
@@ -103,11 +147,32 @@
                         <i class="fas fa-trash me-1"></i> Supprimer
                     </button>
                     <button type="submit" class="btn px-5 py-3 rounded-pill shadow-lg text-white fw-bold" style="background: linear-gradient(45deg, #3b82f6, #2563eb);">
-                        <i class="fas fa-sync-alt me-2"></i> METTRE À JOUR LA RÉUNION
+                        <i class="fas fa-sync-alt me-2"></i> ENREGISTRER LES MODIFICATIONS
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function ouvrirMaCarte() {
+        var lieuSaisi = document.getElementById('input-lieu-edit').value;
+        if (lieuSaisi && lieuSaisi.trim() !== "") {
+            var url = "https://google.com" + encodeURIComponent(lieuSaisi);
+            window.open(url, '_blank');
+        } else {
+            alert("Veuillez saisir un lieu avant de cliquer.");
+            document.getElementById('input-lieu-edit').focus();
+        }
+    }
+
+    $(document).ready(function() {
+        if (typeof $.fn.select2 !== 'undefined') {
+            $('.select2').select2({ theme: 'bootstrap-5', width: '100%' });
+        }
+    });
+</script>
+@endpush
 @endsection
