@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : mar. 31 mars 2026 à 14:38
+-- Généré le : mer. 01 avr. 2026 à 07:39
 -- Version du serveur : 11.4.9-MariaDB
 -- Version de PHP : 8.3.28
 
@@ -102,6 +102,33 @@ INSERT INTO `absences` (`id`, `agent_id`, `type_absence_id`, `date_debut`, `date
 (70, 2, 2, '2026-06-03', '2026-06-07', 0, '1774547936_1770551719_Note_Service_Objectifs_de_recettes_révisés_2025_N\'GUESSAN.doc.pdf', '2026-03-26 17:58:56', '2026-03-26 18:02:05', 'rejete', 'Demande rejetée par le responsable.'),
 (71, 1, 2, '2026-12-15', '2026-12-17', 2, '1774548019_Courrier_444444.pdf', '2026-03-26 18:00:19', '2026-03-26 18:02:40', 'valide_chef', NULL),
 (72, 5, 1, '2026-06-11', '2026-06-13', 1, 'repos malaie', '2026-03-31 10:15:41', '2026-03-31 10:15:41', 'en_attente', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `activities`
+--
+
+DROP TABLE IF EXISTS `activities`;
+CREATE TABLE IF NOT EXISTS `activities` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `service_id` bigint(20) UNSIGNED NOT NULL,
+  `report_date` date NOT NULL,
+  `content` text NOT NULL,
+  `progress` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `activities_service_id_foreign` (`service_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `activities`
+--
+
+INSERT INTO `activities` (`id`, `service_id`, `report_date`, `content`, `progress`, `created_at`, `updated_at`) VALUES
+(1, 1, '2026-03-31', 'coage de données avec Laravel 12, intervention sur le poste de Mme DJE et Mme Krihouan et M. Balley', 0, '2026-03-31 17:09:17', '2026-03-31 17:15:31'),
+(2, 1, '2026-03-31', 'Adressage IP des machines', 0, '2026-03-31 17:13:00', '2026-03-31 17:13:00');
 
 -- --------------------------------------------------------
 
@@ -289,7 +316,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `audit_logs_user_id_foreign` (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=171 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `audit_logs`
@@ -452,7 +479,9 @@ INSERT INTO `audit_logs` (`id`, `user_id`, `event`, `auditable_type`, `auditable
 (167, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 09:16:38', '2026-03-30 09:16:38'),
 (168, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-30 09:16:38', '2026-03-30 09:16:38'),
 (169, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 07:13:43', '2026-03-31 07:13:43'),
-(170, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 07:13:43', '2026-03-31 07:13:43');
+(170, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-03-31 07:13:43', '2026-03-31 07:13:43'),
+(171, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 07:36:36', '2026-04-01 07:36:36'),
+(172, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 07:36:36', '2026-04-01 07:36:36');
 
 -- --------------------------------------------------------
 
@@ -960,7 +989,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(191) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `migrations`
@@ -1030,7 +1059,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (61, '2026_03_25_115957_add_statut_autorisation_absence_and_comment_absence_chef_to_absences_table', 21),
 (62, '2026_03_30_122828_create_meetings_table', 22),
 (63, '2026_03_30_131421_add_externes_to_meetings_table', 23),
-(64, '2026_03_31_080803_add_status_and_files_to_meetings_table', 24);
+(64, '2026_03_31_080803_add_status_and_files_to_meetings_table', 24),
+(65, '2026_03_31_151157_create_activities_table', 25),
+(66, '2026_03_31_162354_create_activities_table', 26);
 
 -- --------------------------------------------------------
 
