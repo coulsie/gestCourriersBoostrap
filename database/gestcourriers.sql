@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : mer. 01 avr. 2026 à 07:39
+-- Généré le : mer. 01 avr. 2026 à 09:11
 -- Version du serveur : 11.4.9-MariaDB
 -- Version de PHP : 8.3.28
 
@@ -119,8 +119,9 @@ CREATE TABLE IF NOT EXISTS `activities` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `activities_service_id_foreign` (`service_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `activities_report_date_index` (`report_date`),
+  KEY `activities_service_id_index` (`service_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `activities`
@@ -128,7 +129,8 @@ CREATE TABLE IF NOT EXISTS `activities` (
 
 INSERT INTO `activities` (`id`, `service_id`, `report_date`, `content`, `progress`, `created_at`, `updated_at`) VALUES
 (1, 1, '2026-03-31', 'coage de données avec Laravel 12, intervention sur le poste de Mme DJE et Mme Krihouan et M. Balley', 0, '2026-03-31 17:09:17', '2026-03-31 17:15:31'),
-(2, 1, '2026-03-31', 'Adressage IP des machines', 0, '2026-03-31 17:13:00', '2026-03-31 17:13:00');
+(2, 1, '2026-03-31', 'Adressage IP des machines', 0, '2026-03-31 17:13:00', '2026-03-31 17:13:00'),
+(3, 1, '2026-04-01', 'Reunion de planification des opérations de sauvegarde des données en vue d\'une réinitialisation des comptes utilisateurs, desormais requis pour avoir accès aux machines', 0, '2026-04-01 09:03:38', '2026-04-01 09:03:38');
 
 -- --------------------------------------------------------
 
@@ -989,7 +991,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(191) NOT NULL,
   `batch` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=68 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `migrations`
@@ -1061,7 +1063,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (63, '2026_03_30_131421_add_externes_to_meetings_table', 23),
 (64, '2026_03_31_080803_add_status_and_files_to_meetings_table', 24),
 (65, '2026_03_31_151157_create_activities_table', 25),
-(66, '2026_03_31_162354_create_activities_table', 26);
+(66, '2026_03_31_162354_create_activities_table', 26),
+(67, '2026_04_01_085915_add_indexes_to_activities_table', 27);
 
 -- --------------------------------------------------------
 
