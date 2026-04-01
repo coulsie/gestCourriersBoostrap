@@ -11,14 +11,15 @@ use App\Http\Controllers\Auth\{PasswordSetupController, ForgotPasswordController
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->group(function () {
-    // Mot de passe oublié
-    Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    // Supprimez ou commentez ces deux lignes :
+    // Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    // Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 
-    // Configuration initiale du mot de passe
+    // Gardez celle-ci si elle est spécifique à votre projet
     Route::get('/password/setup', [PasswordSetupController::class, 'show'])->name('password.setup');
     Route::post('/password/setup', [PasswordSetupController::class, 'update'])->name('password.setup.update');
 });
+
 
 /*
 

@@ -55,7 +55,7 @@ Route::middleware(['role:admin|rh|Superviseur'])->group(function () {
     Route::post('/absences/rejeter/{id}', [AbsenceController::class, 'rejeter'])->name('chef.absences.rejeter');
 });
 
-Route::resource('absences', AbsenceController::class);
+Route::resource('absences', AbsenceController::class)->except(['store']);
 Route::resource('typeabsences', TypeAbsenceController::class);
 Route::resource('holidays', HolidayController::class);
 Route::patch('/interims/{interim}/stop', [InterimController::class, 'stop'])->name('interims.stop');
