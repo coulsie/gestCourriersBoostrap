@@ -35,3 +35,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/signature/update', [ProfileController::class, 'updateSignature'])->name('signature.update');
     });
 });
+// Dans routes/web/auth.php
+Route::prefix('profile')->name('profile.')->group(function () {
+    // ... autres routes ...
+    Route::match(['put', 'post', 'patch'], '/update', [ProfileController::class, 'update'])->name('update');
+});

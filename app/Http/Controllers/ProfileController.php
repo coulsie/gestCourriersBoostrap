@@ -34,6 +34,7 @@ class ProfileController extends Controller
             'email' => ['required','string','email','max:255',Rule::unique('users')->ignore($user->id),],
             // Ajoutez ici d'autres champs personnalisés si nécessaire :
             // 'phone_number' => 'nullable|string|max:20',
+             'bio'   => 'nullable|string|max:2000', // 👈 INDISPENSABLE
         ]);
 
         // 3. Mettre à jour les attributs de l'utilisateur

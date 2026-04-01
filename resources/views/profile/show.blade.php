@@ -212,10 +212,14 @@
                         <label class="small font-weight-bold">Adresse Email</label>
                         <input type="email" name="email" class="form-control" value="{{ $user->email }}" required>
                     </div>
-                    <div class="form-group mb-3">
-                        <label class="small font-weight-bold">Biographie</label>
-                        <textarea name="bio" class="form-control" rows="3">{{ $user->bio }}</textarea>
+                    <div class="form-group">
+                        <label for="bio" class="font-weight-bold text-dark small uppercase">Ma Biographie</label>
+                        <textarea name="bio" id="bio" rows="4"
+                                class="form-control bg-light border-0 shadow-none"
+                                placeholder="Décrivez votre parcours ou vos compétences..."
+                                style="font-size: 0.9rem; resize: none;">{{ old('bio', Auth::user()->bio) }}</textarea>
                     </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
