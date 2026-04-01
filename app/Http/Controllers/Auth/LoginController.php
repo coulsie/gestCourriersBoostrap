@@ -4,65 +4,65 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Login Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
-    |
-    */
-
     use AuthenticatesUsers;
 
     /**
-     * Where to redirect users after login.
-     *
-     * @var string
+     * Redirection après la connexion réussie
      */
     protected $redirectTo = '/home';
 
     /**
-     * Create a new controller instance.
-     *
-     * @return void
-     *
+     * Configuration du constructeur
      */
-    // Dans EventServiceProvider.php
-    protected $listen = [
-        \Illuminate\Auth\Events\Login::class => [
-            \App\Listeners\LogSuccessfulLogin::class,
-        ],
-    ];
-
     public function __construct()
     {
+        // On autorise la déconnexion même si la session a expiré
         $this->middleware('guest')->except('logout');
-        $this->middleware('auth')->only('logout');
     }
-        public function login(Request $request)
+
+    /**
+     * La fonction de déconnexion (Logout)
+     */
+    public function logout(Request $request)
+    {
+        $this->guard()->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        // On appelle explicitement la redirection personnalisée ci-dessous
+        return $this->loggedOut($request) ?: redirect('/');
+    }
+
+    /**
+     * ✅ LA SOLUTION : Redirection forcée vers la racine (welcome-login)
+     */
+    protected function loggedOut(Request $request)
+    {
+        return redirect('/');
+    }
+
+    /**
+     * Authentification manuelle (Optionnel si vous utilisez le trait)
+     */
+    public function login(Request $request)
     {
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
-        // La fonction attempt vérifie le mot de passe haché en base
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            return redirect()->intended('home');
+            return redirect()->intended($this->redirectTo);
         }
 
-        // Si ça échoue, on renvoie une erreur
         return back()->withErrors([
             'email' => 'Les identifiants ne correspondent pas.',
         ]);

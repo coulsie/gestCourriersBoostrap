@@ -385,7 +385,13 @@
                     <i class="fas fa-fw fa-user-circle"></i>
                     <span>Mon Profil</span>
                 </a>
-                <a class="collapse-item" href="{{ route('password.request') }}">{{ __('Mot de passe oublié ?') }}</a>
+                {{-- ✅ Vérifie si la route existe avant de tenter de l'afficher --}}
+                @if (Route::has('password.request'))
+                    <a class="collapse-item" href="{{ route('password.request') }}">
+                        {{ __('Mot de passe oublié ?') }}
+                    </a>
+                @endif
+
 
             </li>
 

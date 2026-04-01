@@ -32,19 +32,39 @@ class Activity extends Model
      * Filtre par période dynamique (Hebdo, Mensuel, Trimestriel...)
      */
     public function scopeForPeriod(Builder $query, string $type): void
-    {
-        $now = Carbon::now();
+{
+    $now = Carbon::now();
 
-        match ($type) {
-            'daily'     => $query->whereDate('report_date', $now),
-            'weekly'    => $query->whereBetween('report_date', [$now->startOfWeek(), $now->endOfWeek()]),
-            'monthly'   => $query->whereMonth('report_date', $now->month)->whereYear('report_date', $now->year),
-            'quarterly' => $query->whereBetween('report_date', [$now->startOfQuarter(), $now->endOfQuarter()]),
-            'semester'  => $this->scopeForSemester($query, $now),
-            'yearly'    => $query->whereYear('report_date', $now->year),
-            default     => $query
-        };
-    }
+    match ($type) {
+        'daily'     => $query->whereDate('report_date', $now),
+
+        // Optimisation : Utilise les plages de dates (index-friendly)
+        'weekly'    => $query->whereBetween('report_date', [
+                           $now->copy()->startOfWeek(),
+                           $now->copy()->endOfWeek()
+                       ]),
+
+        'monthly'   => $query->whereBetween('report_date', [
+                           $now->copy()->startOfMonth(),
+                           $now->copy()->endOfMonth()
+                       ]),
+
+        'quarterly' => $query->whereBetween('report_date', [
+                           $now->copy()->startOfQuarter(),
+                           $now->copy()->endOfQuarter()
+                       ]),
+
+        'semester'  => $this->scopeForSemester($query, $now),
+
+        'yearly'    => $query->whereBetween('report_date', [
+                           $now->copy()->startOfYear(),
+                           $now->copy()->endOfYear()
+                       ]),
+
+        default     => $query
+    };
+}
+
 
     /**
      * Logique spécifique pour le semestre
@@ -57,5 +77,5 @@ class Activity extends Model
         return $query->whereBetween('report_date', [$now->copy()->month(7)->startOfMonth(), $now->endOfYear()]);
     }
 
-    
+
 }

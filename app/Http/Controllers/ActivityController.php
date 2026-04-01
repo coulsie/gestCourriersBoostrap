@@ -115,55 +115,68 @@ class ActivityController extends Controller
      * Synthèse optimisée pour les grandes quantités de données
      */
     public function synthese(Request $request)
-    {
-        $periode = $request->get('periode', 'weekly');
-        $directionId = $request->get('direction_id');
+{
+    $periode = $request->get('periode', 'weekly');
+    $directionId = $request->get('direction_id');
 
-        // On récupère uniquement les directions nécessaires
-        $query = Direction::query()->select('id', 'name');
+    // 1. Base de la requête : On ne sélectionne que l'essentiel
+    $query = Direction::query()->select('id', 'name');
 
-        if ($directionId) {
-            $query->where('id', $directionId);
+    // 2. Filtre par Direction spécifique
+    if ($directionId) {
+        $query->where('id', $directionId);
+    }
+
+    // 3. OPTIMISATION : On ne charge QUE les directions ayant des activités sur la période
+    // Cela évite de traiter des données vides inutilement
+    $query->whereHas('services.activities', function($q) use ($periode) {
+        $q->forPeriod($periode);
+    });
+
+    // 4. Eager Loading ultra-ciblé
+    $directions = $query->with(['services' => function($q) use ($periode) {
+        $q->select('id', 'name', 'direction_id')
+          ->whereHas('activities', function($aq) use ($periode) {
+              $aq->forPeriod($periode);
+          })
+          ->with(['activities' => function($aq) use ($periode) {
+              $aq->select('id', 'service_id', 'report_date', 'content')
+                 ->forPeriod($periode)
+                 ->orderBy('report_date', 'desc');
+          }]);
+    }])->get();
+
+    // 5. Transformation des données
+    $rapport = $directions->map(function ($direction) {
+        $details = [];
+        $total = 0;
+
+        foreach ($direction->services as $service) {
+            foreach ($service->activities as $activity) {
+                $details[] = [
+                    'service' => $service->name,
+                    'date'    => $activity->report_date->format('d/m/Y'),
+                    'texte'   => $activity->content
+                ];
+                $total++;
+            }
         }
 
-        $directions = $query->with(['services' => function($q) use ($periode) {
-            $q->select('id', 'name', 'direction_id')
-              ->with(['activities' => function($aq) use ($periode) {
-                  $aq->select('id', 'service_id', 'report_date', 'content')
-                     ->forPeriod($periode)
-                     ->orderBy('report_date', 'desc');
-              }]);
-        }])->get();
+        return [
+            'direction' => $direction->name,
+            'total_activites' => $total,
+            'details' => $details
+        ];
+    });
 
-        // Transformation optimisée (plus rapide que flatMap sur de gros volumes)
-        $rapport = $directions->map(function ($direction) {
-            $details = [];
-            $total = 0;
+    // Liste pour le filtre (optimisée)
+    $allDirections = Direction::select('id', 'name')->orderBy('name')->get();
 
-            foreach ($direction->services as $service) {
-                foreach ($service->activities as $activity) {
-                    $details[] = [
-                        'service' => $service->name,
-                        'date'    => $activity->report_date->format('d/m/Y'),
-                        'texte'   => $activity->content
-                    ];
-                    $total++;
-                }
-            }
+    return view('activities.synthese', [
+        'rapport' => $rapport,
+        'periode' => $periode,
+        'directions' => $allDirections
+    ]);
+}
 
-            return [
-                'direction' => $direction->name,
-                'total_activites' => $total,
-                'details' => $details
-            ];
-        });
-
-        $allDirections = Direction::select('id', 'name')->orderBy('name')->get();
-
-        return view('activities.synthese', [
-            'rapport' => $rapport,
-            'periode' => $periode,
-            'directions' => $allDirections
-        ]);
-    }
 }

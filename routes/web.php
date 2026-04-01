@@ -2,50 +2,54 @@
 
 use Illuminate\Support\Facades\{Auth, Route};
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 
 /*
 
 |--------------------------------------------------------------------------
-| 1. ACCÈS PUBLICS (INVITÉS)
+| 1. ACCÈS PUBLICS / ACCUEIL (ACCESSIBLE APRÈS DÉCONNEXION)
 |--------------------------------------------------------------------------
 */
 
+// La racine affiche la page de bienvenue sans restriction
 Route::get('/', function () {
     return view('welcome-login');
-})->middleware('guest');
+})->name('welcome');
 
-// AUTHENTIFICATION : On désactive 'reset' ici car vous le gérez dans web/auth.php
+
+
+// AUTHENTIFICATION DE BASE (Désactive le reset par défaut de Laravel UI)
 Auth::routes(['reset' => false]);
 
-// CHARGEMENT DES ROUTES D'AUTH (Mot de passe oublié, Profil, etc.)
-// On le place ICI pour que les routes 'guest' (forgot-password) fonctionnent
+// ✅ RÉTABLISSEMENT DES ROUTES "MOT DE PASSE OUBLIÉ" (Une seule fois ici)
+Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+// CHARGEMENT DES ROUTES D'AUTH (Profil, Signature, etc.)
 require __DIR__ . '/web/auth.php';
 
 /*
 
 |--------------------------------------------------------------------------
-| 2. ROUTES PROTÉGÉES (UTILISATEURS CONNECTÉS)
+| 2. ESPACE SÉCURISÉ (AUTHENTIFICATION REQUISE)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
 
-    // Redirection après connexion
+    // Redirection après connexion réussie (Le Dashboard)
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-    // --- MODULES ---
+    // --- CHARGEMENT DES MODULES ---
     require __DIR__ . '/web/organisation.php';
     require __DIR__ . '/web/hr.php';
     require __DIR__ . '/web/admin.php';
     require __DIR__ . '/web/content.php';
     require __DIR__ . '/web/reunions.php';
 
-    // NOTE : J'ai supprimé le deuxième "require auth.php" qui était ici
-    // et qui causait des doublons.
-
     /*
 
     |--------------------------------------------------------------------------
-    | OPTIONNEL : MIDDLEWARE FORCE.PASSWORD
+    | OPTIONNEL : PROTECTION CHANGEMENT DE MOT DE PASSE FORCÉ
     |--------------------------------------------------------------------------
     */
     Route::middleware(['force.password'])->group(function () {
