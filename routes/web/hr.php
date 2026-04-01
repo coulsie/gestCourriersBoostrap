@@ -57,7 +57,7 @@ Route::middleware(['role:admin|rh|Superviseur'])->group(function () {
     Route::post('/chef/valider/{absence}', [AbsenceController::class, 'valider'])->name('chef.absences.valider');
     Route::post('/absences/rejeter/{id}', [AbsenceController::class, 'rejeter'])->name('chef.absences.rejeter');
 });
-// Gardez uniquement ceci (propre) :
+// Gardez uniquement ceci (propre) 
 Route::resource('absences', AbsenceController::class)->except(['store']);
 
 Route::resource('typeabsences', TypeAbsenceController::class);
