@@ -133,6 +133,7 @@ public function edit($id)
         'interimaire_id' => 'required|exists:agents,id|different:agent_id',
         'date_debut' => 'required|date',
         'date_fin' => 'required|date|after:date_debut',
+        'motif' => 'nullable|string|max:1000',
     ]);
 
     try {
@@ -165,13 +166,16 @@ public function edit($id)
                 ->first();
 
             // B. Mise à jour de l'intérim
+
             $interim->update([
                 'agent_id'       => $validated['agent_id'],
                 'interimaire_id' => $validated['interimaire_id'],
                 'user_id'        => $interimaire->user_id,
                 'date_debut'     => $validated['date_debut'],
                 'date_fin'       => $validated['date_fin'],
+                'motif'          => $validated['motif'], // ✅ AJOUTEZ CETTE LIGNE ICI
             ]);
+
 
             // C. Mise à jour de l'absence si elle existe
             if ($absence) {
@@ -179,9 +183,11 @@ public function edit($id)
                     'agent_id'   => $validated['agent_id'],
                     'date_debut' => $validated['date_debut'],
                     'date_fin'   => $validated['date_fin'],
-                ]);
-            }
-        });
+                    'document_justificatif' => $validated['motif'] ?? $absence->document_justificatif, // Optionnel : mettre à jour le motif aussi dans l'absence
+                    ]);
+                }
+            });
+
 
         return redirect()->route('interims.index')
             ->with('success', "Intérim et absence mis à jour avec succès.");
