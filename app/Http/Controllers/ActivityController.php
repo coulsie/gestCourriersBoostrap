@@ -14,20 +14,25 @@ class ActivityController extends Controller
     /**
      * Liste des activités avec pagination et optimisation RAM
      */
-    public function index()
-    {
-        $activities = Activity::select('id', 'service_id', 'report_date', 'content')
-            ->with([
-                'service:id,name,direction_id',
-                'service.direction:id,name'
-            ])
-            ->orderBy('report_date', 'desc')
-            ->paginate(15); // Augmenté à 15, plus standard
 
-        $services = Service::select('id', 'name')->orderBy('name')->get();
 
-        return view('activities.index', compact('activities', 'services'));
-    }
+ public function index()
+{
+    // On ne prend que les colonnes nécessaires pour l'affichage
+    $activities = Activity::select('id', 'service_id', 'report_date', 'content')
+        ->with([
+            'service:id,name,direction_id',
+            'service.direction:id,name'
+        ])
+        ->orderBy('report_date', 'desc')
+        ->paginate(15); // ✅ Utilise paginate() pour que ->total() fonctionne
+
+    $services = Service::select('id', 'name')->orderBy('name')->get();
+
+    return view('activities.index', compact('activities', 'services'));
+}
+
+
 
     /**
      * Formulaire de création

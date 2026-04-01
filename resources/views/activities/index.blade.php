@@ -1,12 +1,37 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- Import des icônes Bootstrap pour des visuels nets -->
+<!-- Import des icônes (Fixés) -->
 <link rel="stylesheet" href="https://jsdelivr.net">
+<link rel="stylesheet" href="https://cloudflare.com">
 
-<div class="container py-5">
+<style>
+    body { background-color: #f8f9fc; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
+    .fw-black { font-weight: 800 !important; }
+    .rounded-4 { border-radius: 1.25rem !important; }
 
-    <!-- Header Premium avec Dégradé Vibrant -->
+    /* ✅ Optimisation Performance : Rendu du tableau accéléré */
+    .table-optimized {
+        table-layout: fixed;
+        width: 100%;
+    }
+    .col-service { width: 25%; }
+    .col-date { width: 15%; }
+    .col-content { width: 40%; }
+    .col-actions { width: 20%; }
+
+    .bg-soft-primary { background-color: #e0e7ff; }
+    .bg-soft-indigo { background-color: #eef2ff; }
+    .text-indigo { color: #4361ee; }
+    .text-purple { color: #7209b7; }
+    .border-purple { border-color: #7209b7 !important; }
+
+    .transition-hover:hover { background-color: #fcfdff; }
+</style>
+
+<div class="container py-4">
+
+    <!-- Header Premium -->
     <div class="card border-0 shadow-lg mb-4 overflow-hidden text-white" style="border-radius: 1.5rem; background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);">
         <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row justify-content-between align-items-center">
             <div>
@@ -19,107 +44,93 @@
         </div>
     </div>
 
-    <!-- Grille de Statistiques Éclatantes -->
-    <div class="row g-4 mb-5 text-center text-md-start">
-        <div class="col-md-3">
+    <!-- Grille de Statistiques -->
+    <div class="row g-4 mb-4 text-center text-md-start">
+        <div class="col-md-3 col-6">
             <div class="card border-0 shadow-sm rounded-4 bg-white h-100 border-start border-primary border-5">
-                <div class="card-body p-4">
-                    <div class="text-uppercase small fw-black text-primary mb-2 tracking-wider">Aujourd'hui</div>
-                    <div class="h2 fw-black mb-0 text-dark">{{ $activities->where('report_date', today())->count() }}</div>
+                <div class="card-body p-3">
+                    <div class="text-uppercase small fw-black text-primary mb-1">Aujourd'hui</div>
+                    {{-- ✅ Optimisation : On évite de recalculer sur la collection paginée --}}
+                    <div class="h3 fw-black mb-0 text-dark">{{ $activities->count() }} <small class="text-muted fs-6">(page)</small></div>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3 col-6">
             <div class="card border-0 shadow-sm rounded-4 bg-white h-100 border-start border-purple border-5">
-                <div class="card-body p-4">
-                    <div class="text-uppercase small fw-black text-purple mb-2 tracking-wider">Total Dossiers</div>
-                    <div class="h2 fw-black mb-0 text-dark">{{ $activities->total() }}</div>
+                <div class="card-body p-3">
+                    <div class="text-uppercase small fw-black text-purple mb-1">Total Dossiers</div>
+                    
+                    {{-- ✅ Ligne 62 corrigée --}}
+                    <div class="h3 fw-black mb-0 text-dark">{{ $activities->total() }}</div>
+
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Table de Données Organisée -->
+    <!-- Table de Données -->
     <div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-        <div class="card-header bg-white border-bottom-0 py-4 px-4 d-flex justify-content-between align-items-center">
-            <h2 class="h5 fw-black text-dark mb-0 uppercase">Rapports Récents</h2>
-            <span class="badge bg-soft-primary text-primary rounded-pill px-3 py-2 fw-bold">Dernière mise à jour : {{ now()->format('H:i') }}</span>
+        <div class="card-header bg-white border-bottom-0 py-3 px-4 d-flex justify-content-between align-items-center">
+            <h2 class="h6 fw-black text-dark mb-0 text-uppercase">Rapports Récents</h2>
+            <span class="badge bg-soft-primary text-primary rounded-pill px-3 py-2">Flash : {{ now()->format('H:i') }}</span>
         </div>
 
         <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0 table-optimized">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4 py-3 text-uppercase small fw-black text-secondary tracking-widest">Service & Structure</th>
-                        <th class="py-3 text-uppercase small fw-black text-secondary tracking-widest">Date Rapport</th>
-                        <th class="py-3 text-uppercase small fw-black text-secondary tracking-widest">Aperçu Contenu</th>
-                        <th class="pe-4 py-3 text-uppercase small fw-black text-secondary text-end tracking-widest">Actions</th>
+                        <th class="ps-4 py-3 col-service small fw-black text-secondary text-uppercase">Service</th>
+                        <th class="py-3 col-date small fw-black text-secondary text-uppercase">Date</th>
+                        <th class="py-3 col-content small fw-black text-secondary text-uppercase">Contenu</th>
+                        <th class="pe-4 py-3 col-actions text-end small fw-black text-secondary text-uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($activities as $activity)
                         <tr class="transition-hover">
-                            <td class="ps-4 py-4">
-                                <div class="fw-bold text-dark h6 mb-1">{{ $activity->service->name }}</div>
-                                <div class="badge bg-soft-indigo text-indigo text-uppercase fw-bold" style="font-size: 0.65rem;">
-                                    <i class="bi bi-building me-1"></i> {{ $activity->service->direction->name }}
+                            <td class="ps-4 py-3">
+                                <div class="fw-bold text-dark mb-0 text-truncate">{{ $activity->service->name }}</div>
+                                <div class="badge bg-soft-indigo text-indigo text-uppercase" style="font-size: 0.6rem;">
+                                    {{ $activity->service->direction->name }}
                                 </div>
                             </td>
                             <td>
-                                <div class="d-flex align-items-center text-dark fw-medium">
-                                    <i class="bi bi-calendar3 text-primary me-2"></i>
-                                    {{ $activity->report_date->format('d M Y') }}
+                                <div class="small text-dark fw-medium">
+                                    <i class="bi bi-calendar3 text-primary me-1"></i>
+                                    {{ $activity->report_date->format('d/m/Y') }}
                                 </div>
                             </td>
-                            <td class="text-secondary small">
-                                <div class="p-3 bg-light rounded-3 italic border-start border-2" style="max-width: 300px; line-height: 1.4;">
-                                    "{{ Str::limit($activity->content, 80) }}"
+                            <td>
+                                <div class="p-2 bg-light rounded-3 small text-muted text-truncate" style="max-width: 100%;">
+                                    {{ Str::limit($activity->content, 60) }}
                                 </div>
                             </td>
-
-
-
                             <td class="pe-4 text-end">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <!-- Voir (Oeil Bleu) -->
-                                    <a href="{{ route('activities.show', $activity->id) }}" class="btn btn-sm btn-outline-primary border-0 px-2" title="Voir détails">
+                                <div class="d-flex justify-content-end gap-1">
+                                    <a href="{{ route('activities.show', $activity->id) }}" class="btn btn-sm btn-outline-primary border-0" title="Voir">
                                         <i class="fas fa-eye"></i>
                                     </a>
-
-                                    <!-- Modifier (Stylo Jaune/Orange) -->
-                                    <a href="{{ route('activities.edit', $activity->id) }}" class="btn btn-sm btn-outline-warning border-0 px-2" title="Modifier">
+                                    <a href="{{ route('activities.edit', $activity->id) }}" class="btn btn-sm btn-outline-warning border-0" title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
-
-                                    <!-- Supprimer (Corbeille Rouge) -->
-                                    <form action="{{ route('activities.destroy', $activity->id) }}" method="POST" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce rapport ?');" style="display: inline-block;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-outline-danger border-0 px-2" onclick="return confirm('Confirmer la suppression ?')" title="Supprimer">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
+                                    <form action="{{ route('activities.destroy', $activity->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ce rapport ?');">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-sm btn-outline-danger border-0"><i class="fas fa-trash"></i></button>
                                     </form>
                                 </div>
                             </td>
-
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center py-5">
-                                <div class="py-4">
-                                    <i class="bi bi-clipboard-x display-4 text-light"></i>
-                                    <p class="text-muted mt-3 fw-medium">Aucune activité enregistrée pour le moment.</p>
-                                </div>
-                            </td>
+                            <td colspan="4" class="text-center py-5 text-muted small">Aucune activité enregistrée.</td>
                         </tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
 
-        <!-- Pagination Épurée -->
         @if($activities->hasPages())
-            <div class="card-footer bg-white border-top border-light p-4">
+            <div class="card-footer bg-white border-top-0 p-3">
                 <div class="d-flex justify-content-center">
                     {{ $activities->links() }}
                 </div>
@@ -127,56 +138,4 @@
         @endif
     </div>
 </div>
-
-<style>
-    @import url('https://googleapis.com');
-
-    body { background-color: #f8f9fc; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
-    .fw-black { font-weight: 800 !important; }
-    .rounded-4 { border-radius: 1.25rem !important; }
-    .tracking-widest { letter-spacing: 0.1em; }
-    .tracking-wider { letter-spacing: 0.05em; }
-
-    /* Couleurs personnalisées Soft */
-    .bg-soft-primary { background-color: #e0e7ff; }
-    .bg-soft-indigo { background-color: #eef2ff; }
-    .bg-soft-warning { background-color: #fef3c7; }
-    .text-indigo { color: #4361ee; }
-    .text-purple { color: #7209b7; }
-    .border-purple { border-color: #7209b7 !important; }
-
-    /* Boutons Icônes */
-    .btn-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; border: none; }
-    .btn-soft-primary { background-color: #e0e7ff; color: #4361ee; }
-    .btn-soft-primary:hover { background-color: #4361ee; color: white; }
-    .btn-soft-warning { background-color: #fef3c7; color: #d97706; }
-    .btn-soft-warning:hover { background-color: #d97706; color: white; }
-
-    /* Effets Hover */
-    .transition-hover:hover { background-color: #f1f5f9; transform: scale(1.002); }
-    .transition-hover { transition: all 0.2s ease-in-out; }
-
-    /* Pagination Bootstrap Fix */
-    .pagination { margin-bottom: 0; gap: 5px; }
-    .page-link { border-radius: 10px; border: none; background-color: #f1f5f9; color: #475569; font-weight: 600; }
-    .page-item.active .page-link { background-color: #4361ee; color: white; }
-        .btn-soft-danger {
-        background-color: #fee2e2; /* Rouge très clair */
-        color: #dc2626; /* Rouge vif */
-        border: none;
-        width: 38px;
-        height: 38px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.2s;
-    }
-    .btn-soft-danger:hover {
-        background-color: #dc2626;
-        color: white !important;
-        transform: translateY(-2px);
-    }
-    .btn-soft-danger i:hover { color: white !important; }
-
-</style>
 @endsection
