@@ -42,7 +42,10 @@ Route::prefix('absences')->name('absences.')->group(function () {
     Route::get('/pdf/{id}', [AbsenceController::class, 'genererPdf'])->name('genererPdf');
     Route::get('/imprimer/{absence}', [AbsenceController::class, 'print'])->name('print');
     Route::get('/admin/create', [AbsenceController::class, 'createListe'])->name('createListe');
+
+    // Cette ligne crée le nom 'absences.store'
     Route::post('/admin-store', [AbsenceController::class, 'store'])->name('store');
+
     Route::post('/store-grouped', [AbsenceController::class, 'storeGrouped'])->name('storeGrouped');
     Route::post('/ma-demande', [AbsenceController::class, 'storeAutorisationAbsence'])->name('storeAutorisation');
 });
@@ -55,7 +58,9 @@ Route::middleware(['role:admin|rh|Superviseur'])->group(function () {
     Route::post('/absences/rejeter/{id}', [AbsenceController::class, 'rejeter'])->name('chef.absences.rejeter');
 });
 
-Route::resource('absences', AbsenceController::class);
+// Correction ici : on exclut 'store' pour éviter le doublon de nom
+Route::resource('absences', AbsenceController::class)->except(['store']);
+
 Route::resource('typeabsences', TypeAbsenceController::class);
 Route::resource('holidays', HolidayController::class);
 Route::patch('/interims/{interim}/stop', [InterimController::class, 'stop'])->name('interims.stop');

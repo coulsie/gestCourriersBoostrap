@@ -14,7 +14,8 @@ Route::get('/', function () {
 })->middleware('guest');
 
 // Routes d'authentification de base (Login, Logout, etc.)
-Auth::routes();
+
+Auth::routes(['reset' => false]);
 
 /*
 
