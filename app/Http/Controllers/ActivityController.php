@@ -6,135 +6,164 @@ use App\Models\Activity;
 use App\Models\Direction;
 use App\Models\Service;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Exception;
 
 class ActivityController extends Controller
 {
-
+    /**
+     * Liste des activités avec pagination et optimisation RAM
+     */
     public function index()
     {
-        $activities = Activity::with('service.direction')
+        $activities = Activity::select('id', 'service_id', 'report_date', 'content')
+            ->with([
+                'service:id,name,direction_id',
+                'service.direction:id,name'
+            ])
             ->orderBy('report_date', 'desc')
-            ->paginate(10);
+            ->paginate(15); // Augmenté à 15, plus standard
 
-        $services = Service::all();
+        $services = Service::select('id', 'name')->orderBy('name')->get();
+
         return view('activities.index', compact('activities', 'services'));
     }
 
-
-/**
-     * Formulaire de saisie quotidienne pour un service
+    /**
+     * Formulaire de création
      */
     public function create()
     {
-        // En production, on récupérerait le service de l'utilisateur connecté
-        $services = Service::all();
+        $services = Service::select('id', 'name')->orderBy('name')->get();
         return view('activities.create', compact('services'));
     }
 
-    public function edit(Activity $activity) {
-        $services = Service::all();
-        return view('activities.edit', compact('activity', 'services'));
-    }
-
-    public function show(Activity $activity)
-    {
-        // On charge les relations pour éviter les requêtes N+1 dans la vue
-        $activity->load('service.direction');
-        return view('activities.show', compact('activity'));
-    }
-
-
-    public function destroy(Activity $activity)
-    {
-        $activity->delete();
-
-        return redirect()
-            ->route('activities.index')
-            ->with('success', 'Le rapport a été supprimé définitivement.');
-    }
-
-
     /**
-     * Enregistrement de l'activité du jour
+     * Enregistrement sécurisé
      */
     public function store(Request $request)
     {
-            $validated = $request->validate([
-            'service_id'  => 'required|exists:services,id',
-            'report_date' => 'required|date',
-            'content'     => 'required|string|min:10',
-        ]);
-
-        Activity::create($validated);
-
-            // Redirection vers la liste globale avec le message de succès
-            return redirect()
-                ->route('activities.index')
-                ->with('success', 'L\'activité a été enregistrée avec succès !');
-    }
-
-    /**
-     * Synthèse des activités par Direction
-     * Usage : /synthese?periode=monthly&direction_id=1
-     */
-    public function synthese(Request $request)
-    {
-        $periode = $request->get('periode', 'weekly'); // Par défaut hebdo
-        $directionId = $request->get('direction_id');
-
-        // 1. On récupère les directions avec leurs services et activités filtrées
-        $query = Direction::with(['services.activities' => function($q) use ($periode) {
-            $q->forPeriod($periode)->orderBy('report_date', 'desc');
-        }]);
-
-        // 2. Filtrer par une direction spécifique si demandé
-        if ($directionId) {
-            $query->where('id', $directionId);
-        }
-
-        $directions = $query->get();
-
-        // 3. Transformation pour la vue (regrouper les textes par direction)
-        $rapport = $directions->map(function ($direction) {
-            return [
-                'direction' => $direction->name,
-                'total_activites' => $direction->services->sum(fn($s) => $s->activities->count()),
-                'details' => $direction->services->flatMap(fn($s) => $s->activities->map(fn($a) => [
-                    'service' => $s->name,
-                    'date' => $a->report_date->format('d/m/Y'),
-                    'texte' => $a->content
-                ]))
-            ];
-        });
-
-        return view('activities.synthese', [
-            'rapport' => $rapport,
-            'periode' => $periode,
-            'directions' => Direction::all()
-        ]);
-    }
-
-    /**
- * Met à jour une activité existante.
- */
-    public function update(Request $request, Activity $activity)
-    {
-        // 1. Validation des données entrantes
         $validated = $request->validate([
             'service_id'  => 'required|exists:services,id',
             'report_date' => 'required|date',
             'content'     => 'required|string|min:10',
         ]);
 
-        // 2. Mise à jour de l'enregistrement
-        $activity->update($validated);
-
-        // 3. Redirection vers l'index avec le message de succès
-        return redirect()
-            ->route('activities.index')
-            ->with('success', 'Le rapport d\'activité a été mis à jour avec succès !');
+        try {
+            Activity::create($validated);
+            return redirect()->route('activities.index')
+                ->with('success', 'L\'activité a été enregistrée avec succès !');
+        } catch (Exception $e) {
+            return back()->withInput()->with('error', 'Erreur lors de l\'enregistrement.');
+        }
     }
 
+    /**
+     * Détails d'une activité
+     */
+    public function show(Activity $activity)
+    {
+        $activity->load(['service:id,name,direction_id', 'service.direction:id,name']);
+        return view('activities.show', compact('activity'));
+    }
 
+    /**
+     * Edition d'une activité
+     */
+    public function edit(Activity $activity)
+    {
+        $services = Service::select('id', 'name')->orderBy('name')->get();
+        return view('activities.edit', compact('activity', 'services'));
+    }
+
+    /**
+     * Mise à jour sécurisée
+     */
+    public function update(Request $request, Activity $activity)
+    {
+        $validated = $request->validate([
+            'service_id'  => 'required|exists:services,id',
+            'report_date' => 'required|date',
+            'content'     => 'required|string|min:10',
+        ]);
+
+        try {
+            $activity->update($validated);
+            return redirect()->route('activities.index')
+                ->with('success', 'Le rapport d\'activité a été mis à jour.');
+        } catch (Exception $e) {
+            return back()->withInput()->with('error', 'Erreur lors de la mise à jour.');
+        }
+    }
+
+    /**
+     * Suppression sécurisée
+     */
+    public function destroy(Activity $activity)
+    {
+        try {
+            $activity->delete();
+            return redirect()->route('activities.index')
+                ->with('success', 'Le rapport a été supprimé définitivement.');
+        } catch (Exception $e) {
+            return redirect()->route('activities.index')
+                ->with('error', 'Impossible de supprimer ce rapport.');
+        }
+    }
+
+    /**
+     * Synthèse optimisée pour les grandes quantités de données
+     */
+    public function synthese(Request $request)
+    {
+        $periode = $request->get('periode', 'weekly');
+        $directionId = $request->get('direction_id');
+
+        // On récupère uniquement les directions nécessaires
+        $query = Direction::query()->select('id', 'name');
+
+        if ($directionId) {
+            $query->where('id', $directionId);
+        }
+
+        $directions = $query->with(['services' => function($q) use ($periode) {
+            $q->select('id', 'name', 'direction_id')
+              ->with(['activities' => function($aq) use ($periode) {
+                  $aq->select('id', 'service_id', 'report_date', 'content')
+                     ->forPeriod($periode)
+                     ->orderBy('report_date', 'desc');
+              }]);
+        }])->get();
+
+        // Transformation optimisée (plus rapide que flatMap sur de gros volumes)
+        $rapport = $directions->map(function ($direction) {
+            $details = [];
+            $total = 0;
+
+            foreach ($direction->services as $service) {
+                foreach ($service->activities as $activity) {
+                    $details[] = [
+                        'service' => $service->name,
+                        'date'    => $activity->report_date->format('d/m/Y'),
+                        'texte'   => $activity->content
+                    ];
+                    $total++;
+                }
+            }
+
+            return [
+                'direction' => $direction->name,
+                'total_activites' => $total,
+                'details' => $details
+            ];
+        });
+
+        $allDirections = Direction::select('id', 'name')->orderBy('name')->get();
+
+        return view('activities.synthese', [
+            'rapport' => $rapport,
+            'periode' => $periode,
+            'directions' => $allDirections
+        ]);
+    }
 }
