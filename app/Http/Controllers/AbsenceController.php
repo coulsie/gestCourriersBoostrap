@@ -85,7 +85,7 @@ class AbsenceController extends Controller
 
         $absence->update([
             'statut_autorisation_absence' => 'valide_chef',
-            'approuvee' => 2,
+            //'approuvee' => 2,
             'comment_absence_chef' => $request->commentaire,
         ]);
 
