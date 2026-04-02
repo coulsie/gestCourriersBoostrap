@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : jeu. 02 avr. 2026 à 08:49
+-- Généré le : jeu. 02 avr. 2026 à 12:19
 -- Version du serveur : 11.4.9-MariaDB
 -- Version de PHP : 8.3.28
 
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `absences` (
   PRIMARY KEY (`id`),
   KEY `absences_agent_id_foreign` (`agent_id`),
   KEY `absences_type_absence_id_foreign` (`type_absence_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=74 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `absences`
@@ -54,8 +54,7 @@ INSERT INTO `absences` (`id`, `agent_id`, `type_absence_id`, `date_debut`, `date
 (2, 10, 2, '2026-01-13', '2026-01-15', 1, '1769004466_Document_2025-11-27_121019.pdf', '2026-01-21 13:50:03', '2026-01-21 14:07:46', 'en_attente', NULL),
 (8, 4, 2, '2026-02-25', '2026-02-25', 1, '1770720847_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-02-10 10:54:07', '2026-02-10 20:59:46', 'en_attente', NULL),
 (7, 4, 4, '2026-02-27', '2026-02-27', 1, '1770720003_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-02-10 09:44:47', '2026-02-10 20:59:49', 'en_attente', NULL),
-(9, 1, 2, '2026-02-17', '2026-02-20', 2, '1771839504_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-02-23 09:38:24', '2026-03-25 16:39:09', 'valide_chef', NULL),
-(19, 1, 3, '2026-03-11', '2026-03-16', 2, '1772895225_Note_Service_Objectifs de recettes révisés 2025 N\'GUESSAN.doc.pdf', '2026-03-07 14:53:45', '2026-03-25 16:39:12', 'valide_chef', NULL),
+(81, 1, 4, '2026-05-28', '2026-05-30', 1, NULL, '2026-04-02 10:21:30', '2026-04-02 10:23:33', 'valide_chef', 'Avis favorable'),
 (20, 16, 3, '2026-03-11', '2026-03-16', 1, '1772895225_Note_Service_Objectifs de recettes révisés 2025 N\'GUESSAN.doc.pdf', '2026-03-07 14:53:45', '2026-03-09 08:22:22', 'en_attente', NULL),
 (16, 5, 3, '2026-03-11', '2026-03-16', 1, '1772895225_Note_Service_Objectifs de recettes révisés 2025 N\'GUESSAN.doc.pdf', '2026-03-07 14:53:45', '2026-03-09 08:22:25', 'en_attente', NULL),
 (17, 9, 3, '2026-03-11', '2026-03-16', 2, '1772895225_Note_Service_Objectifs de recettes révisés 2025 N\'GUESSAN.doc.pdf', '2026-03-07 14:53:45', '2026-03-09 08:22:28', 'en_attente', NULL),
@@ -65,7 +64,6 @@ INSERT INTO `absences` (`id`, `agent_id`, `type_absence_id`, `date_debut`, `date
 (23, 25, 7, '2026-03-11', '2026-03-16', 1, '1773044425_Compte débiteur 02-03-2026 13.56.pdf', '2026-03-09 08:20:25', '2026-03-09 08:22:20', 'en_attente', NULL),
 (24, 5, 7, '2026-03-20', '2026-04-02', 1, '1773044970_Compte débiteur 02-03-2026 13.56.pdf', '2026-03-09 08:29:30', '2026-03-09 08:29:49', 'en_attente', NULL),
 (25, 20, 7, '2026-03-20', '2026-04-02', 1, '1773044970_Compte débiteur 02-03-2026 13.56.pdf', '2026-03-09 08:29:30', '2026-03-09 08:29:50', 'en_attente', NULL),
-(26, 1, 7, '2026-03-20', '2026-04-02', 0, '1773044970_Compte débiteur 02-03-2026 13.56.pdf', '2026-03-09 08:29:30', '2026-03-25 16:39:15', 'rejete', 'Demande rejetée par le responsable.'),
 (27, 23, 7, '2026-03-20', '2026-03-22', 2, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-11 10:15:31', 'en_attente', NULL),
 (28, 25, 7, '2026-03-20', '2026-03-22', 1, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-19 07:36:10', 'en_attente', NULL),
 (29, 9, 7, '2026-03-20', '2026-03-22', 1, '1773074830_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-03-09 16:47:10', '2026-03-11 10:15:35', 'en_attente', NULL),
@@ -83,26 +81,14 @@ INSERT INTO `absences` (`id`, `agent_id`, `type_absence_id`, `date_debut`, `date
 (50, 18, 7, '2026-03-25', '2026-03-27', 1, '1774251853_Note au MFB_ Objectif de recettes TOFE Aout 2025.pdf', '2026-03-23 07:44:13', '2026-03-23 08:13:38', 'en_attente', NULL),
 (51, 4, 7, '2026-03-25', '2026-03-27', 1, '1774251853_Note au MFB_ Objectif de recettes TOFE Aout 2025.pdf', '2026-03-23 07:44:13', '2026-03-23 08:13:40', 'en_attente', NULL),
 (52, 17, 7, '2026-03-25', '2026-03-27', 1, '1774251853_Note au MFB_ Objectif de recettes TOFE Aout 2025.pdf', '2026-03-23 07:44:13', '2026-03-23 08:13:42', 'en_attente', NULL),
-(53, 1, 1, '2026-07-15', '2026-08-16', 0, '1774365035_Courrier_444444.pdf', '2026-03-24 15:10:35', '2026-03-26 18:01:25', 'rejete', 'Demande rejetée par le responsable.'),
-(55, 1, 1, '2026-05-01', '2026-05-15', 2, '1774439018_autorisation_absence_COULIBALY.pdf', '2026-03-25 11:43:38', '2026-03-25 14:02:58', 'valide_chef', 'accord'),
-(56, 1, 3, '2026-11-10', '2026-12-13', 0, '1774449154_Rapport_ADICO_2026-03 (5).pdf', '2026-03-25 14:32:34', '2026-03-25 14:40:35', 'rejete', 'Demande rejetée par le responsable.'),
-(57, 1, 1, '2026-04-06', '2026-04-10', 0, NULL, '2026-03-25 16:27:45', '2026-03-26 18:01:28', 'rejete', 'Demande rejetée par le responsable.'),
-(58, 1, 2, '2026-04-11', '2026-04-12', 0, '1774456190_Rapport_ADICO_2026-03 (2).pdf', '2026-03-25 16:29:50', '2026-03-26 18:01:46', 'rejete', 'Demande rejetée par le responsable.'),
-(59, 1, 2, '2026-09-10', '2026-09-12', 0, '1774456601_autorisation_absence_COULIBALY.pdf', '2026-03-25 16:36:41', '2026-03-26 18:01:30', 'rejete', 'Demande rejetée par le responsable.'),
-(60, 1, 1, '2026-06-02', '2026-06-06', 0, '1774515179_autorisation_absence_COULIBALY (1).pdf', '2026-03-26 08:52:59', '2026-03-26 18:01:58', 'rejete', 'Demande rejetée par le responsable.'),
-(61, 1, 1, '2026-06-01', '2026-06-05', 0, NULL, '2026-03-26 09:07:09', '2026-03-26 18:01:48', 'rejete', 'Demande rejetée par le responsable.'),
-(62, 1, 2, '2026-07-02', '2026-07-09', 0, NULL, '2026-03-26 09:08:37', '2026-03-26 18:01:39', 'rejete', 'Demande rejetée par le responsable.'),
-(63, 2, 1, '2026-05-01', '2026-05-10', 0, '1774538948_Compte débiteur 02-03-2026 13.56.pdf', '2026-03-26 15:29:08', '2026-03-26 18:01:36', 'rejete', 'Demande rejetée par le responsable.'),
-(64, 1, 1, '2026-06-02', '2026-06-17', 0, NULL, '2026-03-26 15:36:32', '2026-03-26 18:01:55', 'rejete', 'Demande rejetée par le responsable.'),
-(65, 1, 1, '2026-08-02', '2026-08-10', 0, NULL, '2026-03-26 17:22:56', '2026-03-26 18:01:51', 'rejete', 'Demande rejetée par le responsable.'),
-(66, 1, 2, '2026-07-16', '2026-07-20', 0, NULL, '2026-03-26 17:33:25', '2026-03-26 18:01:44', 'rejete', 'Demande rejetée par le responsable.'),
-(67, 1, 2, '2026-05-25', '2026-05-27', 0, NULL, '2026-03-26 17:38:00', '2026-03-26 18:01:53', 'rejete', 'Demande rejetée par le responsable.'),
-(68, 2, 2, '2026-07-16', '2026-07-18', 2, '1774547449_1770551719_Note_Service_Objectifs_de_recettes_révisés_2025_N\'GUESSAN.doc.pdf', '2026-03-26 17:50:49', '2026-03-26 18:02:43', 'valide_chef', NULL),
-(69, 2, 2, '2026-09-10', '2026-09-15', 0, '1774547754_1770551719_Note_Service_Objectifs_de_recettes_révisés_2025_N\'GUESSAN.doc.pdf', '2026-03-26 17:55:54', '2026-03-26 18:02:02', 'rejete', 'Demande rejetée par le responsable.'),
 (70, 2, 2, '2026-06-03', '2026-06-07', 0, '1774547936_1770551719_Note_Service_Objectifs_de_recettes_révisés_2025_N\'GUESSAN.doc.pdf', '2026-03-26 17:58:56', '2026-03-26 18:02:05', 'rejete', 'Demande rejetée par le responsable.'),
-(71, 1, 2, '2026-12-15', '2026-12-17', 2, '1774548019_Courrier_444444.pdf', '2026-03-26 18:00:19', '2026-03-26 18:02:40', 'valide_chef', NULL),
 (72, 5, 1, '2026-06-11', '2026-06-13', 1, 'repos malaie', '2026-03-31 10:15:41', '2026-03-31 10:15:41', 'en_attente', NULL),
-(73, 5, 1, '2026-04-05', '2026-04-08', 1, 'voyage d\'etude à istambul', '2026-04-01 17:04:38', '2026-04-01 17:17:18', 'en_attente', NULL);
+(73, 5, 1, '2026-04-05', '2026-04-08', 1, 'voyage d\'etude à istambul', '2026-04-01 17:04:38', '2026-04-01 17:17:18', 'en_attente', NULL),
+(75, 23, 3, '2026-04-05', '2026-04-06', 1, '1775123691_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-04-02 09:54:51', '2026-04-02 09:55:40', 'en_attente', NULL),
+(76, 25, 3, '2026-04-05', '2026-04-06', 1, '1775123691_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-04-02 09:54:51', '2026-04-02 09:55:43', 'en_attente', NULL),
+(77, 9, 3, '2026-04-05', '2026-04-06', 1, '1775123691_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-04-02 09:54:51', '2026-04-02 09:55:34', 'en_attente', NULL),
+(78, 18, 3, '2026-04-05', '2026-04-06', 1, '1775123691_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-04-02 09:54:51', '2026-04-02 09:55:47', 'en_attente', NULL),
+(79, 20, 3, '2026-04-05', '2026-04-06', 1, '1775123691_Projet de Note du DSESF au DG_Séminaire Loi de règlement 18 20 déc 2024.pdf', '2026-04-02 09:54:51', '2026-04-02 09:55:31', 'en_attente', NULL);
 
 -- --------------------------------------------------------
 
@@ -122,7 +108,7 @@ CREATE TABLE IF NOT EXISTS `activities` (
   PRIMARY KEY (`id`),
   KEY `activities_report_date_index` (`report_date`),
   KEY `activities_service_id_index` (`service_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `activities`
@@ -131,7 +117,8 @@ CREATE TABLE IF NOT EXISTS `activities` (
 INSERT INTO `activities` (`id`, `service_id`, `report_date`, `content`, `progress`, `created_at`, `updated_at`) VALUES
 (1, 1, '2026-03-31', 'coage de données avec Laravel 12, intervention sur le poste de Mme DJE et Mme Krihouan et M. Balley', 0, '2026-03-31 17:09:17', '2026-03-31 17:15:31'),
 (2, 1, '2026-03-31', 'Adressage IP des machines', 0, '2026-03-31 17:13:00', '2026-03-31 17:13:00'),
-(3, 1, '2026-04-01', 'Reunion de planification des opérations de sauvegarde des données en vue d\'une réinitialisation des comptes utilisateurs, desormais requis pour avoir accès aux machines', 0, '2026-04-01 09:03:38', '2026-04-01 09:03:38');
+(3, 1, '2026-04-01', 'Reunion de planification des opérations de sauvegarde des données en vue d\'une réinitialisation des comptes utilisateurs, desormais requis pour avoir accès aux machines', 0, '2026-04-01 09:03:38', '2026-04-01 09:03:38'),
+(4, 1, '2026-04-02', 'Presentation du progiciel de gestion de la DSESF', 0, '2026-04-02 09:29:41', '2026-04-02 09:29:41');
 
 -- --------------------------------------------------------
 
@@ -218,7 +205,7 @@ CREATE TABLE IF NOT EXISTS `agent_imputation` (
   PRIMARY KEY (`id`),
   KEY `agent_imputation_imputation_id_foreign` (`imputation_id`),
   KEY `agent_imputation_agent_id_foreign` (`agent_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=65 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `agent_imputation`
@@ -266,7 +253,9 @@ INSERT INTO `agent_imputation` (`id`, `imputation_id`, `agent_id`, `created_at`,
 (59, 51, 1, NULL, NULL),
 (60, 52, 1, NULL, NULL),
 (61, 53, 1, NULL, NULL),
-(62, 53, 2, NULL, NULL);
+(62, 53, 2, NULL, NULL),
+(63, 54, 1, NULL, NULL),
+(64, 55, 2, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -321,7 +310,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `audit_logs_user_id_foreign` (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=228 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=253 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `audit_logs`
@@ -542,7 +531,32 @@ INSERT INTO `audit_logs` (`id`, `user_id`, `event`, `auditable_type`, `auditable
 (224, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1775062620.png\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1775062902.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature/update', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 17:01:42', '2026-04-01 17:01:42'),
 (225, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1775062902.png\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1775063016.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature/update', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-01 17:03:36', '2026-04-01 17:03:36'),
 (226, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 08:03:24', '2026-04-02 08:03:24'),
-(227, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 08:03:24', '2026-04-02 08:03:24');
+(227, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 08:03:24', '2026-04-02 08:03:24'),
+(228, 3, 'Mise à jour signature pad', 'User', 3, '\"{\\\"path\\\":\\\"pad_3_1775063016.png\\\"}\"', '\"{\\\"path\\\":\\\"pad_3_1775121779.png\\\"}\"', 'http://127.0.0.1:8000/profile/signature/update', 'POST', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:22:59', '2026-04-02 09:22:59'),
+(229, 3, 'created', 'App\\Models\\Courrier', 30, NULL, '\"{\\\"reference\\\":\\\"111444\\\",\\\"type\\\":\\\"Outgoing\\\",\\\"objet\\\":\\\"Projet de note du DG\\\",\\\"date_courrier\\\":\\\"2026-04-02 00:00:00\\\",\\\"expediteur_nom\\\":\\\"DSESF\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"Cabinet DG\\\",\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"chemin_fichier\\\":\\\"1775122794_2026-04-01_152252.pdf\\\",\\\"is_confidentiel\\\":true,\\\"code_acces\\\":\\\"eyJpdiI6IkxGRnowb3FEdFYrb3lZNFJzanp0dmc9PSIsInZhbHVlIjoidlF4djY5UzVKekMrUFB6cklYOTJmQT09IiwibWFjIjoiOTk0ODNjNzVjMzgzN2U5NTdhZWJhZGY3OTBjMmY4ZTg0MTdhNDFhNzc5MDk5ODc0NmQwYzkyNWExNDdkMDJiNCIsInRhZyI6IiJ9\\\",\\\"date_document_original\\\":\\\"2026-04-02\\\",\\\"num_enregistrement\\\":\\\"REG-2026-69CE396A3419F\\\",\\\"affecter\\\":0,\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"updated_at\\\":\\\"2026-04-02 09:39:54\\\",\\\"created_at\\\":\\\"2026-04-02 09:39:54\\\",\\\"id\\\":30}\"', 'http://127.0.0.1:8000/courriers', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:39:54', '2026-04-02 09:39:54'),
+(230, 3, 'updated', 'App\\Models\\Courrier', 30, '\"{\\\"id\\\":30,\\\"num_enregistrement\\\":\\\"REG-2026-69CE396A3419F\\\",\\\"affecter\\\":false,\\\"reference\\\":\\\"111444\\\",\\\"type\\\":\\\"Outgoing\\\",\\\"objet\\\":\\\"Projet de note du DG\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-04-02T00:00:00.000000Z\\\",\\\"date_document_original\\\":\\\"2026-04-02\\\",\\\"expediteur_nom\\\":\\\"DSESF\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"Cabinet DG\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"re\\\\u00e7u\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1775122794_2026-04-01_152252.pdf\\\",\\\"created_at\\\":\\\"2026-04-02T09:39:54.000000Z\\\",\\\"updated_at\\\":\\\"2026-04-02T09:39:54.000000Z\\\",\\\"is_confidentiel\\\":1,\\\"code_acces\\\":\\\"eyJpdiI6IkxGRnowb3FEdFYrb3lZNFJzanp0dmc9PSIsInZhbHVlIjoidlF4djY5UzVKekMrUFB6cklYOTJmQT09IiwibWFjIjoiOTk0ODNjNzVjMzgzN2U5NTdhZWJhZGY3OTBjMmY4ZTg0MTdhNDFhNzc5MDk5ODc0NmQwYzkyNWExNDdkMDJiNCIsInRhZyI6IiJ9\\\",\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', '\"{\\\"id\\\":30,\\\"num_enregistrement\\\":\\\"REG-2026-69CE396A3419F\\\",\\\"affecter\\\":1,\\\"reference\\\":\\\"111444\\\",\\\"type\\\":\\\"Outgoing\\\",\\\"objet\\\":\\\"Projet de note du DG\\\",\\\"description\\\":null,\\\"date_courrier\\\":\\\"2026-04-02\\\",\\\"date_document_original\\\":\\\"2026-04-02\\\",\\\"expediteur_nom\\\":\\\"DSESF\\\",\\\"expediteur_contact\\\":null,\\\"destinataire_nom\\\":\\\"Cabinet DG\\\",\\\"destinataire_contact\\\":null,\\\"statut\\\":\\\"affect\\\\u00e9\\\",\\\"assigne_a\\\":\\\"Non assign\\\\u00e9\\\",\\\"chemin_fichier\\\":\\\"1775122794_2026-04-01_152252.pdf\\\",\\\"created_at\\\":\\\"2026-04-02 09:39:54\\\",\\\"updated_at\\\":\\\"2026-04-02 09:41:40\\\",\\\"is_confidentiel\\\":1,\\\"code_acces\\\":\\\"eyJpdiI6IkxGRnowb3FEdFYrb3lZNFJzanp0dmc9PSIsInZhbHVlIjoidlF4djY5UzVKekMrUFB6cklYOTJmQT09IiwibWFjIjoiOTk0ODNjNzVjMzgzN2U5NTdhZWJhZGY3OTBjMmY4ZTg0MTdhNDFhNzc5MDk5ODc0NmQwYzkyNWExNDdkMDJiNCIsInRhZyI6IiJ9\\\",\\\"signed_by\\\":null,\\\"signed_at\\\":null}\"', 'http://127.0.0.1:8000/imputations', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:41:40', '2026-04-02 09:41:40'),
+(231, 4, 'Connexion réussie', 'Système', 4, NULL, '\"{\\\"email\\\":\\\"nkone05@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:44:58', '2026-04-02 09:44:58'),
+(232, 4, 'Connexion réussie', 'Système', 4, NULL, '\"{\\\"email\\\":\\\"nkone05@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:44:58', '2026-04-02 09:44:58'),
+(233, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:46:05', '2026-04-02 09:46:05'),
+(234, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:46:05', '2026-04-02 09:46:05'),
+(235, 6, 'Connexion réussie', 'Système', 6, NULL, '\"{\\\"email\\\":\\\"andoume@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:49:54', '2026-04-02 09:49:54'),
+(236, 6, 'Connexion réussie', 'Système', 6, NULL, '\"{\\\"email\\\":\\\"andoume@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:49:54', '2026-04-02 09:49:54'),
+(237, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:50:50', '2026-04-02 09:50:50'),
+(238, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 09:50:50', '2026-04-02 09:50:50'),
+(239, 6, 'Connexion réussie', 'Système', 6, NULL, '\"{\\\"email\\\":\\\"andoume@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:06:10', '2026-04-02 10:06:10'),
+(240, 6, 'Connexion réussie', 'Système', 6, NULL, '\"{\\\"email\\\":\\\"andoume@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:06:10', '2026-04-02 10:06:10'),
+(241, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:14:13', '2026-04-02 10:14:13'),
+(242, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:14:13', '2026-04-02 10:14:13'),
+(243, 6, 'Connexion réussie', 'Système', 6, NULL, '\"{\\\"email\\\":\\\"andoume@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:18:13', '2026-04-02 10:18:13'),
+(244, 6, 'Connexion réussie', 'Système', 6, NULL, '\"{\\\"email\\\":\\\"andoume@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:18:13', '2026-04-02 10:18:13'),
+(245, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:20:26', '2026-04-02 10:20:26'),
+(246, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:20:26', '2026-04-02 10:20:26'),
+(247, 6, 'Connexion réussie', 'Système', 6, NULL, '\"{\\\"email\\\":\\\"andoume@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:22:06', '2026-04-02 10:22:06'),
+(248, 6, 'Connexion réussie', 'Système', 6, NULL, '\"{\\\"email\\\":\\\"andoume@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:22:06', '2026-04-02 10:22:06'),
+(249, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:24:12', '2026-04-02 10:24:12'),
+(250, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:24:12', '2026-04-02 10:24:12'),
+(251, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 11:16:36', '2026-04-02 11:16:36'),
+(252, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 11:16:36', '2026-04-02 11:16:36');
 
 -- --------------------------------------------------------
 
@@ -632,7 +646,7 @@ CREATE TABLE IF NOT EXISTS `courriers` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `courriers_num_enregistrement_unique` (`num_enregistrement`) USING HASH,
   KEY `courriers_signed_by_foreign` (`signed_by`)
-) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `courriers`
@@ -666,7 +680,8 @@ INSERT INTO `courriers` (`id`, `num_enregistrement`, `affecter`, `reference`, `t
 (26, 'REG-2026-69BBDB6AAB80B', 1, 'X02', 'Incoming Externe', 'cvfdghg', NULL, '2026-03-19', '2026-03-12', 'DIRECTION BUDGET', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1773919082_Note_Service_Objectifs_de_recettes_révisés_2025_N\'GUESSAN.pdf', '2026-03-19 11:18:02', '2026-03-19 14:59:47', 1, 'eyJpdiI6IlEzY0phdHFteFlXMTduRE16dU1uSEE9PSIsInZhbHVlIjoic0JCWldDQ2tseHE2Ynd6UEZOVGVhUT09IiwibWFjIjoiZTg1ZDEyZWQzNTQzZmU2MmM0NWRhOGM3ZWIwYWY4MTEyZjY4ZmM5YzFlY2Q0NDhiNTE4ZTQ2NDZiMjYwM2Q0ZiIsInRhZyI6IiJ9', NULL, NULL),
 (27, 'REG-2026-69BC0CC8607A3', 1, 'X02022', 'Incoming', 'BHJKKL', NULL, '2026-03-19', '2026-03-10', 'CABINET DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1773931720_Projet_de_Note_du_DSESF_au_DG_Séminaire_Loi_de_règlement_18_20_déc_2024.pdf', '2026-03-19 14:48:40', '2026-03-19 14:51:56', 0, NULL, NULL, NULL),
 (28, 'REG-2026-69C78BD78C7B1', 1, '252525', 'Incoming Mail', 'Mail du DG concernant une formation', NULL, '2026-03-28', '2026-03-27', 'Cabinet DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1774685143_Compte_débiteur_02-03-2026_13.56.pdf', '2026-03-28 08:05:43', '2026-03-28 08:07:18', 0, NULL, NULL, NULL),
-(29, 'REG-2026-69CD38F125415', 1, '2026-04-01_152252', 'Incoming', 'Programmation hebdomadaire', NULL, '2026-04-01', '2026-03-31', 'CABINET DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1775057137_2026-04-01_152252.pdf', '2026-04-01 15:25:37', '2026-04-01 15:27:21', 1, 'eyJpdiI6ImZoODN6NEZQRjE2VG4yakNwbFFlS3c9PSIsInZhbHVlIjoiSnpwWnk1R29wT01zL2N1MmJWZkg4UT09IiwibWFjIjoiYzNhNGNlNWNiYThhYTIzNDg5MGM5MmU1NDI0YWI4MTRmMWU0OTU2OTk0YTA4NzMzNjZkZTlhYzcxODFkZWZjYSIsInRhZyI6IiJ9', NULL, NULL);
+(29, 'REG-2026-69CD38F125415', 1, '2026-04-01_152252', 'Incoming', 'Programmation hebdomadaire', NULL, '2026-04-01', '2026-03-31', 'CABINET DGI', NULL, 'DSESF', NULL, 'affecté', 'Non assigné', '1775057137_2026-04-01_152252.pdf', '2026-04-01 15:25:37', '2026-04-01 15:27:21', 1, 'eyJpdiI6ImZoODN6NEZQRjE2VG4yakNwbFFlS3c9PSIsInZhbHVlIjoiSnpwWnk1R29wT01zL2N1MmJWZkg4UT09IiwibWFjIjoiYzNhNGNlNWNiYThhYTIzNDg5MGM5MmU1NDI0YWI4MTRmMWU0OTU2OTk0YTA4NzMzNjZkZTlhYzcxODFkZWZjYSIsInRhZyI6IiJ9', NULL, NULL),
+(30, 'REG-2026-69CE396A3419F', 1, '111444', 'Outgoing', 'Projet de note du DG', NULL, '2026-04-02', '2026-04-02', 'DSESF', NULL, 'Cabinet DG', NULL, 'affecté', 'Non assigné', '1775122794_2026-04-01_152252.pdf', '2026-04-02 09:39:54', '2026-04-02 09:41:40', 1, 'eyJpdiI6IkxGRnowb3FEdFYrb3lZNFJzanp0dmc9PSIsInZhbHVlIjoidlF4djY5UzVKekMrUFB6cklYOTJmQT09IiwibWFjIjoiOTk0ODNjNzVjMzgzN2U5NTdhZWJhZGY3OTBjMmY4ZTg0MTdhNDFhNzc5MDk5ODc0NmQwYzkyNWExNDdkMDJiNCIsInRhZyI6IiJ9', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -833,7 +848,7 @@ CREATE TABLE IF NOT EXISTS `imputations` (
   KEY `imputations_courrier_id_foreign` (`courrier_id`),
   KEY `imputations_user_id_foreign` (`user_id`),
   KEY `imputations_suivi_par_foreign` (`suivi_par`)
-) ENGINE=MyISAM AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `imputations`
@@ -873,7 +888,9 @@ INSERT INTO `imputations` (`id`, `courrier_id`, `chemin_fichier`, `user_id`, `su
 (47, 26, NULL, 3, NULL, 'autre', 'hb,j,kj;klklmlkm', '\n[LOG] HORO Tiekoura absent (approuvé), redirigé vers l\'intérimaire KEDI Née keita aramata anne elise.', '\"documents\\/imputations\\/annexes\\/1773933627_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-03-19', NULL, '2026-03-21', 'en_attente', '2026-03-19 15:20:27', '2026-03-19 15:20:27'),
 (51, 28, NULL, 3, NULL, 'autre', 'travail à rendre au plus tard le 02 avril 2026', NULL, '\"documents\\/imputations\\/annexes\\/1774685237_Courrier_444444.pdf\"', '2026-03-28', NULL, '2026-04-02', 'en_attente', '2026-03-28 08:07:17', '2026-03-28 08:07:17'),
 (52, 27, NULL, 3, NULL, 'autre', 'dffgg', NULL, '\"documents\\/imputations\\/annexes\\/1774873388_1770551719_Note_Service_Objectifs_de_recettes_r\\u00e9vis\\u00e9s_2025_N\'GUESSAN.doc.pdf\"', '2026-03-30', NULL, '2026-03-05', 'en_attente', '2026-03-30 12:23:08', '2026-03-30 12:23:08'),
-(53, 29, NULL, 3, NULL, 'autre', 'Pour Information et programmation', NULL, '\"documents\\/imputations\\/annexes\\/1775057241_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-04-01', NULL, '2026-04-03', 'en_attente', '2026-04-01 15:27:21', '2026-04-01 15:27:21');
+(53, 29, NULL, 3, NULL, 'autre', 'Pour Information et programmation', NULL, '\"documents\\/imputations\\/annexes\\/1775057241_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-04-01', NULL, '2026-04-03', 'en_attente', '2026-04-01 15:27:21', '2026-04-01 15:27:21'),
+(54, 30, NULL, 3, NULL, 'autre', 'Traiter avec diligence', NULL, '\"documents\\/imputations\\/annexes\\/1775122900_Projet_de_Note_du_DSESF_au_DG_S\\u00e9minaire_Loi_de_r\\u00e8glement_18_20_d\\u00e9c_2024.pdf\"', '2026-04-02', NULL, '2026-04-07', 'en_attente', '2026-04-02 09:41:40', '2026-04-02 09:41:40'),
+(55, 30, NULL, 3, NULL, 'autre', 'diligence', NULL, NULL, '2026-04-02', NULL, '2026-04-07', 'en_cours', '2026-04-02 09:44:26', '2026-04-02 09:44:26');
 
 -- --------------------------------------------------------
 
@@ -910,7 +927,7 @@ INSERT INTO `interims` (`id`, `agent_id`, `interimaire_id`, `user_id`, `date_deb
 (10, 16, 21, 21, '2026-03-19', '2026-03-25', 'seminaire', 1, '2026-03-19 07:22:21', '2026-03-19 07:22:21'),
 (11, 11, 16, 16, '2026-03-19', '2026-03-20', 'stage', 1, '2026-03-19 07:34:19', '2026-03-19 07:34:19'),
 (12, 4, 21, 21, '2026-03-19', '2026-03-21', 'essai verif', 1, '2026-03-19 07:59:17', '2026-03-19 07:59:17'),
-(13, 5, 4, 6, '2026-06-11', '2026-06-13', 'repos malaie', 1, '2026-03-31 10:15:41', '2026-03-31 10:15:41'),
+(13, 5, 25, 25, '2026-06-11', '2026-06-13', 'repos malaie', 1, '2026-03-31 10:15:41', '2026-04-02 09:03:20'),
 (14, 5, 4, 6, '2026-04-05', '2026-04-08', 'voyage d\'etude à istambul', 1, '2026-04-01 17:04:38', '2026-04-01 17:17:18');
 
 -- --------------------------------------------------------
@@ -2661,7 +2678,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 INSERT INTO `users` (`id`, `name`, `email`, `email_verified_at`, `password`, `must_change_password`, `password_changed_at`, `remember_token`, `created_at`, `updated_at`, `bio`, `profile_picture`, `signature_path`) VALUES
 (1, 'Admin Test', 'admin@example.com', NULL, '$2y$12$wAf0LxbRALNrwYQY33KXUeAoOYNIKiI243FdTKLXuaD2/XAiL9LrW', 0, NULL, NULL, '2026-01-20 09:37:00', '2026-01-20 10:44:26', NULL, NULL, NULL),
 (2, 'Utilisateur Test', 'test@example.com', NULL, '$2y$12$7sPkZYqEOdlX17Wh1A6Iw.Y4Nz6LdMMkPR96o3dqBEfzZePhkdWhK', 0, NULL, NULL, '2026-01-20 09:37:00', '2026-01-20 10:44:26', NULL, NULL, NULL),
-(3, 'Sié Yacouba COULIBALY', 'yacouba.coulibaly@dgi.gouv.ci', NULL, '$2y$12$nvVOjl.THEWluaZEDGlD..eFJmJNKOBDEShaKzqHtyysvHhsLxlFW', 0, '2026-04-01 15:01:37', 'KXdALxqfCVuYkDkQLflDnI5rJeNUi9cTr3hfl94jZtI2TFoIrJNWPuzIiSOp', '2026-01-20 13:25:02', '2026-04-01 17:03:36', 'Inspecteur Principal Informatique à la Fonction Publique, précisement à la DGI (Direction Générale des Impôts), à la DSESF (Direction de la Stratégie, des Etudes et Statitiques Fiscales). Première Prise de Service le 08 janvier 2002', 'photos_agents/Km5CbkPx8Rry9FPxsIf9Tu3gi9JOqhDVlXxOtuBP.jpg', 'pad_3_1775063016.png'),
+(3, 'Sié Yacouba COULIBALY', 'yacouba.coulibaly@dgi.gouv.ci', NULL, '$2y$12$nvVOjl.THEWluaZEDGlD..eFJmJNKOBDEShaKzqHtyysvHhsLxlFW', 0, '2026-04-01 15:01:37', 'mBc0vjvnh3RR2vnCKJWSVkEFnLdweuCekoRrtakWXLqIpTpTALsPoPidwyUn', '2026-01-20 13:25:02', '2026-04-02 09:22:59', 'Inspecteur Principal Informatique à la Fonction Publique, précisement à la DGI (Direction Générale des Impôts), à la DSESF (Direction de la Stratégie, des Etudes et Statitiques Fiscales). Première Prise de Service le 08 janvier 2002', 'photos_agents/Km5CbkPx8Rry9FPxsIf9Tu3gi9JOqhDVlXxOtuBP.jpg', 'pad_3_1775121779.png'),
 (4, 'Nafata KONE', 'nkone05@dgi.gouv.ci', NULL, '$2y$12$HN0h/eL.dGC/ltkmjZaQTev48U9ECeH.PqA3tlclhDgYo1aQhFH.6', 1, NULL, NULL, '2026-01-20 13:46:32', '2026-03-26 09:10:31', NULL, NULL, NULL),
 (5, 'Rosine Générosa Epse Dje OUSSOU', 'roussou@dgi.gouv.ci', NULL, '$2y$12$6levTuTb0vIp1M1nBq/oROhQkRMA0T.OpNdr8GOByOjJy.X9YpvMW', 1, NULL, NULL, '2026-01-20 13:48:59', '2026-01-22 12:31:18', NULL, NULL, NULL),
 (6, 'Arlette N\'DOUME', 'andoume@dgi.gouv.ci', NULL, '$2y$12$UptzFnNTF5sgio1UqRK6Ne8.yG7QxbhjxLqmpy9hIoJRKQahDNwmS', 0, NULL, NULL, '2026-01-21 10:43:13', '2026-03-12 06:58:44', NULL, NULL, 'sig_6_1773298724.png'),
