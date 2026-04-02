@@ -59,9 +59,10 @@
             <div class="card border-0 shadow-sm rounded-4 bg-white h-100 border-start border-purple border-5">
                 <div class="card-body p-3">
                     <div class="text-uppercase small fw-black text-purple mb-1">Total Dossiers</div>
-                    
+
                     {{-- ✅ Ligne 62 corrigée --}}
-                    <div class="h3 fw-black mb-0 text-dark">{{ $activities->total() }}</div>
+                    {{-- Affiche le nombre d'éléments chargés sur la page (ex: 15) --}}
+                    <div class="h3 fw-black mb-0 text-dark">{{ $activities->count() }}</div>
 
                 </div>
             </div>

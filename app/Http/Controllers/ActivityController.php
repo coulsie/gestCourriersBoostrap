@@ -16,22 +16,17 @@ class ActivityController extends Controller
      */
 
 
- public function index()
+
+public function index()
 {
-    // On ne prend que les colonnes nécessaires pour l'affichage
     $activities = Activity::select('id', 'service_id', 'report_date', 'content')
-        ->with([
-            'service:id,name,direction_id',
-            'service.direction:id,name'
-        ])
+        ->with(['service:id,name,direction_id', 'service.direction:id,name'])
         ->orderBy('report_date', 'desc')
-        ->paginate(15); // ✅ Utilise paginate() pour que ->total() fonctionne
+        ->simplePaginate(15); // ✅ Plus rapide que paginate()
 
     $services = Service::select('id', 'name')->orderBy('name')->get();
-
     return view('activities.index', compact('activities', 'services'));
 }
-
 
 
     /**
@@ -119,62 +114,43 @@ class ActivityController extends Controller
     /**
      * Synthèse optimisée pour les grandes quantités de données
      */
-    public function synthese(Request $request)
+ 
+
+public function synthese(Request $request)
 {
     $periode = $request->get('periode', 'weekly');
     $directionId = $request->get('direction_id');
 
-    // 1. Base de la requête : On ne sélectionne que l'essentiel
-    $query = Direction::query()->select('id', 'name');
+    // On récupère directement les activités filtrées avec leurs relations
+    $activities = Activity::query()
+        ->select('id', 'service_id', 'report_date', 'content')
+        ->forPeriod($periode)
+        ->with(['service:id,name,direction_id', 'service.direction:id,name'])
+        ->when($directionId, function($q) use ($directionId) {
+            $q->whereHas('service', function($sq) use ($directionId) {
+                $sq->where('direction_id', $directionId);
+            });
+        })
+        ->orderBy('report_date', 'desc')
+        ->get();
 
-    // 2. Filtre par Direction spécifique
-    if ($directionId) {
-        $query->where('id', $directionId);
-    }
-
-    // 3. OPTIMISATION : On ne charge QUE les directions ayant des activités sur la période
-    // Cela évite de traiter des données vides inutilement
-    $query->whereHas('services.activities', function($q) use ($periode) {
-        $q->forPeriod($periode);
-    });
-
-    // 4. Eager Loading ultra-ciblé
-    $directions = $query->with(['services' => function($q) use ($periode) {
-        $q->select('id', 'name', 'direction_id')
-          ->whereHas('activities', function($aq) use ($periode) {
-              $aq->forPeriod($periode);
-          })
-          ->with(['activities' => function($aq) use ($periode) {
-              $aq->select('id', 'service_id', 'report_date', 'content')
-                 ->forPeriod($periode)
-                 ->orderBy('report_date', 'desc');
-          }]);
-    }])->get();
-
-    // 5. Transformation des données
-    $rapport = $directions->map(function ($direction) {
-        $details = [];
-        $total = 0;
-
-        foreach ($direction->services as $service) {
-            foreach ($service->activities as $activity) {
-                $details[] = [
-                    'service' => $service->name,
-                    'date'    => $activity->report_date->format('d/m/Y'),
-                    'texte'   => $activity->content
-                ];
-                $total++;
-            }
-        }
-
+    // ✅ On groupe par Direction directement via les Collections Laravel (très rapide)
+    $rapport = $activities->groupBy(function($activity) {
+        return $activity->service->direction->name;
+    })->map(function ($group, $directionName) {
         return [
-            'direction' => $direction->name,
-            'total_activites' => $total,
-            'details' => $details
+            'direction' => $directionName,
+            'total_activites' => $group->count(),
+            'details' => $group->map(function($act) {
+                return [
+                    'service' => $act->service->name,
+                    'date'    => $act->report_date->format('d/m/Y'),
+                    'texte'   => $act->content
+                ];
+            })
         ];
-    });
+    })->values();
 
-    // Liste pour le filtre (optimisée)
     $allDirections = Direction::select('id', 'name')->orderBy('name')->get();
 
     return view('activities.synthese', [
