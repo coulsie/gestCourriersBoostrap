@@ -39,9 +39,28 @@
 
     {{-- Rapport --}}
     <div class="card shadow border-0 rounded-4 overflow-hidden">
-        <div class="card-header bg-white py-4 text-center">
-            <h4 class="fw-black mb-1">DSESF - ÉTAT RÉCAPITULATIF DES RÉUNIONS</h4>
-            <p class="text-muted mb-0">Période du <strong>{{ $debut->format('d/m/Y') }}</strong> au <strong>{{ $fin->format('d/m/Y') }}</strong></p>
+            <div class="card-header border-0 p-4 p-md-5 text-center text-white shadow-sm"
+            style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%); border-radius: 1.5rem 1.5rem 0 0;">
+
+            <!-- Badge de l'entité -->
+            <span class="badge bg-white text-primary px-3 py-2 rounded-pill fw-bold mb-3 text-uppercase shadow-sm" style="letter-spacing: 2px; font-size: 0.75rem;">
+                Direction de la Stratégie, des Etudes et des Statistiques Fiscales (DSESF)
+            </span>
+
+            <!-- Titre Principal -->
+            <h2 class="display-6 fw-black text-white mb-2 tracking-tight uppercase" style="letter-spacing: -1px;">
+                ÉTAT RÉCAPITULATIF DES RÉUNIONS
+            </h2>
+
+            <!-- Période avec icône -->
+            <div class="d-inline-flex align-items-center bg-white bg-opacity-10 px-4 py-2 rounded-pill backdrop-blur">
+                <i class="bi bi-calendar3 me-2"></i>
+                <p class="mb-0 fw-bold text-dark text-uppercase" style="font-size: 0.9rem; letter-spacing: 0.5px;">
+                    Période du <span class="badge bg-dark text-white px-2 py-1 mx-1">{{ $debut->format('d/m/Y') }}</span>
+                    au <span class="badge bg-dark text-white px-2 py-1 mx-1">{{ $fin->format('d/m/Y') }}</span>
+                </p>
+
+            </div>
         </div>
         <div class="card-body p-0">
             <table class="table table-bordered table-striped mb-0 align-middle">
@@ -129,5 +148,10 @@
         .table-dark { background-color: #eee !important; color: #000 !important; }
         body { background: white !important; }
     }
+</style>
+<style>
+    /* Pour garantir l'épaisseur du titre si non définie dans votre CSS global */
+    .fw-black { font-weight: 800 !important; }
+    .backdrop-blur { backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
 </style>
 @endsection

@@ -79,14 +79,16 @@ class PresenceController extends Controller
     /**
      * Affiche le formulaire de création d'une nouvelle ressource (présence).
      */
-    public function create(): View
-    {
+   public function create(): View
+{
+    // Récupère les agents triés par NOM de famille, puis par Prénom
+    $agents = Agent::orderBy('last_name', 'asc')
+                   ->orderBy('first_name', 'asc')
+                   ->get();
 
-    // Récupère les agents pour le menu déroulant
-    $agents = Agent::all(); // Assurez-vous que Agent a les colonnes 'id', 'first_name' et 'last_name'
     return view('presences.create', compact('agents'));
+}
 
-    }
 
     /**
      * Stocke une nouvelle ressource (présence) dans la base de données.
