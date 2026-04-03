@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : ven. 03 avr. 2026 à 08:52
+-- Généré le : ven. 03 avr. 2026 à 10:37
 -- Version du serveur : 11.4.9-MariaDB
 -- Version de PHP : 8.3.28
 
@@ -2564,8 +2564,8 @@ CREATE TABLE IF NOT EXISTS `seminaires` (
 --
 
 INSERT INTO `seminaires` (`id`, `titre`, `description`, `lieu`, `date_debut`, `date_fin`, `organisateur`, `statut`, `nb_participants_prevu`, `created_at`, `updated_at`) VALUES
-(1, 'Seminaire IA', 'Séminaire de renforcement de capacité sur IA dans la Gestion des Statistiques et de l\'Administration', 'Assinie Sud Comoé', '2026-03-25 09:00:00', '2026-03-27 17:00:00', 'DESEF', 'en attente du rapport final', 10, '2026-04-03 07:38:15', '2026-04-03 08:51:06'),
-(2, 'Séminaire du 1er Trimestre 2026', 'Bilan du 1er Trimestre 2026', 'Grand Bassam', '2026-04-15 07:30:00', '2026-04-17 17:00:00', 'DGI', 'planifie', 12, '2026-04-03 08:41:00', '2026-04-03 08:51:06');
+(1, 'Seminaire IA', 'Séminaire de renforcement de capacité sur IA dans la Gestion des Statistiques et de l\'Administration', 'Assinie Sud Comoé', '2026-03-25 09:00:00', '2026-03-27 17:00:00', 'DESEF', 'termine', 10, '2026-04-03 07:38:15', '2026-04-03 08:58:53'),
+(2, 'Séminaire du 1er Trimestre 2026', 'Bilan du 1er Trimestre 2026', 'Grand Bassam', '2026-04-15 07:30:00', '2026-04-17 17:00:00', 'DGI', 'planifie', 12, '2026-04-03 08:41:00', '2026-04-03 09:39:38');
 
 -- --------------------------------------------------------
 
@@ -2584,7 +2584,14 @@ CREATE TABLE IF NOT EXISTS `seminaire_documents` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `seminaire_documents_seminaire_id_foreign` (`seminaire_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `seminaire_documents`
+--
+
+INSERT INTO `seminaire_documents` (`id`, `seminaire_id`, `nom_document`, `fichier_path`, `type`, `created_at`, `updated_at`) VALUES
+(6, 1, '2026-04-01_152252.pdf', '1775208088_2026-04-01_152252.pdf', 'rapport', '2026-04-03 09:21:28', '2026-04-03 09:21:28');
 
 -- --------------------------------------------------------
 
