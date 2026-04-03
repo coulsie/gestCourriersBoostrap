@@ -19,12 +19,21 @@ class ActivityController extends Controller
 
 public function index()
 {
+    // 1. On récupère les activités de manière fluide (sans calculer le total global)
     $activities = Activity::select('id', 'service_id', 'report_date', 'content')
-        ->with(['service:id,name,direction_id', 'service.direction:id,name'])
+        ->with([
+            'service:id,name,direction_id',
+            'service.direction:id,name'
+        ])
         ->orderBy('report_date', 'desc')
-        ->simplePaginate(15); // ✅ Plus rapide que paginate()
+        ->simplePaginate(15);
 
-    $services = Service::select('id', 'name')->orderBy('name')->get();
+    // 2. On met en cache la liste des services pendant 1 heure (3600 secondes)
+    // Cela évite de recharger la liste des services à chaque affichage de l'index
+    $services = cache()->remember('services_list', 3600, function () {
+        return Service::select('id', 'name')->orderBy('name')->get();
+    });
+
     return view('activities.index', compact('activities', 'services'));
 }
 
@@ -114,7 +123,7 @@ public function index()
     /**
      * Synthèse optimisée pour les grandes quantités de données
      */
- 
+
 
 public function synthese(Request $request)
 {

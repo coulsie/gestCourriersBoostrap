@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\{Auth, Route};
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 
+
 /*
 
 |--------------------------------------------------------------------------
@@ -45,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
     require __DIR__ . '/web/admin.php';
     require __DIR__ . '/web/content.php';
     require __DIR__ . '/web/reunions.php';
+    require __DIR__ . '/web/seminaires.php';
 
     /*
 
@@ -53,6 +55,6 @@ Route::middleware(['auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
     Route::middleware(['force.password'])->group(function () {
-        // Vos routes spécifiques ici
+        //
     });
 });

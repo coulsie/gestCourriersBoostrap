@@ -681,6 +681,97 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
+ * @property string $titre
+ * @property string|null $description
+ * @property string $lieu
+ * @property \Illuminate\Support\Carbon $date_debut
+ * @property \Illuminate\Support\Carbon $date_fin
+ * @property string $organisateur
+ * @property string $statut
+ * @property int $nb_participants_prevu
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Agent> $agents
+ * @property-read int|null $agents_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SeminaireParticipant> $participations
+ * @property-read int|null $participations_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereDateDebut($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereDateFin($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereLieu($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereNbParticipantsPrevu($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereOrganisateur($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereStatut($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereTitre($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereUpdatedAt($value)
+ */
+	class Seminaire extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $seminaire_id
+ * @property string $nom_document
+ * @property string $fichier_path
+ * @property string $type
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Seminaire|null $seminaire
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireDocument newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireDocument newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireDocument query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireDocument whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireDocument whereFichierPath($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireDocument whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireDocument whereNomDocument($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireDocument whereSeminaireId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireDocument whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireDocument whereUpdatedAt($value)
+ */
+	class SeminaireDocument extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $seminaire_id
+ * @property int|null $agent_id
+ * @property string|null $nom_externe
+ * @property string|null $organisme_externe
+ * @property bool $est_present
+ * @property \Illuminate\Support\Carbon|null $heure_pointage
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Agent|null $agent
+ * @property-read string $nom_complet
+ * @property-read string $structure
+ * @property-read \App\Models\Seminaire|null $seminaire
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant presents()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereAgentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereEstPresent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereHeurePointage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereNomExterne($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereOrganismeExterne($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereSeminaireId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereUpdatedAt($value)
+ */
+	class SeminaireParticipant extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
  * @property string $name
  * @property string|null $code
  * @property string|null $description

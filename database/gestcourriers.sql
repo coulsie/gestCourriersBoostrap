@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : jeu. 02 avr. 2026 à 12:19
+-- Généré le : ven. 03 avr. 2026 à 08:52
 -- Version du serveur : 11.4.9-MariaDB
 -- Version de PHP : 8.3.28
 
@@ -310,7 +310,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `audit_logs_user_id_foreign` (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=253 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=255 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `audit_logs`
@@ -556,7 +556,9 @@ INSERT INTO `audit_logs` (`id`, `user_id`, `event`, `auditable_type`, `auditable
 (249, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:24:12', '2026-04-02 10:24:12'),
 (250, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 10:24:12', '2026-04-02 10:24:12'),
 (251, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 11:16:36', '2026-04-02 11:16:36'),
-(252, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 11:16:36', '2026-04-02 11:16:36');
+(252, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-02 11:16:36', '2026-04-02 11:16:36'),
+(253, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-03 07:34:27', '2026-04-03 07:34:27'),
+(254, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-03 07:34:27', '2026-04-03 07:34:27');
 
 -- --------------------------------------------------------
 
@@ -577,7 +579,7 @@ CREATE TABLE IF NOT EXISTS `cache` (
 --
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('laravel-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:8:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"creer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:5;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:18:\"supprimer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:17:\"voir-utilisateurs\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:5:{i:0;i:1;i:1;i:2;i:2;i:4;i:3;i:5;i:4;i:6;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"manage-users\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:17:\"modifier articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:5;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:18:\"supprimer articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:11:\"gerer-roles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:17:\"acceder-dashboard\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:5:{i:0;i:1;i:1;i:3;i:2;i:4;i:3;i:5;i:4;i:6;}}}s:5:\"roles\";a:6:{i:0;a:3:{s:1:\"a\";i:1;s:1:\"b\";s:5:\"admin\";s:1:\"c\";s:3:\"web\";}i:1;a:3:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"utilisateur\";s:1:\"c\";s:3:\"web\";}i:2;a:3:{s:1:\"a\";i:5;s:1:\"b\";s:11:\"Superviseur\";s:1:\"c\";s:3:\"web\";}i:3;a:3:{s:1:\"a\";i:4;s:1:\"b\";s:2:\"rh\";s:1:\"c\";s:3:\"web\";}i:4;a:3:{s:1:\"a\";i:6;s:1:\"b\";s:7:\"Accueil\";s:1:\"c\";s:3:\"web\";}i:5;a:3:{s:1:\"a\";i:3;s:1:\"b\";s:7:\"editeur\";s:1:\"c\";s:3:\"web\";}}}', 1775150324);
+('laravel-cache-spatie.permission.cache', 'a:3:{s:5:\"alias\";a:4:{s:1:\"a\";s:2:\"id\";s:1:\"b\";s:4:\"name\";s:1:\"c\";s:10:\"guard_name\";s:1:\"r\";s:5:\"roles\";}s:11:\"permissions\";a:8:{i:0;a:4:{s:1:\"a\";i:1;s:1:\"b\";s:14:\"creer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:2;i:2;i:5;}}i:1;a:4:{s:1:\"a\";i:2;s:1:\"b\";s:18:\"supprimer-articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:2;a:4:{s:1:\"a\";i:3;s:1:\"b\";s:17:\"voir-utilisateurs\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:5:{i:0;i:1;i:1;i:2;i:2;i:4;i:3;i:5;i:4;i:6;}}i:3;a:4:{s:1:\"a\";i:4;s:1:\"b\";s:12:\"manage-users\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:4;a:4:{s:1:\"a\";i:5;s:1:\"b\";s:17:\"modifier articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:3:{i:0;i:1;i:1;i:3;i:2;i:5;}}i:5;a:4:{s:1:\"a\";i:6;s:1:\"b\";s:18:\"supprimer articles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:6;a:4:{s:1:\"a\";i:7;s:1:\"b\";s:11:\"gerer-roles\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:2:{i:0;i:1;i:1;i:5;}}i:7;a:4:{s:1:\"a\";i:8;s:1:\"b\";s:17:\"acceder-dashboard\";s:1:\"c\";s:3:\"web\";s:1:\"r\";a:5:{i:0;i:1;i:1;i:3;i:2;i:4;i:3;i:5;i:4;i:6;}}}s:5:\"roles\";a:6:{i:0;a:3:{s:1:\"a\";i:1;s:1:\"b\";s:5:\"admin\";s:1:\"c\";s:3:\"web\";}i:1;a:3:{s:1:\"a\";i:2;s:1:\"b\";s:11:\"utilisateur\";s:1:\"c\";s:3:\"web\";}i:2;a:3:{s:1:\"a\";i:5;s:1:\"b\";s:11:\"Superviseur\";s:1:\"c\";s:3:\"web\";}i:3;a:3:{s:1:\"a\";i:4;s:1:\"b\";s:2:\"rh\";s:1:\"c\";s:3:\"web\";}i:4;a:3:{s:1:\"a\";i:6;s:1:\"b\";s:7:\"Accueil\";s:1:\"c\";s:3:\"web\";}i:5;a:3:{s:1:\"a\";i:3;s:1:\"b\";s:7:\"editeur\";s:1:\"c\";s:3:\"web\";}}}', 1775237719);
 
 -- --------------------------------------------------------
 
@@ -1289,7 +1291,7 @@ CREATE TABLE IF NOT EXISTS `presences` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `presences_agent_id_foreign` (`agent_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1054 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=1055 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `presences`
@@ -2348,7 +2350,8 @@ INSERT INTO `presences` (`id`, `agent_id`, `heure_arrivee`, `heure_depart`, `sta
 (1050, 1, '2026-04-02 08:15:52', NULL, 'En Retard', 'Pointage automatique (Self-service)', '2026-04-02 08:15:52', '2026-04-02 08:15:52'),
 (1051, 1, '2026-04-01 07:22:00', NULL, 'Présent', 'Calculé pour Mercredi (Limite: 465m, Arrivée: 442m). ', '2026-04-02 08:22:38', '2026-04-02 08:22:38'),
 (1052, 2, '2026-04-01 07:45:00', NULL, 'Présent', 'Calculé pour Mercredi (Limite: 465m, Arrivée: 465m). ', '2026-04-02 08:23:56', '2026-04-02 08:23:56'),
-(1053, 2, '2026-04-02 08:10:00', NULL, 'En Retard', 'Calculé pour Jeudi (Limite: 465m, Arrivée: 490m). ', '2026-04-02 08:24:27', '2026-04-02 08:24:27');
+(1053, 2, '2026-04-02 08:10:00', NULL, 'En Retard', 'Calculé pour Jeudi (Limite: 465m, Arrivée: 490m). ', '2026-04-02 08:24:27', '2026-04-02 08:24:27'),
+(1054, 1, '2026-04-03 08:47:59', NULL, 'En Retard', 'Pointage automatique (Self-service)', '2026-04-03 08:47:59', '2026-04-03 08:47:59');
 
 -- --------------------------------------------------------
 
@@ -2533,6 +2536,97 @@ CREATE TABLE IF NOT EXISTS `scripts_extraction` (
 INSERT INTO `scripts_extraction` (`id`, `nom`, `description`, `parametres`, `created_at`, `updated_at`, `code`) VALUES
 (3, 'Liste des agents', NULL, '\"{\\\"connection_type\\\":\\\"mariadb\\\",\\\"ora_host\\\":null,\\\"ora_db\\\":null,\\\"ora_user\\\":null,\\\"ora_pass\\\":null,\\\"ora_as\\\":\\\"NORMAL\\\"}\"', '2026-02-16 10:33:18', '2026-02-16 10:33:18', 'select * from agents'),
 (5, 'iste des imputations', NULL, '\"{\\\"connection_type\\\":\\\"mariadb\\\",\\\"ora_host\\\":null,\\\"ora_db\\\":null,\\\"ora_user\\\":null,\\\"ora_pass\\\":null,\\\"ora_as\\\":\\\"NORMAL\\\"}\"', '2026-03-11 10:22:24', '2026-03-11 10:22:24', 'select * from imputations');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `seminaires`
+--
+
+DROP TABLE IF EXISTS `seminaires`;
+CREATE TABLE IF NOT EXISTS `seminaires` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `titre` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `lieu` varchar(255) NOT NULL,
+  `date_debut` datetime NOT NULL,
+  `date_fin` datetime NOT NULL,
+  `organisateur` varchar(255) NOT NULL,
+  `statut` varchar(255) NOT NULL DEFAULT 'planifie',
+  `nb_participants_prevu` int(11) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `seminaires`
+--
+
+INSERT INTO `seminaires` (`id`, `titre`, `description`, `lieu`, `date_debut`, `date_fin`, `organisateur`, `statut`, `nb_participants_prevu`, `created_at`, `updated_at`) VALUES
+(1, 'Seminaire IA', 'Séminaire de renforcement de capacité sur IA dans la Gestion des Statistiques et de l\'Administration', 'Assinie Sud Comoé', '2026-03-25 09:00:00', '2026-03-27 17:00:00', 'DESEF', 'en attente du rapport final', 10, '2026-04-03 07:38:15', '2026-04-03 08:51:06'),
+(2, 'Séminaire du 1er Trimestre 2026', 'Bilan du 1er Trimestre 2026', 'Grand Bassam', '2026-04-15 07:30:00', '2026-04-17 17:00:00', 'DGI', 'planifie', 12, '2026-04-03 08:41:00', '2026-04-03 08:51:06');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `seminaire_documents`
+--
+
+DROP TABLE IF EXISTS `seminaire_documents`;
+CREATE TABLE IF NOT EXISTS `seminaire_documents` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `seminaire_id` bigint(20) UNSIGNED NOT NULL,
+  `nom_document` varchar(255) NOT NULL,
+  `fichier_path` varchar(255) NOT NULL,
+  `type` enum('presence','rapport','support') NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `seminaire_documents_seminaire_id_foreign` (`seminaire_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `seminaire_participants`
+--
+
+DROP TABLE IF EXISTS `seminaire_participants`;
+CREATE TABLE IF NOT EXISTS `seminaire_participants` (
+  `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `seminaire_id` bigint(20) UNSIGNED NOT NULL,
+  `agent_id` bigint(20) UNSIGNED DEFAULT NULL,
+  `nom_externe` varchar(255) DEFAULT NULL,
+  `organisme_externe` varchar(255) DEFAULT NULL,
+  `est_present` tinyint(1) NOT NULL DEFAULT 0,
+  `heure_pointage` datetime DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `seminaire_participants_seminaire_id_foreign` (`seminaire_id`),
+  KEY `seminaire_participants_agent_id_foreign` (`agent_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Déchargement des données de la table `seminaire_participants`
+--
+
+INSERT INTO `seminaire_participants` (`id`, `seminaire_id`, `agent_id`, `nom_externe`, `organisme_externe`, `est_present`, `heure_pointage`, `created_at`, `updated_at`) VALUES
+(1, 1, 5, NULL, NULL, 1, '2026-04-03 08:47:44', '2026-04-03 07:39:14', '2026-04-03 08:47:44'),
+(2, 1, 9, NULL, NULL, 1, '2026-04-03 08:47:48', '2026-04-03 07:39:14', '2026-04-03 08:47:48'),
+(3, 1, 18, NULL, NULL, 1, '2026-04-03 08:47:51', '2026-04-03 07:39:14', '2026-04-03 08:47:51'),
+(4, 1, 1, NULL, NULL, 1, '2026-04-03 08:48:18', '2026-04-03 07:39:14', '2026-04-03 08:48:18'),
+(5, 1, NULL, 'Yao Kouadio', 'DERAR', 1, '2026-04-03 08:48:21', '2026-04-03 07:41:38', '2026-04-03 08:48:21'),
+(6, 1, NULL, 'Bamba Salif', 'DSI', 0, NULL, '2026-04-03 07:42:05', '2026-04-03 07:42:05'),
+(7, 1, 23, NULL, NULL, 1, '2026-04-03 08:48:25', '2026-04-03 08:05:22', '2026-04-03 08:48:25'),
+(8, 2, 25, NULL, NULL, 0, NULL, '2026-04-03 08:49:48', '2026-04-03 08:49:48'),
+(9, 2, 9, NULL, NULL, 0, NULL, '2026-04-03 08:49:48', '2026-04-03 08:49:48'),
+(10, 2, 18, NULL, NULL, 0, NULL, '2026-04-03 08:49:48', '2026-04-03 08:49:48'),
+(11, 2, 20, NULL, NULL, 0, NULL, '2026-04-03 08:49:48', '2026-04-03 08:49:48'),
+(12, 2, 2, NULL, NULL, 0, NULL, '2026-04-03 08:49:48', '2026-04-03 08:49:48'),
+(13, 2, NULL, 'Youboué Kouamé', 'DG des Douanes', 0, NULL, '2026-04-03 08:50:20', '2026-04-03 08:50:20'),
+(14, 2, NULL, 'Sylla Moussa', 'Port Autonome d\'Abidjan', 0, NULL, '2026-04-03 08:50:44', '2026-04-03 08:50:44');
 
 -- --------------------------------------------------------
 
