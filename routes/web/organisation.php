@@ -57,15 +57,25 @@ Route::resource('imputations', ImputationController::class);
 | 4. GESTION DES ACTIVITÉS (PROTÉGÉ PAR AUTH)
 |--------------------------------------------------------------------------
 */
+
+/*
+
+|--------------------------------------------------------------------------
+| 4. GESTION DES ACTIVITÉS (PROTÉGÉ PAR AUTH)
+|--------------------------------------------------------------------------
+*/
 Route::middleware(['auth'])->group(function () {
 
     Route::prefix('activites')->name('activities.')->group(function () {
+        // Liste & Synthèse
         Route::get('/', [ActivityController::class, 'index'])->name('index');
+        Route::get('/synthese', [ActivityController::class, 'synthese'])->name('synthese'); // Ajout de la route de synthèse
+
+        // Création
         Route::get('/saisie', [ActivityController::class, 'create'])->name('create');
         Route::post('/', [ActivityController::class, 'store'])->name('store');
-        Route::get('/synthese', [ActivityController::class, 'synthese'])->name('synthese');
 
-        // Routes avec ID
+        // Actions spécifiques (ID)
         Route::get('/{activity}', [ActivityController::class, 'show'])->name('show');
         Route::get('/{activity}/modifier', [ActivityController::class, 'edit'])->name('edit');
         Route::put('/{activity}', [ActivityController::class, 'update'])->name('update');

@@ -1,99 +1,131 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- Import des icônes Bootstrap -->
-<link rel="stylesheet" href="https://jsdelivr.net">
+<div class="container-fluid py-4" style="background-color: #f0f2f5; min-height: 100vh;">
 
-<div class="container py-5">
-    <!-- Barre d'outils supérieure -->
-    <div class="d-flex justify-content-between align-items-center mb-4 px-2">
-        <a href="{{ route('activities.index') }}" class="btn btn-light rounded-pill shadow-sm px-4 fw-bold text-secondary transition-hover">
-            <i class="bi bi-arrow-left-circle-fill me-2 text-indigo"></i> Journal
+    <!-- BARRE D'ACTIONS -->
+    <div class="d-flex align-items-center justify-content-between mb-4 no-print">
+        <a href="{{ route('activities.index') }}" class="btn btn-white shadow-sm rounded-pill px-4 border fw-bold text-muted">
+            <i class="fas fa-arrow-left me-2 text-primary"></i> Retour
         </a>
         <div class="d-flex gap-2">
-            <a href="{{ route('activities.edit', $activity->id) }}" class="btn btn-warning rounded-pill shadow-sm px-4 fw-bold text-white border-0" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                <i class="bi bi-pencil-square me-1"></i> Modifier
+            <button onclick="window.print();" class="btn btn-dark shadow-sm px-4 py-2 rounded-pill border-0 fw-bold">
+                <i class="fas fa-print me-2 text-warning"></i> Imprimer la fiche
+            </button>
+            <a href="{{ route('activities.edit', $activity->id) }}" class="btn btn-warning shadow-sm px-4 py-2 rounded-pill border-0 fw-bold text-dark">
+                <i class="fas fa-edit me-2"></i> Modifier
             </a>
         </div>
     </div>
 
-    <!-- Carte Principale Éclatante -->
-    <div class="card border-0 shadow-lg rounded-5 overflow-hidden bg-white">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+            <!-- CARTE PRINCIPALE -->
+            <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
 
-        <!-- Header à fort impact visuel -->
-        <div class="card-header p-4 p-md-5 border-0 text-white" style="background: linear-gradient(135deg, #4361ee 0%, #4cc9f0 100%);">
-            <div class="d-flex align-items-center flex-wrap gap-3 mb-4">
-                <span class="badge bg-white bg-opacity-25 rounded-pill px-3 py-2 text-uppercase fw-black" style="font-size: 0.75rem; letter-spacing: 1px; backdrop-filter: blur(5px);">
-                    <i class="bi bi-building me-1"></i> {{ $activity->service->direction->name }}
-                </span>
-                <span class="text-white opacity-50 fw-bold">/</span>
-                <span class="text-white small fw-bold text-uppercase tracking-wider">{{ $activity->service->name }}</span>
-            </div>
-
-            <h1 class="display-5 fw-black text-white mb-0 tracking-tighter">
-                Rapport du <br class="d-md-none">
-                <span class="text-white opacity-100">{{ $activity->report_date->translatedFormat('j F Y') }}</span>
-            </h1>
-        </div>
-
-        <!-- Corps du rapport (Lisibilité accrue) -->
-        <div class="card-body p-4 p-md-5 bg-white">
-            <div class="row">
-                <div class="col-lg-10">
-                    <label class="d-block small fw-black text-uppercase text-indigo mb-4 tracking-widest">
-                        <i class="bi bi-journal-text me-2"></i> Réalisations détaillées
-                    </label>
-
-                    <!-- Encadré de contenu avec bordure néon -->
-                    <div class="p-4 p-md-5 rounded-4 border-start border-indigo border-5 bg-light bg-opacity-50 shadow-sm" style="min-height: 200px;">
-                        <p class="h5 fw-medium text-dark mb-0" style="white-space: pre-line; line-height: 2; color: #1e293b !important;">
-                            {{ $activity->content }}
-                        </p>
+                <!-- HEADER STYLE REUNION -->
+                <div class="card-header p-4 border-0 text-white" style="background: linear-gradient(45deg, #1e293b, #334155);">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="badge rounded-pill px-3 py-2 mb-2 shadow-sm" style="background-color: #22d3ee; color: #083344;">
+                                <i class="fas fa-calendar-alt me-2"></i> Activité du {{ \Carbon\Carbon::parse($activity->report_date)->translatedFormat('l d F Y') }}
+                            </span>
+                            <h3 class="fw-bolder mb-0 mt-2 text-uppercase">Détails de l'exécution</h3>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-white-50 d-block">ID de l'activité</small>
+                            <span class="fw-bold">#ACT-00{{ $activity->id }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Pied de page avec contrastes temporels -->
-        <div class="card-footer bg-light border-0 px-4 px-md-5 py-4">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                <div class="small text-muted fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                    <i class="bi bi-clock-history text-indigo me-1"></i> Enregistré le {{ $activity->created_at->format('d/m/Y à H:i') }}
+                <div class="card-body p-0">
+                    <!-- SECTION INFOS CLÉS -->
+                    <div class="row g-0 border-bottom">
+                        <div class="col-md-6 border-end p-4">
+                            <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Direction Responsable</label>
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box bg-primary-subtle text-primary rounded-3 p-3 me-3">
+                                    <i class="fas fa-building fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark">{{ $activity->service->direction->name }}</h6>
+                                    <small class="text-muted">Code: {{ $activity->service->direction->code ?? 'N/A' }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 p-4">
+                            <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Service Concerné</label>
+                            <div class="d-flex align-items-center">
+                                <div class="icon-box bg-info-subtle text-info rounded-3 p-3 me-3">
+                                    <i class="fas fa-layer-group fa-lg"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-0 text-dark">{{ $activity->service->name }}</h6>
+                                    <small class="text-muted">Opérationnel</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION CONTENU -->
+                    <div class="p-4 bg-white">
+                        <label class="text-muted small fw-bold text-uppercase mb-3 d-block">Rapport détaillé de l'activité</label>
+                        <div class="p-4 rounded-4 shadow-sm border-start border-4 border-primary" style="background-color: #f8fafc; min-height: 150px;">
+                            <p class="text-dark lh-lg fs-5 mb-0" style="white-space: pre-line;">
+                                {{ $activity->content }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- SECTION PROGRESSION -->
+                    <div class="p-4 border-top" style="background-color: #f1f5f9;">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <h6 class="fw-bold mb-1 text-dark">Niveau d'achèvement</h6>
+                                <p class="small text-muted mb-md-0">Mise à jour le {{ $activity->updated_at->format('d/m/Y à H:i') }}</p>
+                            </div>
+                            <div class="col-md-8">
+                                @php
+                                    $color = $activity->progress == 100 ? '#10b981' : ($activity->progress > 50 ? '#f59e0b' : '#ef4444');
+                                @endphp
+                                <div class="d-flex align-items-center">
+                                    <div class="progress flex-grow-1 shadow-sm" style="height: 15px; border-radius: 20px; background-color: #e2e8f0;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                             role="progressbar"
+                                             style="width: {{ $activity->progress }}%; background-color: {{ $color }}; border-radius: 20px;">
+                                        </div>
+                                    </div>
+                                    <span class="ms-3 fw-bolder fs-4" style="color: {{ $color }};">{{ $activity->progress }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                @if($activity->updated_at > $activity->created_at)
-                    <div class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25 px-3 py-2 rounded-pill small fw-bold text-uppercase" style="font-size: 0.65rem;">
-                        <i class="bi bi-info-circle me-1"></i> Mis à jour le {{ $activity->updated_at->format('d/m/Y') }}
+                <!-- FOOTER / SIGNATURE -->
+                <div class="card-footer bg-white p-4 border-0">
+                    <div class="d-flex justify-content-between align-items-center small text-muted italic">
+                        <span>Généré par le système de gestion des activités</span>
+                        <span class="fw-bold">Direction Générale</span>
                     </div>
-                @endif
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    @import url('https://googleapis.com');
+    .icon-box { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
+    .bg-primary-subtle { background-color: #e0e7ff; }
+    .bg-info-subtle { background-color: #e0f2fe; }
+    .italic { font-style: italic; }
 
-    body { background-color: #f1f5f9; font-family: 'Plus Jakarta Sans', sans-serif; }
-    .fw-black { font-weight: 800 !important; }
-    .text-indigo { color: #4361ee !important; }
-    .border-indigo { border-color: #4361ee !important; }
-    .rounded-5 { border-radius: 2rem !important; }
-    .rounded-4 { border-radius: 1.25rem !important; }
-    .tracking-tighter { letter-spacing: -0.05em; }
-    .tracking-widest { letter-spacing: 0.15em; }
-
-    .transition-hover:hover {
-        background-color: #ffffff !important;
-        transform: translateY(-2px);
-        color: #4361ee !important;
-    }
-
-    /* Style spécifique pour la lead text */
-    .h5.fw-medium { font-size: 1.15rem; }
-
-    @media (max-width: 768px) {
-        .display-5 { font-size: 2rem; }
+    @media print {
+        .no-print { display: none !important; }
+        body { background: white !important; }
+        .card { box-shadow: none !important; border: 1px solid #eee !important; }
+        .progress { border: 1px solid #ccc; }
     }
 </style>
 @endsection

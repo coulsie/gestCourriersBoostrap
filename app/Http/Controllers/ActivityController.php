@@ -17,24 +17,37 @@ class ActivityController extends Controller
 
 
 
-public function index()
+public function index(Request $request)
 {
-    // 1. On récupère les activités de manière fluide (sans calculer le total global)
-    $activities = Activity::select('id', 'service_id', 'report_date', 'content')
+    // 1. On récupère les directions pour le menu déroulant (en cache pour la performance)
+    $directions = cache()->remember('directions_list', 3600, function () {
+        return Direction::select('id', 'name')->orderBy('name')->get();
+    });
+
+    // 2. Construction de la requête avec filtrage dynamique
+    $query = Activity::select('id', 'service_id', 'report_date', 'content', 'progress')
         ->with([
             'service:id,name,direction_id',
             'service.direction:id,name'
-        ])
-        ->orderBy('report_date', 'desc')
-        ->simplePaginate(15);
+        ]);
 
-    // 2. On met en cache la liste des services pendant 1 heure (3600 secondes)
-    // Cela évite de recharger la liste des services à chaque affichage de l'index
+    // Filtrer par direction si sélectionné dans le <select>
+    if ($request->filled('direction')) {
+        $query->whereHas('service', function($q) use ($request) {
+            $q->where('direction_id', $request->direction);
+        });
+    }
+
+    $activities = $query->orderBy('report_date', 'desc')
+                        ->simplePaginate(15)
+                        ->withQueryString(); // Garde le filtre actif lors du changement de page
+
+    // 3. Liste des services (déjà en cache dans votre code)
     $services = cache()->remember('services_list', 3600, function () {
         return Service::select('id', 'name')->orderBy('name')->get();
     });
 
-    return view('activities.index', compact('activities', 'services'));
+    return view('activities.index', compact('activities', 'services', 'directions'));
 }
 
 
@@ -127,46 +140,85 @@ public function index()
 
 public function synthese(Request $request)
 {
-    $periode = $request->get('periode', 'weekly');
-    $directionId = $request->get('direction_id');
+    // 1. Récupération des filtres
+    $periode = $request->get('periode', 'mensuel');
+    $direction_id = $request->get('direction_id');
+    $date = now();
 
-    // On récupère directement les activités filtrées avec leurs relations
-    $activities = Activity::query()
-        ->select('id', 'service_id', 'report_date', 'content')
-        ->forPeriod($periode)
-        ->with(['service:id,name,direction_id', 'service.direction:id,name'])
-        ->when($directionId, function($q) use ($directionId) {
-            $q->whereHas('service', function($sq) use ($directionId) {
-                $sq->where('direction_id', $directionId);
-            });
-        })
-        ->orderBy('report_date', 'desc')
+    // 2. Construction de la requête de base selon la période
+    $query = Activity::query();
+    switch ($periode) {
+        case 'hebdomadaire':
+            $query->whereBetween('report_date', [$date->startOfWeek()->format('Y-m-d'), $date->endOfWeek()->format('Y-m-d')]);
+            $label = "cette semaine";
+            break;
+        case 'trimestriel':
+            $query->whereBetween('report_date', [$date->startOfQuarter()->format('Y-m-d'), $date->endOfQuarter()->format('Y-m-d')]);
+            $label = "ce trimestre";
+            break;
+        case 'annuel':
+            $query->whereYear('report_date', $date->year);
+            $label = "l'année " . $date->year;
+            break;
+        default:
+            $query->whereMonth('report_date', $date->month)->whereYear('report_date', $date->year);
+            $label = "ce mois";
+            break;
+    }
+
+    // 3. Application du filtre Direction sur les KPI (en haut)
+    $kpiQuery = clone $query;
+    if ($direction_id) {
+        $kpiQuery->whereHas('service', fn($q) => $q->where('direction_id', $direction_id));
+        $label .= " (Direction spécifique)";
+    }
+
+    // 4. Calcul des KPI
+    $totalActivites = (clone $kpiQuery)->count();
+    $tauxMoyen = (clone $kpiQuery)->avg('progress') ?? 0;
+    $activitesEnCours = (clone $kpiQuery)->whereBetween('progress', [1, 99])->count();
+    $activitesNonDemarrees = (clone $kpiQuery)->where('progress', 0)->count();
+
+    // 5. Calcul du Top Services (TOUJOURS DÉFINI ICI)
+    $topServices = Service::select('services.*', 'directions.name as direction_name')
+        ->join('directions', 'services.direction_id', '=', 'directions.id')
+        ->withCount(['activities' => function($q) use ($query) {
+            $q->whereIn('id', (clone $query)->pluck('id'));
+        }])
+        ->orderBy('activities_count', 'desc')
+        ->take(5)
         ->get();
 
-    // ✅ On groupe par Direction directement via les Collections Laravel (très rapide)
-    $rapport = $activities->groupBy(function($activity) {
-        return $activity->service->direction->name;
-    })->map(function ($group, $directionName) {
-        return [
-            'direction' => $directionName,
-            'total_activites' => $group->count(),
-            'details' => $group->map(function($act) {
-                return [
-                    'service' => $act->service->name,
-                    'date'    => $act->report_date->format('d/m/Y'),
-                    'texte'   => $act->content
-                ];
-            })
-        ];
-    })->values();
+    // 6. Logique adaptative pour le bas de page (Compil ou Détail)
+    $directions = Direction::all();
+    if ($direction_id) {
+        $statsDirections = Service::where('direction_id', $direction_id)
+            ->get()
+            ->map(function ($service) use ($query) {
+                $sub = Activity::where('service_id', $service->id)->whereIn('id', (clone $query)->pluck('id'));
+                $service->activities_count = $sub->count();
+                $service->avg_progress = $sub->avg('progress') ?? 0;
+                return $service;
+            });
+        $isDetailView = true;
+    } else {
+        $statsDirections = $directions->map(function ($dir) use ($query) {
+            $sub = Activity::whereHas('service', fn($q) => $q->where('direction_id', $dir->id))
+                            ->whereIn('id', (clone $query)->pluck('id'));
+            $dir->activities_count = $sub->count();
+            $dir->avg_progress = $sub->avg('progress') ?? 0;
+            return $dir;
+        })->filter(fn($d) => $d->activities_count > 0);
+        $isDetailView = false;
+    }
 
-    $allDirections = Direction::select('id', 'name')->orderBy('name')->get();
-
-    return view('activities.synthese', [
-        'rapport' => $rapport,
-        'periode' => $periode,
-        'directions' => $allDirections
-    ]);
+    return view('activities.synthese', compact(
+        'totalActivites', 'tauxMoyen', 'activitesEnCours', 'activitesNonDemarrees',
+        'statsDirections', 'topServices', 'periode', 'label', 'directions',
+        'direction_id', 'isDetailView'
+    ));
 }
+
+
 
 }

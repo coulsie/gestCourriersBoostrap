@@ -41,12 +41,17 @@ class Direction extends Model
 
 
 
-    public function activities() { return $this->hasMany(Activity::class); }
-
-    // Pour voir toutes les activités de la direction + ses services
-    public function allActivities() {
-        return Activity::where('direction_id', $this->id)->get();
-    }
+    public function activities()
+{
+    return $this->hasManyThrough(
+        Activity::class, // Le modèle final
+        Service::class,  // Le modèle intermédiaire
+        'direction_id',  // Clé étrangère sur la table services
+        'service_id',    // Clé étrangère sur la table activities
+        'id',            // Clé locale sur la table directions
+        'id'             // Clé locale sur la table services
+    );
+}
 
 
     }

@@ -1,175 +1,165 @@
 @extends('layouts.app')
 
 @section('content')
-<!-- Import des icônes (Fixés) -->
-<link rel="stylesheet" href="https://jsdelivr.net">
-<link rel="stylesheet" href="https://cloudflare.com">
 
-<style>
-    body { background-color: #f8f9fc; font-family: 'Plus Jakarta Sans', sans-serif; color: #1e293b; }
-    .fw-black { font-weight: 800 !important; }
-    .rounded-4 { border-radius: 1.25rem !important; }
+<div class="container-fluid py-4" style="background-color: #f0f2f5;">
 
-    /* ✅ Optimisation Performance : Rendu du tableau accéléré */
-    .table-optimized {
-        table-layout: fixed;
-        width: 100%;
-    }
-    .col-service { width: 25%; }
-    .col-date { width: 15%; }
-    .col-content { width: 40%; }
-    .col-actions { width: 20%; }
+    {{-- Message d'information dynamique --}}
+    <div class="alert alert-info border-0 shadow-sm rounded-3 d-flex align-items-center mb-4">
+        <i class="fas fa-chart-line fa-lg me-3"></i>
+        <div>
+            <strong>Suivi en temps réel :</strong> Les activités avec une progression de 100% sont automatiquement marquées comme terminées.
+        </div>
+    </div>
 
-    .bg-soft-primary { background-color: #e0e7ff; }
-    .bg-soft-indigo { background-color: #eef2ff; }
-    .text-indigo { color: #4361ee; }
-    .text-purple { color: #7209b7; }
-    .border-purple { border-color: #7209b7 !important; }
+   <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-dark fw-bolder">🚀 Suivi des Activités</h1>
+        <div class="d-flex gap-2 flex-wrap no-print">
 
-    .transition-hover:hover { background-color: #fcfdff; }
-</style>
+            <!-- FILTRE PAR DIRECTION -->
+            <form action="{{ route('activities.index') }}" method="GET" class="d-flex gap-2">
+                <select name="direction" class="form-select shadow-sm border-0 rounded-pill px-3" onchange="this.form.submit()">
+                    <option value="">🌍 Toutes les Directions</option>
+                    @foreach($directions as $d)
+                        <option value="{{ $d->id }}" {{ request('direction') == $d->id ? 'selected' : '' }}>
+                            {{ $d->name }}
+                        </option>
+                    @endforeach
+                </select>
+                @if(request('direction'))
+                    <a href="{{ route('activities.index') }}" class="btn btn-light rounded-pill shadow-sm border-0">
+                        <i class="fas fa-times text-danger"></i>
+                    </a>
+                @endif
+            </form>
 
-<div class="container py-4">
+            <a href="javascript:void(0)" onclick="window.print();" class="btn btn-dark shadow-sm px-3 py-2 rounded-pill border-0 fw-bold">
+                <i class="fas fa-print me-1 text-warning"></i> Imprimer
+            </a>
 
-    <!-- Header Premium -->
-    <div class="card border-0 shadow-lg mb-4 overflow-hidden text-white" style="border-radius: 1.5rem; background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);">
-        <div class="card-body p-4 p-md-5 d-flex flex-column flex-md-row justify-content-between align-items-center">
-            <div>
-                <h1 class="display-6 fw-black mb-1 text-white">Journal des Activités</h1>
-                <p class="lead opacity-75 mb-0 fw-medium">Suivi en temps réel des prestations par service</p>
-            </div>
-            <a href="{{ route('activities.create') }}" class="btn btn-light btn-lg px-4 py-3 rounded-4 shadow-sm mt-4 mt-md-0 fw-bold text-primary transition-hover">
-                <i class="bi bi-plus-circle-fill me-2"></i> Nouvelle Saisie
+            <a href="{{ route('activities.create') }}" class="btn shadow-lg px-4 py-2 rounded-pill border-0 text-white fw-bold" style="background: linear-gradient(45deg, #6366f1, #a855f7);">
+                <i class="fas fa-plus-circle me-1"></i> Nouvelle Activité
             </a>
         </div>
     </div>
 
-    <!-- Grille de Statistiques -->
-    <div class="row g-4 mb-4 text-center text-md-start">
-        <div class="col-md-3 col-6">
-            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 border-start border-primary border-5">
-                <div class="card-body p-3">
-                    <div class="text-uppercase small fw-black text-primary mb-1">Aujourd'hui</div>
-                    {{-- ✅ Optimisation : On évite de recalculer sur la collection paginée --}}
-                    <div class="h3 fw-black mb-0 text-dark">{{ $activities->count() }} <small class="text-muted fs-6">(page)</small></div>
-                </div>
+    {{-- Tableau des activités --}}
+    <div class="card shadow-lg mb-4 border-0 rounded-4 overflow-hidden">
+        <div class="card-header py-3 bg-white border-0 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold" style="color: #6366f1;">
+                <i class="fas fa-list-ul me-2 text-warning"></i>Journal des activités récentes
+            </h6>
+            <span class="badge bg-light text-muted border px-3 py-2 rounded-pill">Total: {{ $activities->count() }} lignes</span>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead style="background: #1e293b; color: #f8fafc;">
+                        <tr class="text-uppercase small fw-bold">
+                            <th class="ps-4 py-3">Date & Période</th>
+                            <th>Entité & Service</th>
+                            <th>Contenu de l'activité</th>
+                            <th class="text-center">Progression</th>
+                            <th class="text-end pe-4 no-print">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($activities as $activity)
+                        <tr>
+                            {{-- 1. DATE --}}
+                            <td class="ps-4">
+                                <span class="badge rounded-pill px-3 py-2 mb-1 shadow-sm" style="background-color: #22d3ee; color: #083344;">
+                                    {{ \Carbon\Carbon::parse($activity->report_date)->translatedFormat('l d F Y') }}
+                                </span><br>
+                                <small class="text-muted italic ps-1">
+                                    <i class="far fa-clock me-1"></i>{{ \Carbon\Carbon::parse($activity->report_date)->diffForHumans() }}
+                                </small>
+                            </td>
+
+                            {{-- 2. DIRECTION ET SERVICE --}}
+                            <td>
+                                <div class="mb-1">
+                                    <span class="badge shadow-sm text-white px-2 py-1 mb-1" style="background-color: #6366f1; font-size: 0.7rem;">
+                                        <i class="fas fa-building me-1"></i>{{ $activity->service->direction->name }}
+                                    </span>
+                                </div>
+                                <div class="fw-bold text-dark small">
+                                    <i class="fas fa-layer-group text-info me-1"></i>{{ $activity->service->name }}
+                                </div>
+                            </td>
+
+                            {{-- 3. CONTENU --}}
+                            <td style="max-width: 350px;">
+                                <div class="text-dark small lh-base" style="text-align: justify;">
+                                    {{ Str::limit($activity->content, 150) }}
+                                </div>
+                            </td>
+
+                            {{-- 4. PROGRESSION --}}
+                            <td class="text-center" style="min-width: 180px;">
+                                @php
+                                    $progress = $activity->progress;
+                                    $color = $progress == 100 ? '#10b981' : ($progress > 50 ? '#f59e0b' : '#ef4444');
+                                @endphp
+                                <div class="d-flex align-items-center justify-content-center flex-column">
+                                    <span class="fw-bold mb-1" style="color: {{ $color }};">{{ $progress }}%</span>
+                                    <div class="progress w-75 shadow-sm" style="height: 8px; border-radius: 10px; background-color: #e2e8f0;">
+                                        <div class="progress-bar" role="progressbar"
+                                             style="width: {{ $progress }}%; background-color: {{ $color }}; border-radius: 10px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            {{-- 5. ACTIONS --}}
+                            <td class="text-end pe-4 no-print">
+                                <div class="btn-group shadow-sm rounded-pill overflow-hidden border">
+                                    <a href="{{ route('activities.show', $activity->id) }}" class="btn btn-white btn-sm px-3 border-0" title="Voir">
+                                        <i class="fas fa-eye text-primary"></i>
+                                    </a>
+                                    <a href="{{ route('activities.edit', $activity->id) }}" class="btn btn-white btn-sm px-3 border-0" title="Modifier">
+                                        <i class="fas fa-edit text-warning"></i>
+                                    </a>
+                                    <form action="{{ route('activities.destroy', $activity->id) }}" method="POST" class="d-inline">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="btn btn-white btn-sm px-3 border-0" onclick="return confirm('Supprimer cette activité ?')" title="Supprimer">
+                                            <i class="fas fa-trash-alt text-danger"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="text-center py-5">
+                                <i class="fas fa-folder-open fa-3x text-muted mb-3 opacity-25"></i>
+                                <p class="text-muted fw-bold">Aucune activité trouvée pour cette période.</p>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
-        <div class="col-md-3 col-6">
-            <div class="card border-0 shadow-sm rounded-4 bg-white h-100 border-start border-purple border-5">
-                <div class="card-body p-3">
-                    <div class="text-uppercase small fw-black text-purple mb-1">Total Dossiers</div>
-
-                    {{-- ✅ Ligne 62 corrigée --}}
-                    {{-- Affiche le nombre d'éléments chargés sur la page (ex: 15) --}}
-                    <div class="h3 fw-black mb-0 text-dark">{{ $activities->count() }}</div>
-
-
-                </div>
-            </div>
+        @if($activities->hasPages())
+        <div class="card-footer bg-white border-0 py-3">
+            {{ $activities->links() }}
         </div>
+        @endif
     </div>
-
-    <!-- Table de Données Optimisée -->
-<div class="card border-0 shadow-sm rounded-4 overflow-hidden bg-white">
-    <div class="card-header bg-white border-bottom-0 py-3 px-4 d-flex justify-content-between align-items-center">
-        <h2 class="h6 fw-black text-dark mb-0 text-uppercase">Rapports Récents</h2>
-        {{-- Utilisation de count() au lieu de total() pour la rapidité --}}
-        <span class="badge bg-primary text-white rounded-pill px-3 py-2">
-            {{ $activities->count() }} éléments affichés
-        </span>
-    </div>
-
-    <div class="table-responsive">
-        {{-- Ajout de table-layout: fixed pour accélérer le rendu du navigateur --}}
-        <table class="table table-hover align-middle mb-0" style="table-layout: fixed;">
-            <thead class="bg-light text-muted">
-                <tr>
-                    <th class="ps-4 py-3 small fw-black text-uppercase" style="width: 25%;">Service</th>
-                    <th class="py-3 small fw-black text-uppercase" style="width: 15%;">Date</th>
-                    <th class="py-3 small fw-black text-uppercase" style="width: 45%;">Contenu</th>
-                    <th class="pe-4 py-3 text-end small fw-black text-uppercase" style="width: 15%;">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($activities as $activity)
-                    <tr class="transition-hover">
-                        <td class="ps-4">
-                            {{-- On vérifie l'existence des relations pour éviter les erreurs 500 --}}
-                            <div class="fw-bold text-dark text-truncate">{{ $activity->service->name ?? 'N/A' }}</div>
-                            <div class="badge bg-light text-primary text-uppercase" style="font-size: 0.6rem;">
-                                {{ $activity->service->direction->name ?? 'Direction inconnue' }}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="small text-dark fw-medium text-nowrap">
-                                <i class="bi bi-calendar3 text-primary me-1"></i>
-                                {{ optional($activity->report_date)->format('d/m/Y') }}
-                            </div>
-                        </td>
-                        <td>
-                            {{-- Str::limit est crucial pour la RAM si content est un TEXT long --}}
-                            <div class="p-2 bg-light rounded-3 small text-muted text-truncate" title="{{ $activity->content }}">
-                                {{ Str::limit($activity->content, 80) }}
-                            </div>
-                        </td>
-                        <td class="pe-4 text-end">
-                            <div class="d-flex justify-content-end gap-2">
-                                <!-- Bouton Voir -->
-                                <a href="{{ route('activities.show', $activity->id) }}" class="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center" style="width: 35px; height: 35px;" title="Voir">
-                                    <svg xmlns="http://w3.org" width="16" height="16" fill="currentColor" class="bi bi-eye-fill text-primary" viewBox="0 0 16 16">
-                                        <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
-                                        <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
-                                    </svg>
-                                </a>
-
-                                <!-- Bouton Modifier -->
-                                <a href="{{ route('activities.edit', $activity->id) }}" class="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center" style="width: 35px; height: 35px;" title="Modifier">
-                                    <svg xmlns="http://w3.org" width="16" height="16" fill="currentColor" class="bi bi-pencil-square text-warning" viewBox="0 0 16 16">
-                                        <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                        <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
-                                    </svg>
-                                </a>
-
-                                <!-- Bouton Supprimer -->
-                                <form action="{{ route('activities.destroy', $activity->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer ce rapport ?');">
-                                    @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-light border d-inline-flex align-items-center justify-content-center" style="width: 35px; height: 35px;" title="Supprimer">
-                                        <svg xmlns="http://w3.org" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill text-danger" viewBox="0 0 16 16">
-                                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
-                                        </svg>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="text-center py-5 text-muted">
-                            <i class="bi bi-inbox fs-1 d-block mb-2 opacity-25"></i>
-                            Aucune activité enregistrée.
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    {{-- Pagination simple (Précédent/Suivant) pour la performance --}}
-    @if($activities->hasPages())
-        <div class="card-footer bg-white border-top-0 p-3">
-            <div class="d-flex justify-content-center">
-                {{ $activities->links() }}
-            </div>
-        </div>
-    @endif
-</div>
 </div>
 
 <style>
-    /* Accélère le rendu en évitant les recalculs de largeur de colonnes */
-    .text-truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .transition-hover:hover { background-color: #f8f9fa !important; }
+    /* Masquer les éléments à l'impression */
+    @media print {
+        .no-print, .btn-group, .pagination, .alert { display: none !important; }
+        .container-fluid { background: white !important; padding: 0 !important; }
+        .card { box-shadow: none !important; border: 1px solid #ddd !important; }
+        .table { border: 1px solid #eee; }
+    }
+    .italic { font-style: italic; font-size: 0.8rem; }
+    .btn-white { background: #fff; transition: background 0.2s; }
+    .btn-white:hover { background: #f8fafc; }
 </style>
+
 @endsection
