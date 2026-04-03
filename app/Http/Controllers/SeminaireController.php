@@ -175,32 +175,57 @@ class SeminaireController extends Controller
 
         if ($request->hasFile('fichier')) {
             $file = $request->file('fichier');
-            $path = $file->store('documents_seminaires', 'public');
 
-            // 1. Enregistrement du document
+            // 1. Génération d'un nom de fichier unique (Timestamp + Nom original)
+            $fileName = time() . '_' . $file->getClientOriginalName();
+
+            // 2. Déplacement du fichier physiquement dans public/seminaires_rapport
+            $file->move(public_path('seminaires_rapport'), $fileName);
+
+            // 3. Enregistrement en base de données
+            // Note : On stocke uniquement le nom du fichier ($fileName) dans fichier_path
             SeminaireDocument::create([
                 'seminaire_id' => $seminaireId,
                 'nom_document' => $file->getClientOriginalName(),
-                'fichier_path' => $path,
+                'fichier_path' => $fileName,
                 'type'         => $request->type,
             ]);
 
-            // 2. Si le document est de type 'rapport', on met à jour le statut du séminaire
+            // 4. Mise à jour du statut si c'est un rapport
             if ($request->type === 'rapport') {
                 $seminaire = Seminaire::findOrFail($seminaireId);
                 $seminaire->update(['statut' => 'termine']);
             }
 
-            return back()->with('success', 'Rapport archivé et séminaire marqué comme terminé !');
+            return back()->with('success', 'Document archivé avec succès !');
         }
 
         return back()->with('error', 'Aucun fichier sélectionné.');
     }
 
+    
+    public function deleteDocument($seminaireId, $documentId)
+        {
+            $document = SeminaireDocument::findOrFail($documentId);
+
+            // Suppression physique du fichier
+            $filePath = public_path('seminaires_rapport/' . $document->fichier_path);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+
+            // Suppression de l'enregistrement en base de données
+            $document->delete();
+
+            return back()->with('success', 'Document supprimé avec succès !');
+        }
+
+
     public function dashboard()
-    {
-        // On récupère les séminaires avec le compte des participants et des documents
-        $stats = Seminaire::withCount([
+{
+    // On charge la relation 'documents' ET on compte les participants/documents en une seule requête
+    $stats = Seminaire::with(['documents'])
+        ->withCount([
             'participants as inscrits_total',
             'participants as presents_count' => function ($query) {
                 $query->where('est_present', 1);
@@ -208,13 +233,18 @@ class SeminaireController extends Controller
             'documents as rapports_count' => function ($query) {
                 $query->where('type', 'rapport');
             }
-        ])->orderBy('date_debut', 'desc')->get();
+        ])
+        ->orderBy('date_debut', 'desc')
+        ->get();
 
-        // Calculs globaux pour le haut de page
-        $totalSeminaires = $stats->count();
-        $enAttenteRapport = $stats->where('statut', 'en attente du rapport final')->count();
+    // Calculs globaux pour les compteurs du haut de page
+    $totalSeminaires = $stats->count();
 
-        return view('seminaires.report', compact('stats', 'totalSeminaires', 'enAttenteRapport'));
-    }
+    // On vérifie le statut exact (avec espaces comme en base de données)
+    $enAttenteRapport = $stats->where('statut', 'en attente du rapport final')->count();
+
+    return view('seminaires.report', compact('stats', 'totalSeminaires', 'enAttenteRapport'));
+}
+
 
     }

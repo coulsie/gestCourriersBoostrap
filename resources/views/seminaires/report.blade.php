@@ -64,11 +64,29 @@
                         </td>
                         <td class="text-center">
                             @if($s->rapports_count > 0)
-                                <i class="fas fa-file-pdf text-danger fs-5" title="Rapport présent"></i>
+                                @php
+                                    // On récupère le document de type 'rapport'
+                                    $rapport = $s->documents->where('type', 'rapport')->first();
+                                @endphp
+
+                                @if($rapport)
+                                    {{-- Le chemin en base contient déjà 'Seminaires_Rapport/nom.pdf' --}}
+                                    <a href="{{ asset('seminaires_rapport/' . $rapport->fichier_path) }}" target="_blank" class="text-decoration-none">
+                                        <div class="p-1 rounded shadow-sm d-inline-block" style="background-color: #fff1f2; border: 1px solid #fecaca;">
+                                            <i class="fas fa-file-pdf text-danger fs-4" title="Cliquez pour ouvrir le rapport final"></i>
+                                        </div>
+                                        <small class="d-block text-danger fw-bold mt-1" style="font-size: 0.6rem;">OUVRIR RAPPORT</small>
+                                    </a>
+                                @endif
                             @else
-                                <i class="fas fa-exclamation-triangle text-warning" title="Rapport manquant"></i>
+                                <div class="opacity-50">
+                                    <i class="fas fa-file-invoice text-muted fs-4"></i>
+                                    <small class="d-block text-muted fw-bold mt-1" style="font-size: 0.6rem;">AUCUN RAPPORT</small>
+                                </div>
                             @endif
                         </td>
+
+
                         <td>
                             <a href="{{ route('seminaires.show', $s->id) }}" class="btn btn-sm btn-outline-primary rounded-pill">Détails</a>
                         </td>
