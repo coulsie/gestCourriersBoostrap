@@ -2,8 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
-    DirectionController, ServiceController, AgentServiceController,
-    CourrierController, ImputationController, ActivityController
+    DirectionController,
+    ServiceController,
+    AgentServiceController,
+    CourrierController,
+    ImputationController,
+    ActivityController,
+    SeminaireController
 };
 
 /*
@@ -12,6 +17,7 @@ use App\Http\Controllers\{
 | 1. AFFECTATIONS & SERVICES
 |--------------------------------------------------------------------------
 */
+
 Route::prefix('agents')->name('agents.')->group(function () {
     Route::match(['get', 'post'], '/par-service', [AgentServiceController::class, 'listeParService'])->name('par.service');
     Route::match(['get', 'post'], '/par-service/recherche', [AgentServiceController::class, 'recherche'])->name('par.service.recherche');
@@ -54,31 +60,34 @@ Route::resource('imputations', ImputationController::class);
 /*
 
 |--------------------------------------------------------------------------
-| 4. GESTION DES ACTIVITÉS (PROTÉGÉ PAR AUTH)
-|--------------------------------------------------------------------------
-*/
-
-/*
-
-|--------------------------------------------------------------------------
-| 4. GESTION DES ACTIVITÉS (PROTÉGÉ PAR AUTH)
+| 4. GESTION DES ACTIVITÉS & SÉMINAIRES (PROTÉGÉ PAR AUTH)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
 
+    // ACTIVITÉS
     Route::prefix('activites')->name('activities.')->group(function () {
-        // Liste & Synthèse
         Route::get('/', [ActivityController::class, 'index'])->name('index');
-        Route::get('/synthese', [ActivityController::class, 'synthese'])->name('synthese'); // Ajout de la route de synthèse
-
-        // Création
+        Route::get('/synthese', [ActivityController::class, 'synthese'])->name('synthese');
+        Route::get('/reporting', [ActivityController::class, 'reporting'])->name('reporting');
         Route::get('/saisie', [ActivityController::class, 'create'])->name('create');
         Route::post('/', [ActivityController::class, 'store'])->name('store');
 
-        // Actions spécifiques (ID)
         Route::get('/{activity}', [ActivityController::class, 'show'])->name('show');
         Route::get('/{activity}/modifier', [ActivityController::class, 'edit'])->name('edit');
         Route::put('/{activity}', [ActivityController::class, 'update'])->name('update');
         Route::delete('/{activity}', [ActivityController::class, 'destroy'])->name('destroy');
+    });
+
+    // SÉMINAIRES
+    Route::prefix('seminaires')->name('seminaires.')->group(function () {
+
+        // 1. Routes spécifiques d'abord (très important)
+        Route::get('/{seminaire}/emargement', [SeminaireController::class, 'showEmargement'])->name('emargement');
+        Route::post('/{seminaire}/pointer/{participation}', [SeminaireController::class, 'pointer'])->name('pointer');
+        Route::post('/{seminaire}/participation/{participation}/update-pointage', [SeminaireController::class, 'updatePointage'])->name('update-pointage');
+
+        // 2. Ressource ensuite
+        Route::resource('/', SeminaireController::class)->parameters(['' => 'seminaire']);
     });
 });

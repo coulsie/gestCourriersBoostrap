@@ -219,6 +219,40 @@ public function synthese(Request $request)
     ));
 }
 
+    public function reporting(Request $request)
+    {
+        // On récupère l'année en cours par défaut ou celle choisie
+        $annee = $request->get('annee', date('Y'));
+        $type = $request->get('type', 'mois'); // 'mois' ou 'semaine'
 
+        // 1. Récupérer les directions et leurs services
+        $directions = Direction::with('services')->get();
 
+        // 2. Initialiser la requête sur le modèle Activity avec la bonne colonne : report_date
+        $query = Activity::whereYear('report_date', $annee);
+
+        if ($type == 'semaine') {
+            // Groupement par semaine via la colonne report_date
+            $stats = $query->selectRaw('service_id, WEEK(report_date) as periode, COUNT(*) as total')
+                ->groupBy('service_id', 'periode')
+                ->get();
+            $colonnes = range(1, 52);
+            $labelPeriode = "Semaine";
+        } else {
+            // Groupement par mois via la colonne report_date
+            $stats = $query->selectRaw('service_id, MONTH(report_date) as periode, COUNT(*) as total')
+                ->groupBy('service_id', 'periode')
+                ->get();
+            $colonnes = range(1, 12);
+            $labelPeriode = "Mois";
+        }
+
+        // 3. Transformer en tableau associatif [service_id][periode] = total
+        $matrix = [];
+        foreach ($stats as $s) {
+            $matrix[$s->service_id][$s->periode] = $s->total;
+        }
+
+        return view('activities.reporting', compact('directions', 'matrix', 'colonnes', 'type', 'annee', 'labelPeriode'));
+    }
 }

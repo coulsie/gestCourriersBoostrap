@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Seminaire;
+use App\Models\Participation; // <--- AJOUTEZ CETTE LIGNE ICI
 use Illuminate\Http\Request;
 use Exception;
 use App\Models\Agent; // N'oubliez pas d'importer le modèle en haut
 use App\Models\SeminaireDocument;
 use Illuminate\Support\Facades\Storage; // Utile pour supprimer des fichiers plus tard
+use Illuminate\Support\Facades\DB; // Ajoutez cet import en haut du contrôleur
+use Illuminate\Support\Carbon;
+
+
 
 
 class SeminaireController extends Controller
@@ -203,7 +208,7 @@ class SeminaireController extends Controller
         return back()->with('error', 'Aucun fichier sélectionné.');
     }
 
-    
+
     public function deleteDocument($seminaireId, $documentId)
         {
             $document = SeminaireDocument::findOrFail($documentId);
@@ -246,5 +251,106 @@ class SeminaireController extends Controller
     return view('seminaires.report', compact('stats', 'totalSeminaires', 'enAttenteRapport'));
 }
 
+    /**
+     * Méthode pour le bouton de pointage rapide (Présent / Pointer)
+     */
+    public function pointer(Request $request, $seminaireId, $participationId)
+    {
+        // On récupère l'état actuel pour basculer (toggle)
+        $participation = DB::table('seminaire_participants')->where('id', $participationId)->first();
 
+        if (!$participation) {
+            return back()->with('error', 'Participant introuvable.');
+        }
+
+        $nouvelEtat = !$participation->est_present;
+
+        DB::table('seminaire_participants')
+            ->where('id', $participationId)
+            ->update([
+                'est_present' => $nouvelEtat,
+                'heure_pointage' => $nouvelEtat ? now() : null, // On met l'heure actuelle si on pointe présent
+                'updated_at' => now()
+            ]);
+
+        return back()->with('success', 'Statut de présence mis à jour.');
     }
+
+    /**
+     * Méthode pour la saisie manuelle Date & Heure (La disquette)
+     */
+    public function updatePointage(Request $request, $seminaireId, $participantId)
+    {
+        // 1. Validation stricte
+        $request->validate([
+            'date_pointage'  => 'required|date_format:Y-m-d',
+            'heure_presence' => 'required',
+        ]);
+
+        try {
+            // 2. Construction propre du datetime
+            $fullDatetime = $request->date_pointage . ' ' . $request->heure_presence . ':00';
+
+            // 3. Mise à jour ou Insertion
+            DB::table('seminaire_emargements')->updateOrInsert(
+                [
+                    'seminaire_id'   => $seminaireId,
+                    'participant_id' => $participantId,
+                    'date_pointage'  => $request->date_pointage,
+                ],
+                [
+                    'heure_pointage' => $fullDatetime,
+                    'est_present'    => true,
+                    'created_at'     => now(),
+                    'updated_at'     => now()
+                ]
+            );
+
+            return back()->with('success', 'Pointage enregistré avec succès !');
+        } catch (\Exception $e) {
+            // En cas d'erreur SQL, on affiche le message réel
+            return back()->withErrors(['error' => 'Erreur SQL : ' . $e->getMessage()]);
+        }
+    }
+
+    public function showEmargement(Request $request, $id)
+    {
+        $seminaire = Seminaire::findOrFail($id);
+
+        // 1. Générer la liste des dates (du début à la fin du séminaire)
+        $debut = \Carbon\Carbon::parse($seminaire->date_debut);
+        $fin = \Carbon\Carbon::parse($seminaire->date_fin);
+        $jours = [];
+
+        // On utilise copy() pour ne pas modifier l'objet original dans la boucle
+        for ($date = $debut->copy(); $date->lte($fin); $date->addDay()) {
+            $jours[] = $date->format('Y-m-d');
+        }
+
+        // 2. Déterminer le jour affiché (par défaut le 1er jour du séminaire)
+        $dateSelectionnee = $request->get('date_pointage', $jours[0] ?? date('Y-m-d'));
+
+        // 3. Requête avec concaténation du nom et prénom de l'agent
+        $participants = DB::table('seminaire_participants as sp')
+            ->leftJoin('agents as a', 'sp.agent_id', '=', 'a.id')
+            ->leftJoin('seminaire_emargements as se', function ($join) use ($dateSelectionnee) {
+                $join->on('sp.id', '=', 'se.participant_id')
+                    ->where('se.date_pointage', '=', $dateSelectionnee);
+            })
+            ->where('sp.seminaire_id', $id)
+            ->select(
+                'sp.id',
+                'sp.nom_externe',
+                'sp.organisme_externe',
+                // Concaténation SQL pour MariaDB/MySQL
+                DB::raw("CONCAT(a.first_name, ' ', a.last_name) as nom_agent"),
+                'se.heure_pointage',
+                'se.est_present'
+            )
+            ->get();
+
+        return view('seminaires.emargement', compact('seminaire', 'jours', 'dateSelectionnee', 'participants'));
+    }
+
+
+}

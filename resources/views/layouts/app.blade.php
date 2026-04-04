@@ -170,10 +170,14 @@
                                 <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('activities.synthese') }}">
                                     <i class="fas fa-calendar-alt me-1"></i> Suivi des activités
                                 </a>
+                                <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('activities.reporting') }}">
+                                    <i class="fas fa-calendar-alt me-1"></i> Reporting des activités
+                                </a>
                                     <!-- AJOUT DU SUIVI DES SEMINAIRES ICI -->
                                 <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('seminaires.index') }}">
                                     <i class="fas fa-calendar-alt me-1"></i> Suivi des Séminaires
                                 </a>
+                                
                                 <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('seminaires.report') }}">
                                     <i class="fas fa-file-alt me-1"></i> État des Séminaires
 

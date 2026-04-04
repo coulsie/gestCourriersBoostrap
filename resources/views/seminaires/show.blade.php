@@ -15,6 +15,10 @@
             <h1 class="h3 mb-0 text-dark fw-bolder">🎓 {{ $seminaire->titre }}</h1>
         </div>
         <div>
+            <!-- BOUTON ÉMARGEMENT QUOTIDIEN AJOUTÉ ICI -->
+            <a href="{{ route('seminaires.emargement', $seminaire->id) }}" class="btn btn-primary shadow-sm rounded-pill px-4 fw-bold">
+                <i class="fas fa-clipboard-check me-2"></i> Émargement Quotidien
+            </a>
             <button onclick="window.print()" class="btn btn-outline-secondary shadow-sm rounded-pill px-3 me-2">
                 <i class="fas fa-print me-1"></i> Imprimer
             </button>
@@ -70,56 +74,75 @@
                 </div>
             </div>
 
-            <!-- TABLEAU D'ÉMARGEMENT (LISTE DE PRÉSENCE) -->
-            <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
-                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 fw-bold text-dark"><i class="fas fa-check-double me-2 text-success"></i>Liste d'Émargement</h6>
-                    <span class="badge rounded-pill bg-soft-primary text-primary px-3 py-2 no-print">
-                        {{ $seminaire->participations->count() }} Inscrits
-                    </span>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead style="background: #f8fafc;">
-                            <tr class="text-uppercase small fw-bold text-muted">
-                                <th class="ps-4">Participant</th>
-                                <th>Structure</th>
-                                <th class="text-center no-print">Pointage</th>
-                                <th class="text-end pe-4">Signature / Heure</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($seminaire->participations as $p)
-                            <tr>
-                                <td class="ps-4">
-                                    <div class="fw-bold text-dark">{{ $p->nom_complet }}</div>
-                                    @if($p->agent) <small class="text-muted">Mat: {{ $p->agent->matricule }}</small> @endif
-                                </td>
-                                <td>
-                                    <span class="badge px-2 py-1 rounded-pill {{ $p->agent_id ? 'bg-soft-info text-info' : 'bg-soft-warning text-warning' }}" style="font-size: 0.7rem;">
-                                        {{ $p->structure }}
-                                    </span>
-                                </td>
-                                <td class="text-center no-print">
-                                    <form action="{{ route('seminaires.pointer', [$seminaire->id, $p->id]) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="btn btn-sm {{ $p->est_present ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3 fw-bold">
-                                            <i class="fas {{ $p->est_present ? 'fa-check' : 'fa-fingerprint' }} me-1"></i>
-                                            {{ $p->est_present ? 'Présent' : 'Pointer' }}
-                                        </button>
-                                    </form>
-                                </td>
-                                <td class="text-end pe-4 text-muted small italic">
-                                    {{ $p->heure_pointage ? $p->heure_pointage->format('H:i') : '..........................' }}
-                                </td>
-                            </tr>
-                            @empty
-                            <tr><td colspan="4" class="text-center py-5 text-muted">Aucun participant inscrit.</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+            <!-- TABLEAU D'ÉMARGEMENT MODIFIÉ -->
+        <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
+            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center border-bottom">
+                <h6 class="m-0 fw-bold text-dark"><i class="fas fa-check-double me-2 text-success"></i>Pointage des Présences</h6>
+                <span class="badge rounded-pill bg-soft-primary text-primary px-3 py-2 no-print">
+                    {{ $seminaire->participations->count() }} Inscrits
+                </span>
             </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead style="background: #f8fafc;">
+                        <tr class="text-uppercase small fw-bold text-muted">
+                            <th class="ps-4">Participant</th>
+                            <th>Structure</th>
+                            <th class="text-center no-print">Action Rapide</th>
+                            <th class="pe-4" style="min-width: 250px;">Date & Heure d'arrivée</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($seminaire->participations as $p)
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold text-dark">{{ $p->nom_complet }}</div>
+                                @if($p->agent) <small class="text-muted">Mat: {{ $p->agent->matricule }}</small> @endif
+                            </td>
+                            <td>
+                                <span class="badge px-2 py-1 rounded-pill {{ $p->agent_id ? 'bg-soft-info text-info' : 'bg-soft-warning text-warning' }}" style="font-size: 0.7rem;">
+                                    {{ $p->structure }}
+                                </span>
+                            </td>
+
+                            <!-- BOUTON DE POINTAGE RAPIDE (Caché à l'impression) -->
+                            <td class="text-center no-print">
+                                <form action="{{ route('seminaires.pointer', [$seminaire->id, $p->id]) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm {{ $p->est_present ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3 fw-bold shadow-sm">
+                                        <i class="fas {{ $p->est_present ? 'fa-check' : 'fa-fingerprint' }} me-1"></i>
+                                        {{ $p->est_present ? 'Pointé' : 'Présent' }}
+                                    </button>
+                                </form>
+                            </td>
+
+                            <!-- SAISIE MANUELLE DATE/HEURE (Visible impression) -->
+                            <td class="pe-4">
+                                <form action="{{ route('seminaires.update-pointage', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex gap-1 no-print">
+                                    @csrf
+                                    <input type="date" name="date_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('Y-m-d') : date('Y-m-d') }}" class="form-control form-control-sm border-0 bg-light rounded-pill shadow-none" style="font-size: 0.75rem;">
+                                    <input type="time" name="heure_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('H:i') : '' }}" class="form-control form-control-sm border-0 bg-light rounded-pill shadow-none" style="font-size: 0.75rem;">
+                                    <button type="submit" class="btn btn-sm btn-primary rounded-circle shadow-sm"><i class="fas fa-save fa-xs"></i></button>
+                                </form>
+
+                                <!-- TEXTE POUR L'IMPRESSION (Caché sur écran) -->
+                                <div class="d-none d-print-block border-bottom text-center pb-1">
+                                    @if($p->heure_pointage)
+                                        <span class="fw-bold">{{ $p->heure_pointage->format('d/m/Y à H:i') }}</span>
+                                    @else
+                                        <span class="text-muted opacity-25">........................................</span>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr><td colspan="4" class="text-center py-5 text-muted">Aucun participant inscrit.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         </div>
 
         <!-- Colonne Droite : Inscriptions & Rapports -->
