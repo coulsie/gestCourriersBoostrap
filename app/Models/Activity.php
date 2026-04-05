@@ -13,13 +13,29 @@ class Activity extends Model
         'service_id',
         'report_date',
         'content',
-        'observation'
+        'observation',
+        'start_date',
+        'end_date',
+        'is_permanent',
+        'progress'
     ];
 
+
     protected $casts = [
-        // Utiliser 'date' suffit, mais assurez-vous que c'est bien mappé
-        'report_date' => 'date',
+    'report_date' => 'date',
+    'start_date' => 'date',
+        'end_date' => 'date',
+        'is_permanent' => 'boolean',
     ];
+
+    public function getStatusAttribute()
+    {
+        if ($this->is_permanent) return 'Permanent';
+        if ($this->progress >= 100) return 'Terminé';
+        if (now()->gt($this->end_date) && $this->progress < 100) return 'En retard';
+        return 'En cours';
+    }
+
 
     public function service(): BelongsTo
     {

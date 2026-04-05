@@ -17,38 +17,46 @@ class ActivityController extends Controller
 
 
 
-public function index(Request $request)
-{
-    // 1. On récupère les directions pour le menu déroulant (en cache pour la performance)
-    $directions = cache()->remember('directions_list', 3600, function () {
-        return Direction::select('id', 'name')->orderBy('name')->get();
-    });
-
-    // 2. Construction de la requête avec filtrage dynamique
-    $query = Activity::select('id', 'service_id', 'report_date', 'content', 'progress')
-        ->with([
-            'service:id,name,direction_id',
-            'service.direction:id,name'
-        ]);
-
-    // Filtrer par direction si sélectionné dans le <select>
-    if ($request->filled('direction')) {
-        $query->whereHas('service', function($q) use ($request) {
-            $q->where('direction_id', $request->direction);
+    public function index(Request $request)
+    {
+        // 1. On récupère les directions pour le menu déroulant
+        $directions = cache()->remember('directions_list', 3600, function () {
+            return Direction::select('id', 'name')->orderBy('name')->get();
         });
+
+        // 2. Construction de la requête avec TOUTES les colonnes nécessaires
+        $query = Activity::select(
+            'id',
+            'service_id',
+            'report_date',
+            'start_date',    // <--- AJOUTÉ
+            'end_date',      // <--- AJOUTÉ
+            'is_permanent',  // <--- AJOUTÉ
+            'content',
+            'progress'
+        )
+            ->with([
+                'service:id,name,direction_id',
+                'service.direction:id,name'
+            ]);
+
+        // Filtrer par direction si sélectionné
+        if ($request->filled('direction')) {
+            $query->whereHas('service', function ($q) use ($request) {
+                $q->where('direction_id', $request->direction);
+            });
+        }
+
+        $activities = $query->orderBy('report_date', 'desc')
+            ->simplePaginate(15)
+            ->withQueryString();
+
+        $services = cache()->remember('services_list', 3600, function () {
+            return Service::select('id', 'name')->orderBy('name')->get();
+        });
+
+        return view('activities.index', compact('activities', 'services', 'directions'));
     }
-
-    $activities = $query->orderBy('report_date', 'desc')
-                        ->simplePaginate(15)
-                        ->withQueryString(); // Garde le filtre actif lors du changement de page
-
-    // 3. Liste des services (déjà en cache dans votre code)
-    $services = cache()->remember('services_list', 3600, function () {
-        return Service::select('id', 'name')->orderBy('name')->get();
-    });
-
-    return view('activities.index', compact('activities', 'services', 'directions'));
-}
 
 
     /**
@@ -66,19 +74,33 @@ public function index(Request $request)
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'service_id'  => 'required|exists:services,id',
-            'report_date' => 'required|date',
-            'content'     => 'required|string|min:10',
+            'service_id'   => 'required|exists:services,id',
+            'report_date'  => 'required|date',
+            'start_date'   => 'required|date',
+            'end_date'     => 'nullable|date|after_or_equal:start_date',
+            'is_permanent' => 'nullable|boolean',
+            'content'      => 'required|string|min:10',
+            'progress'     => 'required|integer|min:0|max:100',
         ]);
 
         try {
+            // Force la valeur de is_permanent à boolean (car le checkbox n'envoie rien si non coché)
+            $validated['is_permanent'] = $request->has('is_permanent');
+
+            // Si c'est une activité permanente, on s'assure que end_date est nul
+            if ($validated['is_permanent']) {
+                $validated['end_date'] = null;
+            }
+
             Activity::create($validated);
+
             return redirect()->route('activities.index')
                 ->with('success', 'L\'activité a été enregistrée avec succès !');
-        } catch (Exception $e) {
-            return back()->withInput()->with('error', 'Erreur lors de l\'enregistrement.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Erreur lors de l\'enregistrement : ' . $e->getMessage());
         }
     }
+
 
     /**
      * Détails d'une activité
@@ -104,19 +126,33 @@ public function index(Request $request)
     public function update(Request $request, Activity $activity)
     {
         $validated = $request->validate([
-            'service_id'  => 'required|exists:services,id',
-            'report_date' => 'required|date',
-            'content'     => 'required|string|min:10',
+            'service_id'   => 'required|exists:services,id',
+            'report_date'  => 'required|date',
+            'start_date'   => 'required|date',
+            'end_date'     => 'nullable|date|after_or_equal:start_date',
+            'is_permanent' => 'nullable|boolean',
+            'content'      => 'required|string|min:10',
+            'progress'     => 'required|integer|min:0|max:100',
         ]);
 
         try {
+            // Transformation du checkbox en boolean
+            $validated['is_permanent'] = $request->has('is_permanent');
+
+            // Nettoyage de la date de fin si l'activité devient permanente
+            if ($validated['is_permanent']) {
+                $validated['end_date'] = null;
+            }
+
             $activity->update($validated);
+
             return redirect()->route('activities.index')
-                ->with('success', 'Le rapport d\'activité a été mis à jour.');
-        } catch (Exception $e) {
-            return back()->withInput()->with('error', 'Erreur lors de la mise à jour.');
+                ->with('success', 'Le rapport d\'activité a été mis à jour avec succès.');
+        } catch (\Exception $e) {
+            return back()->withInput()->with('error', 'Erreur lors de la mise à jour : ' . $e->getMessage());
         }
     }
+
 
     /**
      * Suppression sécurisée

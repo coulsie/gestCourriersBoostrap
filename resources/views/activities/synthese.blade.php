@@ -127,12 +127,46 @@
                                         <tbody>
                                             @foreach($service->activities as $act)
                                                 <tr>
-                                                    <td class="small text-muted" style="width: 20%">
-                                                        {{ \Carbon\Carbon::parse($act->report_date)->format('d/m/y') }}
+                                                    <td class="small text-muted" style="width: 25%">
+                                                        <!-- Affichage de la plage de dates -->
+                                                        <div class="fw-bold text-dark">
+                                                            {{ \Carbon\Carbon::parse($act->start_date ?? $act->report_date)->format('d/m/y') }}
+                                                            @if(!$act->is_permanent && $act->end_date)
+                                                                <i class="fas fa-arrow-right mx-1 small opacity-50"></i>
+                                                                {{ \Carbon\Carbon::parse($act->end_date)->format('d/m/y') }}
+                                                            @endif
+                                                        </div>
+
+                                                        <!-- Badge de statut temporel -->
+                                                        @if($act->is_permanent)
+                                                            <span class="badge bg-soft-info text-info rounded-pill mt-1" style="font-size: 0.6rem; background-color: #e0f2fe;">
+                                                                <i class="fas fa-sync-alt fa-spin-hover me-1"></i> PERMANENTE
+                                                            </span>
+                                                        @elseif($act->end_date && now()->gt(\Carbon\Carbon::parse($act->end_date)) && $act->progress < 100)
+                                                            <span class="badge bg-soft-danger text-danger rounded-pill mt-1" style="font-size: 0.6rem; background-color: #fee2e2;">
+                                                                <i class="fas fa-exclamation-triangle me-1"></i> EN RETARD
+                                                            </span>
+                                                        @else
+                                                            <small class="text-muted italic" style="font-size: 0.65rem;">
+                                                                {{ $act->is_permanent ? '' : 'Échéance : ' . \Carbon\Carbon::parse($act->end_date)->diffForHumans() }}
+                                                            </small>
+                                                        @endif
                                                     </td>
-                                                    <td class="text-dark small py-1" style="white-space: pre-line;">{{ $act->content }}</td>
+
+                                                    <td class="text-dark small py-2" style="white-space: pre-line;">
+                                                        <div class="fw-bold">{{ $act->content }}</div>
+                                                        <!-- Petite barre de progression discrète en dessous du texte -->
+                                                        <div class="d-flex align-items-center mt-1">
+                                                            <div class="progress flex-grow-1" style="height: 3px; background-color: #f1f5f9;">
+                                                                <div class="progress-bar {{ $act->is_permanent ? 'bg-info' : ($act->progress == 100 ? 'bg-success' : 'bg-primary') }}"
+                                                                    style="width: {{ $act->progress }}%"></div>
+                                                            </div>
+                                                            <span class="ms-2 text-muted" style="font-size: 0.65rem;">{{ $act->progress }}%</span>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             @endforeach
+
                                         </tbody>
                                     </table>
                                 </div>
