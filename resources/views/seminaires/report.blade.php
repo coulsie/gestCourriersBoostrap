@@ -62,31 +62,40 @@
                             <div class="fw-bold">{{ round($pourcentage) }}%</div>
                             <small class="text-muted">{{ $s->presents_count }} / {{ $s->inscrits_total }} présents</small>
                         </td>
-                        <td class="text-center">
+                        <td class="text-center align-middle">
                             @if($s->rapports_count > 0)
                                 @php
-                                    // On récupère le document de type 'rapport'
                                     $rapport = $s->documents->where('type', 'rapport')->first();
+                                    $nomBrut = basename($rapport->fichier_path);
+                                    $cheminFinal = $nomBrut;
+
+                                    if (!file_exists(public_path('seminaires_rapport/' . $nomBrut))) {
+                                        $nomSansPdf = str_replace('.pdf', '', $nomBrut);
+                                        if (file_exists(public_path('seminaires_rapport/' . $nomSansPdf))) {
+                                            $cheminFinal = $nomSansPdf;
+                                        }
+                                    }
                                 @endphp
 
-                                @if($rapport)
-                                    {{-- Le chemin en base contient déjà 'Seminaires_Rapport/nom.pdf' --}}
-                                    <a href="{{ asset('seminaires_rapport/' . $rapport->fichier_path) }}" target="_blank" class="text-decoration-none">
-                                        <div class="p-1 rounded shadow-sm d-inline-block" style="background-color: #fff1f2; border: 1px solid #fecaca;">
-                                            <i class="fas fa-file-pdf text-danger fs-4" title="Cliquez pour ouvrir le rapport final"></i>
-                                        </div>
-                                        <small class="d-block text-danger fw-bold mt-1" style="font-size: 0.6rem;">OUVRIR RAPPORT</small>
-                                    </a>
-                                @endif
+                                <a href="{{ asset('seminaires_rapport/' . $cheminFinal) }}"
+                                target="_blank"
+                                class="btn btn-sm btn-outline-danger border-2 shadow-sm d-inline-flex align-items-center gap-2 px-3 py-2"
+                                style="border-radius: 8px;">
+
+                                    <!-- Icône taille standard mais nette -->
+                                    <i class="fas fa-file-pdf fs-5"></i>
+
+                                    <!-- Texte horizontal pour gagner de la place en hauteur -->
+                                    <span class="fw-bold text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
+                                        Rapport
+                                    </span>
+                                </a>
                             @else
-                                <div class="opacity-50">
-                                    <i class="fas fa-file-invoice text-muted fs-4"></i>
-                                    <small class="d-block text-muted fw-bold mt-1" style="font-size: 0.6rem;">AUCUN RAPPORT</small>
-                                </div>
+                                <span class="badge bg-light text-muted border py-2">
+                                    <i class="fas fa-times-circle me-1"></i> Aucun
+                                </span>
                             @endif
                         </td>
-
-
                         <td>
                             <a href="{{ route('seminaires.show', $s->id) }}" class="btn btn-sm btn-outline-primary rounded-pill">Détails</a>
                         </td>
@@ -97,4 +106,10 @@
         </div>
     </div>
 </div>
+<style>
+    /* Petit effet de survol pour le côté moderne */
+    .hover-zoom { transition: transform 0.2s ease; }
+    .hover-zoom:hover { transform: scale(1.05); background-color: #dc3545; color: white !important; }
+</style>
+
 @endsection

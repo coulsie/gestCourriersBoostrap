@@ -50,7 +50,7 @@
                                 <i class="fas fa-map-marker-alt"></i>
                             </span>
                             <input type="text" name="lieu" id="lieu_seminaire" class="form-control border-start-0 ps-0 bg-light fw-bold" placeholder="ex: Salle de conférence, Grand-Bassam..." required>
-                            <span class="btn btn-outline-danger bg-white border-start-0 d-flex align-items-center" style="cursor: pointer !important;" onclick="window.open('https://google.com' + document.getElementById('lieu_seminaire').value)">
+                            <span class="btn btn-outline-danger bg-white border-start-0 d-flex align-items-center" style="cursor: pointer !important;" onclick="window.open('https://https://www.google.com/maps' + document.getElementById('lieu_seminaire').value)">
                                 <i class="fab fa-google text-danger me-1"></i> Maps
                             </span>
                         </div>
@@ -83,7 +83,7 @@
                         </div>
                     </div>
 
-                   
+
                     <!-- Statut -->
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-secondary"><i class="fas fa-info-circle me-2"></i> Statut du séminaire</label>

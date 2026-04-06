@@ -11,6 +11,8 @@ use App\Models\SeminaireDocument;
 use Illuminate\Support\Facades\Storage; // Utile pour supprimer des fichiers plus tard
 use Illuminate\Support\Facades\DB; // Ajoutez cet import en haut du contrôleur
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+
 
 
 
@@ -174,6 +176,7 @@ class SeminaireController extends Controller
     public function uploadDocument(Request $request, $seminaireId)
     {
         $request->validate([
+            // Ajout de mimes:pdf pour le type rapport pour plus de sécurité
             'fichier' => 'required|file|mimes:pdf,docx,jpg,png|max:10240',
             'type'    => 'required|in:presence,rapport,support'
         ]);
@@ -181,33 +184,38 @@ class SeminaireController extends Controller
         if ($request->hasFile('fichier')) {
             $file = $request->file('fichier');
 
-            // 1. Génération d'un nom de fichier unique (Timestamp + Nom original)
-            $fileName = time() . '_' . $file->getClientOriginalName();
+            // 1. Nettoyage du nom original pour éviter les espaces et caractères spéciaux
+            $originalName = str_replace(' ', '_', $file->getClientOriginalName());
+            $fileName = time() . '_' . $originalName;
 
-            // 2. Déplacement du fichier physiquement dans public/seminaires_rapport
+            // 2. Déplacement physique
             $file->move(public_path('seminaires_rapport'), $fileName);
 
-            // 3. Enregistrement en base de données
-            // Note : On stocke uniquement le nom du fichier ($fileName) dans fichier_path
-            SeminaireDocument::create([
-                'seminaire_id' => $seminaireId,
-                'nom_document' => $file->getClientOriginalName(),
-                'fichier_path' => $fileName,
-                'type'         => $request->type,
-            ]);
+            // 3. Enregistrement en base de données (Utilisation de updateOrCreate pour le rapport)
+            // Cela évite d'avoir 2 rapports pour un même séminaire
+            SeminaireDocument::updateOrCreate(
+                [
+                    'seminaire_id' => $seminaireId,
+                    'type'         => $request->type
+                ],
+                [
+                    'nom_document' => $file->getClientOriginalName(),
+                    'fichier_path' => $fileName, // On stocke UNIQUEMENT le nom du fichier
+                ]
+            );
 
             // 4. Mise à jour du statut si c'est un rapport
             if ($request->type === 'rapport') {
                 $seminaire = Seminaire::findOrFail($seminaireId);
+                // On s'assure que le statut correspond exactement à votre base
                 $seminaire->update(['statut' => 'termine']);
             }
 
-            return back()->with('success', 'Document archivé avec succès !');
+            return back()->with('success', 'Document ' . $request->type . ' archivé avec succès !');
         }
 
         return back()->with('error', 'Aucun fichier sélectionné.');
     }
-
 
     public function deleteDocument($seminaireId, $documentId)
         {
