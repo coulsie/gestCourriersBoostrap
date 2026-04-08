@@ -15,6 +15,11 @@
             <h1 class="h3 mb-0 text-dark fw-bolder">🎓 {{ $seminaire->titre }}</h1>
         </div>
         <div>
+
+            <!-- BOUTON QR CODE (NOUVEAU) -->
+            <a href="{{ route('seminaires.qrcode', $seminaire->id) }}" target="_blank" class="btn btn-dark shadow-sm rounded-pill px-4 fw-bold me-2">
+                <i class="fas fa-qrcode me-2"></i> QR Code
+            </a>
             <!-- BOUTON ÉMARGEMENT QUOTIDIEN AJOUTÉ ICI -->
             <a href="{{ route('seminaires.emargement', $seminaire->id) }}" class="btn btn-primary shadow-sm rounded-pill px-4 fw-bold">
                 <i class="fas fa-clipboard-check me-2"></i> Émargement Quotidien
@@ -95,9 +100,9 @@
                     <tbody>
                         @forelse($seminaire->participations as $p)
                         <tr>
-                            <td class="ps-4">
-                                <div class="fw-bold text-dark">{{ $p->nom_complet }}</div>
-                                @if($p->agent) <small class="text-muted">Mat: {{ $p->agent->matricule }}</small> @endif
+                            <td class="ps-4 py-3">
+                                <div class="fw-bold text-dark mb-0">{{ $p->nom_complet }}</div>
+                                @if($p->agent) <small class="text-muted text-uppercase" style="font-size: 0.65rem;">Matricule: {{ $p->agent->matricule }}</small> @endif
                             </td>
                             <td>
                                 <span class="badge px-2 py-1 rounded-pill {{ $p->agent_id ? 'bg-soft-info text-info' : 'bg-soft-warning text-warning' }}" style="font-size: 0.7rem;">
@@ -105,47 +110,55 @@
                                 </span>
                             </td>
 
-                            <!-- BOUTON DE POINTAGE RAPIDE (Caché à l'impression) -->
-                            <td class="text-center no-print">
-                                <form action="{{ route('seminaires.pointer', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex align-items-center gap-2">
+                            <!-- ACTION DE POINTAGE (Caché à l'impression) -->
+                            <!-- ACTION DE POINTAGE (Réorganisée en colonne) -->
+                            <td class="no-print" style="min-width: 320px;">
+                                <form action="{{ route('seminaires.pointer', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex align-items-center gap-3">
                                     @csrf
 
-                                    <!-- Bouton de pointage -->
-                                    <button type="submit" class="btn btn-sm {{ $p->est_present ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3 fw-bold shadow-sm">
-                                        <i class="fas {{ $p->est_present ? 'fa-check' : 'fa-fingerprint' }} me-1"></i>
-                                        {{ $p->est_present ? 'Pointé' : 'Présent' }}
+                                    <!-- Bouton de pointage (à gauche) -->
+                                    <button type="submit" class="btn btn-sm {{ $p->est_present ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3 fw-bold shadow-sm" style="min-width: 110px; height: fit-content;">
+                                        <i class="fas {{ $p->est_present ? 'fa-check-circle' : 'fa-fingerprint' }} me-1"></i>
+                                        {{ $p->est_present ? 'Pointé' : 'Pointer' }}
                                     </button>
 
-                                    <!-- Champ Email -->
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text bg-light"><i class="fas fa-envelope fa-xs text-muted"></i></span>
-                                        <input type="email" name="email" class="form-control" placeholder="Email" value="{{ $p->email }}">
-                                    </div>
+                                    <!-- Conteneur Vertical pour les champs de saisie (à droite) -->
+                                    <div class="d-flex flex-column gap-1 flex-grow-1" style="max-width: 200px;">
+                                        <!-- Champ Email -->
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-white border-end-0 text-muted py-0" style="border-radius: 10px 0 0 0;"><i class="fas fa-envelope fa-xs"></i></span>
+                                            <input type="email" name="email" class="form-control border-start-0 py-0" placeholder="Email" value="{{ $p->email }}" style="font-size: 0.75rem; border-radius: 0 10px 0 0; height: 25px;">
+                                        </div>
 
-                                    <!-- Champ Téléphone -->
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text bg-light"><i class="fas fa-phone fa-xs text-muted"></i></span>
-                                        <input type="text" name="telephone" class="form-control" placeholder="Téléphone" value="{{ $p->telephone }}">
+                                        <!-- Champ Téléphone -->
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-white border-end-0 text-muted py-0" style="border-radius: 0 0 0 10px;"><i class="fas fa-phone fa-xs"></i></span>
+                                            <input type="text" name="telephone" class="form-control border-start-0 py-0" placeholder="Téléphone" value="{{ $p->telephone }}" style="font-size: 0.75rem; border-radius: 0 0 10px 0; height: 25px;">
+                                        </div>
                                     </div>
                                 </form>
-
                             </td>
 
-                            <!-- SAISIE MANUELLE DATE/HEURE (Visible impression) -->
-                            <td class="pe-4">
-                                <form action="{{ route('seminaires.update-pointage', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex gap-1 no-print">
+                            <!-- SAISIE MANUELLE DATE/HEURE -->
+                            <td class="pe-4" style="min-width: 280px;">
+                                <form action="{{ route('seminaires.update-pointage', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex align-items-center gap-1 no-print">
                                     @csrf
-                                    <input type="date" name="date_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('Y-m-d') : date('Y-m-d') }}" class="form-control form-control-sm border-0 bg-light rounded-pill shadow-none" style="font-size: 0.75rem;">
-                                    <input type="time" name="heure_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('H:i') : '' }}" class="form-control form-control-sm border-0 bg-light rounded-pill shadow-none" style="font-size: 0.75rem;">
-                                    <button type="submit" class="btn btn-sm btn-primary rounded-circle shadow-sm"><i class="fas fa-save fa-xs"></i></button>
+                                    <div class="d-flex bg-light rounded-pill p-1 border">
+                                        <input type="date" name="date_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('Y-m-d') : date('Y-m-d') }}" class="form-control form-control-sm border-0 bg-transparent py-0" style="font-size: 0.75rem; width: 115px;">
+                                        <div class="vr mx-1 my-1"></div>
+                                        <input type="time" name="heure_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('H:i') : '' }}" class="form-control form-control-sm border-0 bg-transparent py-0" style="font-size: 0.75rem; width: 75px;">
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-primary rounded-circle shadow-sm" title="Enregistrer l'heure">
+                                        <i class="fas fa-save fa-xs"></i>
+                                    </button>
                                 </form>
 
-                                <!-- TEXTE POUR L'IMPRESSION (Caché sur écran) -->
+                                <!-- TEXTE POUR L'IMPRESSION -->
                                 <div class="d-none d-print-block border-bottom text-center pb-1">
                                     @if($p->heure_pointage)
                                         <span class="fw-bold">{{ $p->heure_pointage->format('d/m/Y à H:i') }}</span>
                                     @else
-                                        <span class="text-muted opacity-25">........................................</span>
+                                        <span class="text-muted opacity-25 italic small">Non pointé</span>
                                     @endif
                                 </div>
                             </td>
@@ -154,6 +167,7 @@
                         <tr><td colspan="4" class="text-center py-5 text-muted">Aucun participant inscrit.</td></tr>
                         @endforelse
                     </tbody>
+
                 </table>
             </div>
         </div>

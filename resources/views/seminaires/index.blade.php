@@ -130,6 +130,14 @@
                             {{-- 5. ACTIONS (Même style de boutons) --}}
                             <td class="text-center no-print pe-4">
                                 <div class="d-flex justify-content-center gap-1">
+
+                                    <!-- NOUVEAU : BOUTON QR CODE -->
+                                    <a href="{{ route('seminaires.qrcode', $seminaire->id) }}"
+                                    target="_blank"
+                                    class="btn btn-sm btn-outline-dark border-0 px-2"
+                                    title="Afficher le QR Code d'émargement">
+                                        <i class="fas fa-qrcode fa-lg"></i>
+                                    </a>
                                     {{-- Gérer les participants (Bouton spécial) --}}
                                     <a href="{{ route('seminaires.show', $seminaire->id) }}" class="btn btn-sm btn-outline-primary border-0 shadow-sm" title="Émargement & Participants">
                                         <i class="fas fa-users-cog fs-5"></i>
