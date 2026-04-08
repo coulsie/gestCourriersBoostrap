@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\Storage; // Utile pour supprimer des fichiers plu
 use Illuminate\Support\Facades\DB; // Ajoutez cet import en haut du contrôleur
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-
-
-
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 
 class SeminaireController extends Controller
@@ -264,25 +262,41 @@ class SeminaireController extends Controller
      */
     public function pointer(Request $request, $seminaireId, $participationId)
     {
-        // On récupère l'état actuel pour basculer (toggle)
+        // 1. On récupère le participant
         $participation = DB::table('seminaire_participants')->where('id', $participationId)->first();
 
         if (!$participation) {
             return back()->with('error', 'Participant introuvable.');
         }
 
+        // 2. On bascule l'état (Toggle)
         $nouvelEtat = !$participation->est_present;
 
+        // 3. Préparation des données à mettre à jour
+        $data = [
+            'est_present'    => $nouvelEtat,
+            'heure_pointage' => $nouvelEtat ? now() : null,
+            'updated_at'     => now()
+        ];
+
+        // 4. Si le formulaire contient email/téléphone, on les ajoute à la mise à jour
+        if ($request->has('email')) {
+            $data['email'] = $request->email;
+        }
+
+        if ($request->has('telephone')) {
+            $data['telephone'] = $request->telephone;
+        }
+
+        // 5. Exécution de la mise à jour
         DB::table('seminaire_participants')
             ->where('id', $participationId)
-            ->update([
-                'est_present' => $nouvelEtat,
-                'heure_pointage' => $nouvelEtat ? now() : null, // On met l'heure actuelle si on pointe présent
-                'updated_at' => now()
-            ]);
+            ->update($data);
 
-        return back()->with('success', 'Statut de présence mis à jour.');
+        $message = $nouvelEtat ? 'Présence confirmée.' : 'Pointage annulé.';
+        return back()->with('success', $message);
     }
+
 
     /**
      * Méthode pour la saisie manuelle Date & Heure (La disquette)
@@ -360,5 +374,28 @@ class SeminaireController extends Controller
         return view('seminaires.emargement', compact('seminaire', 'jours', 'dateSelectionnee', 'participants'));
     }
 
+
+    // 1. Affiche le QR Code à projeter sur écran ou imprimer
+    public function showQrCode(Seminaire $seminaire)
+    {
+        // Test temporaire avec l'ID
+        $url = route('seminaires.public.scan', $seminaire->id);
+
+
+        $qrCode = QrCode::size(300)
+            ->style('round')
+            ->eye('square')
+            ->color(10, 50, 150) // Bleu foncé pro
+            ->generate($url);
+
+        return view('seminaires.qrcode', compact('qrCode', 'seminaire'));
+    }
+
+    // 2. Page affichée sur le téléphone du participant
+    public function scanEmargement($uuid)
+    {
+        $seminaire = Seminaire::where('uuid', $uuid)->firstOrFail();
+        return view('seminaires.public_emarge', compact('seminaire'));
+    }
 
 }

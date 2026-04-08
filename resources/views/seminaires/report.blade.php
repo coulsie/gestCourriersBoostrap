@@ -97,8 +97,24 @@
                             @endif
                         </td>
                         <td>
-                            <a href="{{ route('seminaires.show', $s->id) }}" class="btn btn-sm btn-outline-primary rounded-pill">Détails</a>
+                            <div class="d-flex gap-2">
+                                <!-- Bouton Détails existant -->
+                                <a href="{{ route('seminaires.show', $s->id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    Détails
+                                </a>
+
+                                <!-- NOUVEAU : Bouton QR CODE intégré -->
+                                <a href="{{ route('seminaires.qrcode', $s->id) }}"
+                                target="_blank"
+                                class="btn btn-sm btn-outline-dark border-2 shadow-sm px-3"
+                                style="border-radius: 8px;"
+                                title="Générer QR Code pour émargement">
+                                    <i class="fas fa-qrcode"></i>
+                                    <span class="ms-1 small fw-bold">QR CODE</span>
+                                </a>
+                            </div>
                         </td>
+
                     </tr>
                     @endforeach
                 </tbody>

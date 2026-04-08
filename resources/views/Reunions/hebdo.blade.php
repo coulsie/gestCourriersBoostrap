@@ -186,9 +186,11 @@
                             <td class="text-center pe-4">
                                 <div class="btn-group shadow-sm rounded-pill border bg-white overflow-hidden">
                                     <a href="{{ route('reunions.show', $reunion->id) }}" class="btn btn-sm text-primary px-2" title="Voir"><i class="fas fa-eye"></i></a>
-                                    <a href="{{ route('reunions.edit', $reunion->id) }}" class="btn btn-sm text-warning px-2" title="Modifier/Clôturer"><i class="fas fa-magic"></i></a>
+                                    <a href="{{ route('reunions.edit', $reunion->id) }}" class="btn btn-sm text-warning px-2" title="Traiter-Modifier/Clôturer">
+                                        <i class="fas fa-check-double"></i>
+                                    </a>
                                     <form action="{{ route('reunions.destroy', $reunion->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Supprimer définitivement ?');">
-                                        @csrf @method('DELETE')
+                                     @csrf @method('DELETE')
                                         <button type="submit" class="btn btn-sm text-danger px-2"><i class="fas fa-trash-alt"></i></button>
                                     </form>
                                 </div>

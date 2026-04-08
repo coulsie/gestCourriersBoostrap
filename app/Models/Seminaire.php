@@ -16,8 +16,13 @@ class Seminaire extends Model
         'date_fin',
         'statut',
         'nb_participants_prevu', // <--- Doit être ici
+        'uuid', // <--- AJOUTEZ CECI
     ];
 
+    protected static function booted()
+    {
+        static::creating(fn($s) => $s->uuid = (string) \Illuminate\Support\Str::uuid());
+    }
 
 
     protected $casts = [

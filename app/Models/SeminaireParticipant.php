@@ -13,8 +13,11 @@ class SeminaireParticipant extends Model
         'nom_externe',
         'organisme_externe',
         'est_present',
-        'heure_pointage'
+        'heure_pointage',
+        'email',
+        'telephone'
     ];
+
 
     protected $casts = [
         'est_present' => 'boolean',

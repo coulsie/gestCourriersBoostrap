@@ -107,13 +107,28 @@
 
                             <!-- BOUTON DE POINTAGE RAPIDE (Caché à l'impression) -->
                             <td class="text-center no-print">
-                                <form action="{{ route('seminaires.pointer', [$seminaire->id, $p->id]) }}" method="POST">
+                                <form action="{{ route('seminaires.pointer', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex align-items-center gap-2">
                                     @csrf
+
+                                    <!-- Bouton de pointage -->
                                     <button type="submit" class="btn btn-sm {{ $p->est_present ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3 fw-bold shadow-sm">
                                         <i class="fas {{ $p->est_present ? 'fa-check' : 'fa-fingerprint' }} me-1"></i>
                                         {{ $p->est_present ? 'Pointé' : 'Présent' }}
                                     </button>
+
+                                    <!-- Champ Email -->
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-light"><i class="fas fa-envelope fa-xs text-muted"></i></span>
+                                        <input type="email" name="email" class="form-control" placeholder="Email" value="{{ $p->email }}">
+                                    </div>
+
+                                    <!-- Champ Téléphone -->
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-light"><i class="fas fa-phone fa-xs text-muted"></i></span>
+                                        <input type="text" name="telephone" class="form-control" placeholder="Téléphone" value="{{ $p->telephone }}">
+                                    </div>
                                 </form>
+
                             </td>
 
                             <!-- SAISIE MANUELLE DATE/HEURE (Visible impression) -->
