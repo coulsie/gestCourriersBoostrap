@@ -398,4 +398,35 @@ class SeminaireController extends Controller
         return view('seminaires.public_emarge', compact('seminaire'));
     }
 
+
+    public function validerEmargement(Request $request, $uuid)
+    {
+        // 1. Validation des données reçues du mobile
+        $request->validate([
+            'participant_id' => 'required|exists:seminaire_participants,id',
+            'telephone'      => 'required|string|min:8',
+            'email'          => 'nullable|email'
+        ]);
+
+        // 2. Récupération du séminaire via l'UUID
+        $seminaire = Seminaire::where('uuid', $uuid)->firstOrFail();
+
+        // 3. Mise à jour du pointage
+        $updated = DB::table('seminaire_participants')
+            ->where('id', $request->participant_id)
+            ->where('seminaire_id', $seminaire->id)
+            ->update([
+                'est_present'    => true,
+                'heure_pointage' => now(),
+                'telephone'      => $request->telephone,
+                'email'          => $request->email,
+                'updated_at'     => now()
+            ]);
+
+        if ($updated) {
+            return back()->with('success', 'Votre présence a été enregistrée avec succès !');
+        }
+
+        return back()->with('error', 'Impossible de valider votre présence. Veuillez contacter l\'administrateur.');
+    }
 }
