@@ -15,14 +15,17 @@ class SeminaireParticipant extends Model
         'est_present',
         'heure_pointage',
         'email',
-        'telephone'
+        'telephone',
+        'seminaireparticipant_id'
     ];
+
 
 
     protected $casts = [
         'est_present' => 'boolean',
         'heure_pointage' => 'datetime',
     ];
+
 
     /**
      * Relation avec le séminaire parent

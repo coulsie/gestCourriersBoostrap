@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB; // Ajoutez cet import en haut du contrôleur
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\SeminaireParticipant; // N'oubliez pas d'importer le modèle en haut
 
 
 class SeminaireController extends Controller
@@ -260,42 +261,29 @@ class SeminaireController extends Controller
     /**
      * Méthode pour le bouton de pointage rapide (Présent / Pointer)
      */
-    public function pointer(Request $request, $seminaireId, $participationId)
-    {
-        // 1. On récupère le participant
-        $participation = DB::table('seminaire_participants')->where('id', $participationId)->first();
+public function pointer(Request $request, $seminaireId, $participationId)
+{
+    $participation = SeminaireParticipant::where('id', $participationId)
+                                         ->where('seminaire_id', $seminaireId)
+                                         ->firstOrFail();
 
-        if (!$participation) {
-            return back()->with('error', 'Participant introuvable.');
-        }
+    $nouvelEtat = !$participation->est_present;
 
-        // 2. On bascule l'état (Toggle)
-        $nouvelEtat = !$participation->est_present;
+    // Récupération de l'heure saisie ou heure actuelle par défaut
+    $heureSaisie = $request->input('heure_manuelle');
 
-        // 3. Préparation des données à mettre à jour
-        $data = [
-            'est_present'    => $nouvelEtat,
-            'heure_pointage' => $nouvelEtat ? now() : null,
-            'updated_at'     => now()
-        ];
+    $participation->update([
+        'est_present'    => $nouvelEtat,
+        // Si on pointe, on prend l'heure du formulaire, sinon null
+        'heure_pointage' => $nouvelEtat ? ($heureSaisie ?? now()) : null,
+        'email'          => $request->input('email', $participation->email),
+        'telephone'      => $request->input('telephone', $participation->telephone),
+    ]);
 
-        // 4. Si le formulaire contient email/téléphone, on les ajoute à la mise à jour
-        if ($request->has('email')) {
-            $data['email'] = $request->email;
-        }
+    return back()->with('success', 'Pointage enregistré à la date choisie.');
+}
 
-        if ($request->has('telephone')) {
-            $data['telephone'] = $request->telephone;
-        }
 
-        // 5. Exécution de la mise à jour
-        DB::table('seminaire_participants')
-            ->where('id', $participationId)
-            ->update($data);
-
-        $message = $nouvelEtat ? 'Présence confirmée.' : 'Pointage annulé.';
-        return back()->with('success', $message);
-    }
 
 
     /**
