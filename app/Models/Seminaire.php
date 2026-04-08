@@ -68,10 +68,12 @@ class Seminaire extends Model
         return $this->hasMany(SeminaireDocument::class, 'seminaire_id');
     }
 
-    // app/Models/Seminaire.php
-    public function participants() {
-        return $this->belongsToMany(seminaireParticipant::class, 'seminaire_participant')
-                    ->withPivot('est_present'); // Important pour accéder au champ
-    }
+ 
+// app/Models/Seminaire.php
+public function participants() {
+    // Utilise la table définie dans le modèle SeminaireParticipant
+    return $this->hasMany(SeminaireParticipant::class, 'seminaire_id');
+}
+
 
 }

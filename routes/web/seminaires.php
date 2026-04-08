@@ -7,7 +7,7 @@ use App\Http\Controllers\SeminaireParticipantController;
 /*
 
 |--------------------------------------------------------------------------
-| MODULE SÉMINAIRES
+| MODULE SÉMINAIRES (Administration)
 |--------------------------------------------------------------------------
 */
 
@@ -18,25 +18,26 @@ Route::middleware(['auth'])->group(function () {
         // 1. STATISTIQUES & TABLEAUX DE BORD
         Route::get('/etat-global', [SeminaireController::class, 'dashboard'])->name('etat-global');
 
-        // 2. GESTION DES DOCUMENTS & QR CODE
-        Route::get('/{seminaire}/qrcode', [SeminaireController::class, 'showQrCode'])->name('qrcode'); // <--- BIEN PLACÉ ICI
+        // 2. GESTION DES DOCUMENTS & QR CODES
+        Route::get('/{seminaire}/qrcode', [SeminaireController::class, 'showQrCode'])->name('qrcode');
+        Route::get('/{seminaire}/qrcode-journalier', [SeminaireController::class, 'qrcodeJournalier'])->name('qrcodeJournalier');
         Route::post('/{seminaire}/documents', [SeminaireController::class, 'uploadDocument'])->name('documents.store');
         Route::delete('/{seminaire}/documents/{documentId}', [SeminaireController::class, 'deleteDocument'])->name('documents.destroy');
 
-        // 3. GESTION DES PARTICIPANTS
+        // 3. GESTION DES PARTICIPANTS ET ÉMARGEMENT
         Route::prefix('/{seminaire}/participants')->group(function () {
+            // Ajout de participants
             Route::post('/add-multiple', [SeminaireParticipantController::class, 'ajouterMultiplesAgents'])->name('add_multiple_agents');
             Route::post('/add-service', [SeminaireParticipantController::class, 'ajouterParService'])->name('add_service');
             Route::post('/add-externe', [SeminaireParticipantController::class, 'ajouterExterne'])->name('add_externe');
 
-
-
+            // Émargement journalier (Table seminaire_emargements)
             Route::get('/emargement', [SeminaireController::class, 'showEmargement'])->name('emargement');
-            Route::post('/{participation}/pointer', [SeminaireParticipantController::class, 'pointerPresence'])->name('pointer');
-           
-             // Dans le groupe Route::prefix('/{seminaire}/participants')
-            Route::post('/{participantId}/update-pointage', [SeminaireParticipantController::class, 'updatePointage'])->name('update-pointage');
+            Route::post('/{participantId}/update-emargement', [SeminaireController::class, 'updatePointage'])->name('update-emargement');
 
+            // Pointage global (Table seminaire_participants)
+            Route::post('/{participation}/pointer', [SeminaireParticipantController::class, 'pointerPresence'])->name('pointer');
+            Route::post('/{participantId}/update-pointage', [SeminaireParticipantController::class, 'updatePointage'])->name('update-pointage');
         });
 
         // 4. CRUD STANDARD
@@ -53,10 +54,17 @@ Route::middleware(['auth'])->group(function () {
 /*
 
 |--------------------------------------------------------------------------
-| ROUTES PUBLIQUES (Scan QR Code)
+| ROUTES PUBLIQUES (Scan Mobile)
 |--------------------------------------------------------------------------
 */
-Route::get('/seminaires/scan/{uuid}', [SeminaireController::class, 'scanEmargement'])->name('seminaires.public.scan');
-Route::post('/seminaires/scan/{uuid}/valider', [SeminaireController::class, 'validerEmargement'])->name('seminaires.public.valider');
-// Modifiez la ligne de scan en bas du fichier :
-Route::get('/seminaires/scan/{id}', [SeminaireController::class, 'scanEmargement'])->name('seminaires.public.scan');
+
+Route::prefix('seminaires/public')->name('seminaires.public.')->group(function () {
+
+    // Scan Global
+    Route::get('/scan/{uuid}', [SeminaireController::class, 'scanEmargement'])->name('scan');
+    Route::post('/scan/{uuid}/valider', [SeminaireController::class, 'validerEmargement'])->name('valider');
+
+    // Scan Journalier (QR Code projeté)
+    Route::get('/scan-journalier/{uuid}', [SeminaireController::class, 'public_emargeJournalier'])->name('emargeJournalier');
+    Route::post('/scan-journalier/{uuid}/valider', [SeminaireController::class, 'validerEmargementJournalier'])->name('validerJournalier');
+});

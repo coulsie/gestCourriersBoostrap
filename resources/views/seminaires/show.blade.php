@@ -14,23 +14,32 @@
             </nav>
             <h1 class="h3 mb-0 text-dark fw-bolder">🎓 {{ $seminaire->titre }}</h1>
         </div>
-        <div>
-
-            <!-- BOUTON QR CODE (NOUVEAU) -->
-            <a href="{{ route('seminaires.qrcode', $seminaire->id) }}" target="_blank" class="btn btn-dark shadow-sm rounded-pill px-4 fw-bold me-2">
-                <i class="fas fa-qrcode me-2"></i> QR Code
+        <div class="d-flex flex-wrap gap-2">
+            <!-- BOUTON QR CODE GLOBAL -->
+            <a href="{{ route('seminaires.qrcode', $seminaire->id) }}" target="_blank" class="btn btn-dark shadow-sm rounded-pill px-4 fw-bold">
+                <i class="fas fa-qrcode me-2"></i> QR Code Global
             </a>
-            <!-- BOUTON ÉMARGEMENT QUOTIDIEN AJOUTÉ ICI -->
+
+            <!-- BOUTON QR CODE QUOTIDIEN (NOUVEAU) -->
+            <a href="{{ route('seminaires.qrcodeJournalier', $seminaire->id) }}" target="_blank" class="btn btn-info shadow-sm rounded-pill px-4 fw-bold text-white">
+                <i class="fas fa-qrcode me-2"></i> QR Quotidien
+            </a>
+
+            <!-- BOUTON ÉMARGEMENT QUOTIDIEN -->
             <a href="{{ route('seminaires.emargement', $seminaire->id) }}" class="btn btn-primary shadow-sm rounded-pill px-4 fw-bold">
                 <i class="fas fa-clipboard-check me-2"></i> Émargement Quotidien
             </a>
-            <button onclick="window.print()" class="btn btn-outline-secondary shadow-sm rounded-pill px-3 me-2">
+
+            <!-- AUTRES ACTIONS -->
+            <button onclick="window.print()" class="btn btn-outline-secondary shadow-sm rounded-pill px-3">
                 <i class="fas fa-print me-1"></i> Imprimer
             </button>
+
             <a href="{{ route('seminaires.edit', $seminaire->id) }}" class="btn btn-warning shadow-sm rounded-pill px-4 text-white fw-bold">
                 <i class="fas fa-edit me-1"></i> Modifier
             </a>
         </div>
+
     </div>
 
     <!-- Titre d'impression (Visible uniquement sur papier) -->

@@ -289,78 +289,81 @@ public function pointer(Request $request, $seminaireId, $participationId)
     /**
      * Méthode pour la saisie manuelle Date & Heure (La disquette)
      */
-    public function updatePointage(Request $request, $seminaireId, $participantId)
-    {
-        // 1. Validation stricte
-        $request->validate([
-            'date_pointage'  => 'required|date_format:Y-m-d',
-            'heure_presence' => 'required',
+public function updatePointage(Request $request, $seminaireId, $participantId)
+{
+    $request->validate([
+        'date_pointage'  => 'required',
+        'heure_presence' => 'required',
+    ]);
+
+    try {
+        $fullDatetime = $request->date_pointage . ' ' . $request->heure_presence . ':00';
+
+        // Nettoyage et Insertion forcée dans seminaire_emargements
+        DB::table('seminaire_emargements')
+            ->where('seminaire_id', $seminaireId)
+            ->where('participant_id', $participantId)
+            ->where('date_pointage', $request->date_pointage)
+            ->delete();
+
+        $success = DB::table('seminaire_emargements')->insert([
+            'seminaire_id'   => $seminaireId,
+            'participant_id' => $participantId,
+            'date_pointage'  => $request->date_pointage,
+            'heure_pointage' => $fullDatetime,
+            'est_present'    => 1,
+            'created_at'     => now(),
+            'updated_at'     => now()
         ]);
 
-        try {
-            // 2. Construction propre du datetime
-            $fullDatetime = $request->date_pointage . ' ' . $request->heure_presence . ':00';
-
-            // 3. Mise à jour ou Insertion
-            DB::table('seminaire_emargements')->updateOrInsert(
-                [
-                    'seminaire_id'   => $seminaireId,
-                    'participant_id' => $participantId,
-                    'date_pointage'  => $request->date_pointage,
-                ],
-                [
-                    'heure_pointage' => $fullDatetime,
-                    'est_present'    => true,
-                    'created_at'     => now(),
-                    'updated_at'     => now()
-                ]
-            );
-
-            return back()->with('success', 'Pointage enregistré avec succès !');
-        } catch (\Exception $e) {
-            // En cas d'erreur SQL, on affiche le message réel
-            return back()->withErrors(['error' => 'Erreur SQL : ' . $e->getMessage()]);
+        if($success) {
+            return back()->with('success', 'Pointage journalier enregistré avec succès !');
         }
+
+        return back()->withErrors(['error' => "L'enregistrement a échoué sans erreur SQL."]);
+
+    } catch (\Exception $e) {
+        return back()->withErrors(['error' => 'Erreur SQL : ' . $e->getMessage()]);
     }
+}
+
+
+
 
     public function showEmargement(Request $request, $id)
-    {
-        $seminaire = Seminaire::findOrFail($id);
+{
+    $seminaire = Seminaire::findOrFail($id);
+    $debut = \Carbon\Carbon::parse($seminaire->date_debut);
+    $fin = \Carbon\Carbon::parse($seminaire->date_fin);
+    $jours = [];
 
-        // 1. Générer la liste des dates (du début à la fin du séminaire)
-        $debut = \Carbon\Carbon::parse($seminaire->date_debut);
-        $fin = \Carbon\Carbon::parse($seminaire->date_fin);
-        $jours = [];
-
-        // On utilise copy() pour ne pas modifier l'objet original dans la boucle
-        for ($date = $debut->copy(); $date->lte($fin); $date->addDay()) {
-            $jours[] = $date->format('Y-m-d');
-        }
-
-        // 2. Déterminer le jour affiché (par défaut le 1er jour du séminaire)
-        $dateSelectionnee = $request->get('date_pointage', $jours[0] ?? date('Y-m-d'));
-
-        // 3. Requête avec concaténation du nom et prénom de l'agent
-        $participants = DB::table('seminaire_participants as sp')
-            ->leftJoin('agents as a', 'sp.agent_id', '=', 'a.id')
-            ->leftJoin('seminaire_emargements as se', function ($join) use ($dateSelectionnee) {
-                $join->on('sp.id', '=', 'se.participant_id')
-                    ->where('se.date_pointage', '=', $dateSelectionnee);
-            })
-            ->where('sp.seminaire_id', $id)
-            ->select(
-                'sp.id',
-                'sp.nom_externe',
-                'sp.organisme_externe',
-                // Concaténation SQL pour MariaDB/MySQL
-                DB::raw("CONCAT(a.first_name, ' ', a.last_name) as nom_agent"),
-                'se.heure_pointage',
-                'se.est_present'
-            )
-            ->get();
-
-        return view('seminaires.emargement', compact('seminaire', 'jours', 'dateSelectionnee', 'participants'));
+    for ($date = $debut->copy(); $date->lte($fin); $date->addDay()) {
+        $jours[] = $date->format('Y-m-d');
     }
+
+    $dateSelectionnee = $request->get('date_pointage', $jours[0] ?? date('Y-m-d'));
+
+    $participants = DB::table('seminaire_participants as sp')
+        ->leftJoin('agents as a', 'sp.agent_id', '=', 'a.id')
+        ->leftJoin('seminaire_emargements as se', function ($join) use ($dateSelectionnee) {
+            $join->on('sp.id', '=', 'se.participant_id')
+                ->where('se.date_pointage', '=', $dateSelectionnee);
+        })
+        ->where('sp.seminaire_id', $id)
+        ->select(
+            'sp.id',
+            'sp.nom_externe',
+            'sp.organisme_externe',
+            DB::raw("CONCAT(a.first_name, ' ', a.last_name) as nom_agent"),
+            'se.heure_pointage',
+            // FORCE LA VALEUR À 0 SI VIDE POUR ÉVITER LE CRASH
+            DB::raw("IFNULL(se.est_present, 0) as est_present")
+        )
+        ->get();
+
+    return view('seminaires.emargement', compact('seminaire', 'jours', 'dateSelectionnee', 'participants'));
+}
+
 
 
     // 1. Affiche le QR Code à projeter sur écran ou imprimer
@@ -417,4 +420,69 @@ public function pointer(Request $request, $seminaireId, $participationId)
 
         return back()->with('error', 'Impossible de valider votre présence. Veuillez contacter l\'administrateur.');
     }
+
+
+
+/**
+ * Affiche la page d'émargement sur le téléphone du participant
+ */
+public function public_emargeJournalier($uuid)
+{
+    $seminaire = Seminaire::where('uuid', $uuid)->firstOrFail();
+    $aujourdhui = now()->translatedFormat('l d F Y');
+
+    return view('seminaires.public_emargeJournalier', compact('seminaire', 'aujourdhui'));
+}
+
+/**
+ * Enregistre la présence du jour via le mobile
+ */
+public function validerEmargementJournalier(Request $request, $uuid)
+{
+    $request->validate([
+        'participant_id' => 'required|exists:seminaire_participants,id',
+    ]);
+
+    $seminaire = Seminaire::where('uuid', $uuid)->firstOrFail();
+    $dateJour = now()->format('Y-m-d');
+
+    try {
+        // Enregistrement spécifique dans la table journalière
+        DB::table('seminaire_emargements')->updateOrInsert(
+            [
+                'seminaire_id'   => $seminaire->id,
+                'participant_id' => $request->participant_id,
+                'date_pointage'  => $dateJour,
+            ],
+            [
+                'heure_pointage' => now(),
+                'est_present'    => 1,
+                'updated_at'     => now(),
+                'created_at'     => DB::raw('IFNULL(created_at, NOW())')
+            ]
+        );
+
+        return back()->with('success', 'Votre présence pour ce jour a été validée avec succès !');
+
+    } catch (\Exception $e) {
+        return back()->with('error', 'Erreur lors de la validation : ' . $e->getMessage());
+    }
+}
+
+public function qrcodeJournalier(Seminaire $seminaire)
+{
+    // L'URL pointe vers la route publique de saisie journalière
+    $url = route('seminaires.public.emargeJournalier', $seminaire->uuid);
+
+    $qrCode = QrCode::size(400)
+        ->style('round')
+        ->eye('square')
+        ->color(0, 102, 204) // Un bleu vif pour bien différencier
+        ->generate($url);
+
+    return view('seminaires.qrcodeJournalier', compact('qrCode', 'seminaire', 'url'));
+}
+
+
+
 }
