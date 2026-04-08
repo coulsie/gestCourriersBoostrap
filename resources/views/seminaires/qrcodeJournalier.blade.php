@@ -36,11 +36,21 @@
     </div>
 </div>
 
+
 <style>
+    .letter-spacing-1 { letter-spacing: 1px; }
+
     @media print {
-        .no-print, nav, footer { display: none !important; }
-        .container { padding: 0 !important; }
-        .card { shadow: none !important; border: none !important; }
+        /* Masquer tout sauf le QR Code et les infos du séminaire */
+        .d-print-none, nav, .sidebar, .btn, .mt-4, header, footer {
+            display: none !important;
+        }
+        body { background-color: white !important; }
+        .container { width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+        .card { border: none !important; box-shadow: none !important; }
+        .shadow-print-none { box-shadow: none !important; }
+        .card-header { background-color: white !important; color: black !important; border-bottom: 2px solid #000 !important; }
+        .text-primary { color: black !important; }
     }
 </style>
 @endsection
