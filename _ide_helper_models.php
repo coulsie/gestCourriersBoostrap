@@ -49,11 +49,15 @@ namespace App\Models{
 /**
  * @property int $id
  * @property int $service_id
+ * @property \Illuminate\Support\Carbon|null $start_date
+ * @property \Illuminate\Support\Carbon|null $end_date
+ * @property bool $is_permanent
  * @property \Illuminate\Support\Carbon $report_date
  * @property string $content
  * @property int $progress
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read mixed $status
  * @property-read \App\Models\Service|null $service
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity forPeriod(string $type)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity newModelQuery()
@@ -61,10 +65,13 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereContent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereEndDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereIsPermanent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereProgress($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereReportDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereServiceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereStartDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Activity whereUpdatedAt($value)
  */
 	class Activity extends \Eloquent {}
@@ -119,10 +126,6 @@ namespace App\Models{
  * @property-read int|null $meetings_animees_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Meeting> $meetingsRedigees
  * @property-read int|null $meetings_redigees_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtache
- * @property-read int|null $notificationtache_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtaches
- * @property-read int|null $notificationtaches_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Meeting> $participations
  * @property-read int|null $participations_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
@@ -137,9 +140,9 @@ namespace App\Models{
  * @property-read \App\Models\User|null $user
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent permission($permissions, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent permission($permissions, bool $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent role($roles, $guard = null, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent role($roles, ?string $guard = null, bool $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent whereAddress($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent whereContactPersonneAPrevenir($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent whereCreatedAt($value)
@@ -163,7 +166,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent withoutPermission($permissions)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent withoutRole($roles, $guard = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Agent withoutRole($roles, ?string $guard = null)
  */
 	class Agent extends \Eloquent {}
 }
@@ -486,26 +489,6 @@ namespace App\Models{
 
 namespace App\Models{
 /**
- * @property \App\Enums\PrioriteEnum $priorite
- * @property \App\Enums\StatutEnum $statut
- * @property-read \App\Models\Agent|null $agent
- * @property-read string $priorite_label
- * @property-read mixed $progression
- * @property-read string $statut_label
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReponseNotification> $reponseNotification
- * @property-read int|null $reponse_notification_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReponseNotification> $reponses
- * @property-read int|null $reponses_count
- * @property-read \App\Models\User|null $user
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NotificationTache newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NotificationTache newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|NotificationTache query()
- */
-	class NotificationTache extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
  * @property int $id
  * @property string $name
  * @property string $guard_name
@@ -519,16 +502,16 @@ namespace App\Models{
  * @property-read int|null $users_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission permission($permissions, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission permission($permissions, bool $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission role($roles, $guard = null, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission role($roles, ?string $guard = null, bool $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereGuardName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withoutPermission($permissions)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withoutRole($roles, $guard = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Permission withoutRole($roles, ?string $guard = null)
  */
 	class Permission extends \Eloquent {}
 }
@@ -622,7 +605,6 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property-read \App\Models\User|null $agent
- * @property-read \App\Models\NotificationTache|null $notification
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReponseNotification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReponseNotification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ReponseNotification query()
@@ -643,7 +625,7 @@ namespace App\Models{
  * @property-read int|null $users_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Role permission($permissions, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Role permission($permissions, bool $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Role whereGuardName($value)
@@ -681,6 +663,7 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
+ * @property string|null $uuid
  * @property string $titre
  * @property string|null $description
  * @property string $lieu
@@ -693,6 +676,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Agent> $agents
  * @property-read int|null $agents_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SeminaireDocument> $documents
+ * @property-read int|null $documents_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SeminaireParticipant> $participations
  * @property-read int|null $participations_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire newModelQuery()
@@ -709,6 +694,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereStatut($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereTitre($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire whereUuid($value)
  */
 	class Seminaire extends \Eloquent {}
 }
@@ -748,6 +734,8 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $heure_pointage
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property string|null $email
+ * @property string|null $telephone
  * @property-read \App\Models\Agent|null $agent
  * @property-read string $nom_complet
  * @property-read string $structure
@@ -758,12 +746,14 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereAgentId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereEstPresent($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereHeurePointage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereNomExterne($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereOrganismeExterne($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereSeminaireId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereTelephone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SeminaireParticipant whereUpdatedAt($value)
  */
 	class SeminaireParticipant extends \Eloquent {}
@@ -851,10 +841,6 @@ namespace App\Models{
  * @property-read \App\Models\Agent|null $agent
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtache
- * @property-read int|null $notificationtache_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\NotificationTache> $notificationtaches
- * @property-read int|null $notificationtaches_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Spatie\Permission\Models\Permission> $permissions
  * @property-read int|null $permissions_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Role> $roles
@@ -862,9 +848,9 @@ namespace App\Models{
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User permission($permissions, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User permission($permissions, bool $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User role($roles, $guard = null, $without = false)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User role($roles, ?string $guard = null, bool $without = false)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereBio($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereEmail($value)
@@ -879,7 +865,7 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereSignaturePath($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutPermission($permissions)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutRole($roles, $guard = null)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|User withoutRole($roles, ?string $guard = null)
  */
 	class User extends \Eloquent {}
 }

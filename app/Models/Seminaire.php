@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use App\Models\SeminaireParticipant;
+
+
 
 class Seminaire extends Model
 {
@@ -55,11 +58,6 @@ class Seminaire extends Model
 /**
      * Relation avec les participants
      */
-    public function participants()
-    {
-        // On lie le séminaire à la table seminaires_participants
-        return $this->hasMany(SeminaireParticipant::class, 'seminaire_id');
-    }
 
     /**
      * Relation avec les documents
@@ -70,5 +68,10 @@ class Seminaire extends Model
         return $this->hasMany(SeminaireDocument::class, 'seminaire_id');
     }
 
+    // app/Models/Seminaire.php
+    public function participants() {
+        return $this->belongsToMany(seminaireParticipant::class, 'seminaire_participant')
+                    ->withPivot('est_present'); // Important pour accéder au champ
+    }
 
 }

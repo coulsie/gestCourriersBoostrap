@@ -112,56 +112,60 @@
 
                             <!-- ACTION DE POINTAGE (Caché à l'impression) -->
                             <!-- ACTION DE POINTAGE (Réorganisée en colonne) -->
-                            <td class="no-print" style="min-width: 320px;">
-                                <form action="{{ route('seminaires.pointer', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex align-items-center gap-3">
+                            <td class="text-center no-print" style="width: 150px;">
+                                <form action="{{ route('seminaires.pointer', [$seminaire->id, $p->id]) }}" method="POST">
                                     @csrf
-
-                                    <!-- Bouton de pointage (à gauche) -->
-                                    <button type="submit" class="btn btn-sm {{ $p->est_present ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3 fw-bold shadow-sm" style="min-width: 110px; height: fit-content;">
+                                    <button type="submit" class="btn btn-sm {{ $p->est_present ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3 fw-bold shadow-sm w-100">
                                         <i class="fas {{ $p->est_present ? 'fa-check-circle' : 'fa-fingerprint' }} me-1"></i>
-                                        {{ $p->est_present ? 'Pointé' : 'Pointer' }}
+                                        {{ $p->est_present ? 'Présent' : 'Pointer' }}
                                     </button>
-
-                                    <!-- Conteneur Vertical pour les champs de saisie (à droite) -->
-                                    <div class="d-flex flex-column gap-1 flex-grow-1" style="max-width: 200px;">
-                                        <!-- Champ Email -->
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text bg-white border-end-0 text-muted py-0" style="border-radius: 10px 0 0 0;"><i class="fas fa-envelope fa-xs"></i></span>
-                                            <input type="email" name="email" class="form-control border-start-0 py-0" placeholder="Email" value="{{ $p->email }}" style="font-size: 0.75rem; border-radius: 0 10px 0 0; height: 25px;">
-                                        </div>
-
-                                        <!-- Champ Téléphone -->
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text bg-white border-end-0 text-muted py-0" style="border-radius: 0 0 0 10px;"><i class="fas fa-phone fa-xs"></i></span>
-                                            <input type="text" name="telephone" class="form-control border-start-0 py-0" placeholder="Téléphone" value="{{ $p->telephone }}" style="font-size: 0.75rem; border-radius: 0 0 10px 0; height: 25px;">
-                                        </div>
-                                    </div>
                                 </form>
+                                {{-- Affichage de l'heure sous le bouton si déjà pointé --}}
+                                @if($p->heure_pointage)
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">
+                                        <i class="far fa-clock me-1"></i>{{ $p->heure_pointage->format('H:i') }}
+                                    </small>
+                                @endif
                             </td>
+
 
                             <!-- SAISIE MANUELLE DATE/HEURE -->
-                            <td class="pe-4" style="min-width: 280px;">
-                                <form action="{{ route('seminaires.update-pointage', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex align-items-center gap-1 no-print">
+                            <td class="pe-3 no-print" style="min-width: 420px;">
+                                <form action="{{ route('seminaires.update-pointage', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex align-items-center gap-2">
                                     @csrf
-                                    <div class="d-flex bg-light rounded-pill p-1 border">
-                                        <input type="date" name="date_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('Y-m-d') : date('Y-m-d') }}" class="form-control form-control-sm border-0 bg-transparent py-0" style="font-size: 0.75rem; width: 115px;">
-                                        <div class="vr mx-1 my-1"></div>
-                                        <input type="time" name="heure_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('H:i') : '' }}" class="form-control form-control-sm border-0 bg-transparent py-0" style="font-size: 0.75rem; width: 75px;">
+                                    <input type="hidden" name="est_present" value="1">
+
+                                    <!-- Groupe Date/Heure -->
+                                    <div class="flex-shrink-0">
+                                        <div class="d-flex bg-white rounded-3 border shadow-sm p-1">
+                                            <input type="date" name="date_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('Y-m-d') : date('Y-m-d') }}"
+                                                class="form-control form-control-sm border-0 bg-transparent p-0 px-1" style="font-size: 0.75rem; width: 105px;">
+                                            <div class="vr mx-1"></div>
+                                            <input type="time" name="heure_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('H:i') : date('H:i') }}"
+                                                class="form-control form-control-sm border-0 bg-transparent p-0 px-1" style="font-size: 0.75rem; width: 65px;">
+                                        </div>
                                     </div>
-                                    <button type="submit" class="btn btn-sm btn-primary rounded-circle shadow-sm" title="Enregistrer l'heure">
-                                        <i class="fas fa-save fa-xs"></i>
+
+                                    <!-- Groupe Contacts -->
+                                    <div class="flex-grow-1">
+                                        <div class="input-group input-group-sm mb-1">
+                                            <span class="input-group-text bg-light border-0" style="font-size: 0.6rem;"><i class="fas fa-envelope"></i></span>
+                                            <input type="email" name="email" placeholder="Email" value="{{ $p->email }}" class="form-control border-light" style="font-size: 0.7rem;">
+                                        </div>
+                                        <div class="input-group input-group-sm">
+                                            <span class="input-group-text bg-light border-0" style="font-size: 0.6rem;"><i class="fas fa-phone"></i></span>
+                                            <input type="text" name="telephone" placeholder="Téléphone" value="{{ $p->telephone }}" class="form-control border-light" style="font-size: 0.7rem;">
+                                        </div>
+                                    </div>
+
+                                    <!-- Validation -->
+                                    <button type="submit" class="btn btn-primary btn-sm rounded-3 shadow-sm px-2" title="Enregistrer les infos complémentaires">
+                                        <i class="fas fa-save"></i>
                                     </button>
                                 </form>
-
-                                <!-- TEXTE POUR L'IMPRESSION -->
-                                <div class="d-none d-print-block border-bottom text-center pb-1">
-                                    @if($p->heure_pointage)
-                                        <span class="fw-bold">{{ $p->heure_pointage->format('d/m/Y à H:i') }}</span>
-                                    @else
-                                        <span class="text-muted opacity-25 italic small">Non pointé</span>
-                                    @endif
-                                </div>
                             </td>
+
+
                         </tr>
                         @empty
                         <tr><td colspan="4" class="text-center py-5 text-muted">Aucun participant inscrit.</td></tr>
@@ -314,5 +318,6 @@ function toggleAll() {
     const allChecked = Array.from(checkboxes).every(cb => cb.checked);
     checkboxes.forEach(cb => cb.checked = !allChecked);
 }
+
 </script>
 @endsection

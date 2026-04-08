@@ -86,5 +86,31 @@ class SeminaireParticipantController extends Controller
             return back()->with('success', 'Statut de présence mis à jour.');
         }
 
+       public function updatePointage(Request $request, $seminaireId, $participantId)
+{
+    $participation = SeminaireParticipant::where('id', $participantId)
+                                         ->where('seminaire_id', $seminaireId)
+                                         ->firstOrFail();
+
+    // 1. Fusion de la date et de l'heure saisies
+    if ($request->filled('date_presence') && $request->filled('heure_presence')) {
+        // Crée une chaîne "YYYY-MM-DD HH:MM:00"
+        $dateHeureSaisie = $request->date_presence . ' ' . $request->heure_presence . ':00';
+    } else {
+        $dateHeureSaisie = now(); // Par défaut si vide
+    }
+
+    // 2. Mise à jour (On force aussi est_present à true puisqu'on définit une heure)
+    $participation->update([
+        'est_present'    => true,
+        'heure_pointage' => $dateHeureSaisie,
+        'email'          => $request->input('email', $participation->email),
+        'telephone'      => $request->input('telephone', $participation->telephone),
+    ]);
+
+    return back()->with('success', 'Pointage manuel enregistré avec succès.');
+}
+
+
 
     }

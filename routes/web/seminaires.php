@@ -29,9 +29,14 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/add-service', [SeminaireParticipantController::class, 'ajouterParService'])->name('add_service');
             Route::post('/add-externe', [SeminaireParticipantController::class, 'ajouterExterne'])->name('add_externe');
 
+
+
             Route::get('/emargement', [SeminaireController::class, 'showEmargement'])->name('emargement');
             Route::post('/{participation}/pointer', [SeminaireParticipantController::class, 'pointerPresence'])->name('pointer');
-            Route::post('/{participation}/update-pointage', [SeminaireParticipantController::class, 'updatePointage'])->name('update-pointage');
+           
+             // Dans le groupe Route::prefix('/{seminaire}/participants')
+            Route::post('/{participantId}/update-pointage', [SeminaireParticipantController::class, 'updatePointage'])->name('update-pointage');
+
         });
 
         // 4. CRUD STANDARD
