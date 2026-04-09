@@ -441,48 +441,76 @@ public function validerEmargementJournalier(Request $request, $uuid)
 {
     $request->validate([
         'participant_id' => 'required|exists:seminaire_participants,id',
+        'date_pointage'  => 'required|date',
     ]);
 
     $seminaire = Seminaire::where('uuid', $uuid)->firstOrFail();
-    $dateJour = now()->format('Y-m-d');
+    $dateDuQrCode = $request->date_pointage;
+    $aujourdhui = now()->format('Y-m-d');
+
+    // 1. SÉCURITÉ : Vérifier si on est le bon jour
+    if ($dateDuQrCode !== $aujourdhui) {
+        return back()->with('error', "Ce code est pour le $dateDuQrCode. Aujourd'hui : $aujourdhui.");
+    }
+
+    // 2. VÉRIFIER SI DÉJÀ ÉMARGÉ (Éviter les doublons)
+    $dejaPresent = DB::table('seminaire_emargements')
+        ->where('seminaire_id', $seminaire->id)
+        ->where('participant_id', $request->participant_id)
+        ->where('date_pointage', $dateDuQrCode)
+        ->exists();
+
+    if ($dejaPresent) {
+        return back()->with('info', 'Vous avez déjà validé votre présence pour aujourd\'hui !');
+    }
 
     try {
-        // Enregistrement spécifique dans la table journalière
-        DB::table('seminaire_emargements')->updateOrInsert(
-            [
-                'seminaire_id'   => $seminaire->id,
-                'participant_id' => $request->participant_id,
-                'date_pointage'  => $dateJour,
-            ],
-            [
-                'heure_pointage' => now(),
-                'est_present'    => 1,
-                'updated_at'     => now(),
-                'created_at'     => DB::raw('IFNULL(created_at, NOW())')
-            ]
-        );
+        DB::table('seminaire_emargements')->insert([
+            'seminaire_id'   => $seminaire->id,
+            'participant_id' => $request->participant_id,
+            'date_pointage'  => $dateDuQrCode,
+            'heure_pointage' => now(),
+            'est_present'    => 1,
+            'created_at'     => now(),
+            'updated_at'     => now()
+        ]);
 
-        return back()->with('success', 'Votre présence pour ce jour a été validée avec succès !');
+        return back()->with('success', 'Présence validée !');
 
     } catch (\Exception $e) {
-        return back()->with('error', 'Erreur lors de la validation : ' . $e->getMessage());
+        return back()->with('error', 'Erreur : ' . $e->getMessage());
     }
 }
 
+
+
+
+
 public function qrcodeJournalier(Seminaire $seminaire)
 {
-    // L'URL pointe vers la route publique de saisie journalière
-    $url = route('seminaires.public.emargeJournalier', $seminaire->uuid);
+    $debut = \Carbon\Carbon::parse($seminaire->date_debut);
+    $fin = \Carbon\Carbon::parse($seminaire->date_fin);
+    $qrCodesParJour = [];
 
-    $qrCode = QrCode::size(400)
-        ->style('round')
-        ->eye('square')
-        ->color(0, 102, 204) // Un bleu vif pour bien différencier
-        ->generate($url);
+    // On boucle sur chaque jour du séminaire
+    for ($date = $debut->copy(); $date->lte($fin); $date->addDay()) {
+        $dateString = $date->format('Y-m-d');
 
-    return view('seminaires.qrcodeJournalier', compact('qrCode', 'seminaire', 'url'));
+        // On passe la date précise dans l'URL pour que le scan sache quel jour valider
+        $url = route('seminaires.public.emargeJournalier', [
+            'uuid' => $seminaire->uuid,
+            'date_pointage' => $dateString
+        ]);
+
+        $qrCodesParJour[] = [
+            'date' => $date->translatedFormat('l d F Y'),
+            'label' => "Jour " . (count($qrCodesParJour) + 1),
+            'code' => QrCode::size(250)->style('round')->eye('square')->color(0, 102, 204)->generate($url)
+        ];
+    }
+
+    return view('seminaires.qrcodeJournalier', compact('qrCodesParJour', 'seminaire'));
 }
-
 
 
 }

@@ -68,3 +68,6 @@ Route::prefix('seminaires/public')->name('seminaires.public.')->group(function (
     Route::get('/scan-journalier/{uuid}', [SeminaireController::class, 'public_emargeJournalier'])->name('emargeJournalier');
     Route::post('/scan-journalier/{uuid}/valider', [SeminaireController::class, 'validerEmargementJournalier'])->name('validerJournalier');
 });
+// Modifiez la route publique dans web.php
+Route::get('/seminaires/public/scan-journalier/{uuid}/{date_pointage}', [SeminaireController::class, 'public_emargeJournalier'])
+    ->name('seminaires.public.emargeJournalier');
