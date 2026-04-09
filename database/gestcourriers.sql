@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3307
--- Généré le : mer. 08 avr. 2026 à 15:43
+-- Généré le : jeu. 09 avr. 2026 à 08:31
 -- Version du serveur : 11.4.9-MariaDB
 -- Version de PHP : 8.3.28
 
@@ -314,7 +314,7 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `audit_logs_user_id_foreign` (`user_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=279 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=281 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Déchargement des données de la table `audit_logs`
@@ -586,7 +586,9 @@ INSERT INTO `audit_logs` (`id`, `user_id`, `event`, `auditable_type`, `auditable
 (275, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-08 07:33:02', '2026-04-08 07:33:02'),
 (276, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-08 07:33:02', '2026-04-08 07:33:02'),
 (277, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-08 13:34:57', '2026-04-08 13:34:57'),
-(278, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-08 13:34:57', '2026-04-08 13:34:57');
+(278, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-08 13:34:57', '2026-04-08 13:34:57'),
+(279, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-09 07:24:05', '2026-04-09 07:24:05'),
+(280, 3, 'Connexion réussie', 'Système', 3, NULL, '\"{\\\"email\\\":\\\"yacouba.coulibaly@dgi.gouv.ci\\\"}\"', 'http://127.0.0.1:8000/login', NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', '2026-04-09 07:24:05', '2026-04-09 07:24:05');
 
 -- --------------------------------------------------------
 
@@ -2603,8 +2605,8 @@ CREATE TABLE IF NOT EXISTS `seminaires` (
 
 INSERT INTO `seminaires` (`id`, `uuid`, `titre`, `description`, `lieu`, `date_debut`, `date_fin`, `organisateur`, `statut`, `nb_participants_prevu`, `created_at`, `updated_at`) VALUES
 (1, 'a80b91c8-6a95-4942-bfd7-79b7566518b1', 'Seminaire IA', 'Séminaire de renforcement de capacité sur IA dans la Gestion des Statistiques et de l\'Administration', 'Assinie Sud Comoé', '2026-03-25 09:00:00', '2026-03-27 17:00:00', 'DESEF', 'termine', 10, '2026-04-03 07:38:15', '2026-04-07 14:21:21'),
-(2, '749f9352-e0be-4afa-b56b-f3597cae1ce8', 'Séminaire du 1er Trimestre 2026', 'Bilan du 1er Trimestre 2026', 'Grand Bassam', '2026-04-15 07:30:00', '2026-04-17 17:00:00', 'DGI', 'planifie', 12, '2026-04-03 08:41:00', '2026-04-08 15:41:58'),
-(3, '06008bb2-e0d9-4f1a-9672-506165e53d92', 'Renforcement de capacité sur la fiscalité numérique', 'Gestion de la fiscalité à travers le numérique', 'Abidjan hotel Ivoire', '2026-05-15 09:00:00', '2026-05-17 16:30:00', 'Direction Générale des Impôts', 'planifie', 15, '2026-04-08 13:37:15', '2026-04-08 15:41:58');
+(2, '749f9352-e0be-4afa-b56b-f3597cae1ce8', 'Séminaire du 1er Trimestre 2026', 'Bilan du 1er Trimestre 2026', 'Grand Bassam', '2026-04-15 07:30:00', '2026-04-18 17:00:00', 'DGI', 'planifie', 12, '2026-04-03 08:41:00', '2026-04-09 07:31:54'),
+(3, '06008bb2-e0d9-4f1a-9672-506165e53d92', 'Renforcement de capacité sur la fiscalité numérique', 'Gestion de la fiscalité à travers le numérique', 'Abidjan hotel Ivoire', '2026-05-15 09:00:00', '2026-05-17 16:30:00', 'Direction Générale des Impôts', 'planifie', 15, '2026-04-08 13:37:15', '2026-04-09 07:31:54');
 
 -- --------------------------------------------------------
 
