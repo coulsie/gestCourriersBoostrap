@@ -169,15 +169,41 @@
                                 {{-- 3. Fichiers joints (Archives) --}}
                                 <div class="d-flex align-items-center gap-2 mt-2">
                                     @if($reunion->presence_file)
-                                        <a href="{{ asset('Rapport_Reunions/' . $reunion->presence_file) }}" target="_blank" class="btn btn-sm btn-light border shadow-sm text-primary" title="Liste de présence">
-                                            <i class="fas fa-clipboard-check"></i>
+                                        {{-- Bouton si le fichier existe --}}
+                                        <a href="{{ asset('Rapport_Reunions/' . $reunion->presence_file) }}"
+                                        target="_blank"
+                                        class="btn btn-sm btn-outline-primary shadow-sm fw-bold px-3"
+                                        title="Voir la liste de présence">
+                                            <i class="fas fa-file-download me-1"></i> PRÉSENCE
                                         </a>
+                                    @elseif($reunion->status == 'terminee')
+                                        {{-- Badge discret si la réunion est finie mais sans fichier --}}
+                                        <span class="badge bg-soft-warning text-warning border border-warning px-2 py-1" style="font-size: 0.7rem;">
+                                            <i class="fas fa-clock me-1"></i> EN ATTENTE LISTE DE PRESENCE
+                                        </span>
+                                    @else
+                                        {{-- Optionnel : Texte si la réunion n'est pas encore terminée --}}
+                                        <span class="text-muted small italic">Aucun document</span>
                                     @endif
+
                                     @if($reunion->report_file)
-                                        <a href="{{ asset('Rapport_Reunions/' . $reunion->report_file) }}" target="_blank" class="btn btn-sm btn-light border shadow-sm text-success" title="Compte-rendu">
-                                            <i class="fas fa-file-pdf"></i>
+                                        {{-- Bouton si le compte-rendu existe --}}
+                                        <a href="{{ asset('Rapport_Reunions/' . $reunion->report_file) }}"
+                                        target="_blank"
+                                        class="btn btn-sm btn-outline-success shadow-sm fw-bold px-3"
+                                        title="Voir le compte-rendu">
+                                            <i class="fas fa-file-pdf me-1"></i> COMPTE-RENDU
                                         </a>
+                                    @elseif($reunion->status == 'terminee')
+                                        {{-- Badge si la réunion est terminée mais le rapport manque --}}
+                                        <span class="badge bg-soft-danger text-danger border border-danger px-2 py-1" style="font-size: 0.7rem;">
+                                            <i class="fas fa-exclamation-triangle me-1"></i> EN ATTENTE DU CR 
+                                        </span>
+                                    @else
+                                        {{-- État pour les réunions planifiées ou en cours --}}
+                                        <span class="text-muted small fst-italic">Non disponible</span>
                                     @endif
+
                                 </div>
                             </td>
 
