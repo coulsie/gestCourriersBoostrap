@@ -64,7 +64,8 @@
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+
+                <table class="table table-hover align-middle mb-0" id="tableauHebdo">
                     <thead style="background: #1e293b; color: #f8fafc;">
                         <tr class="text-uppercase small fw-bold">
                             <th class="ps-4 py-3">Jour & Heure</th>
@@ -309,143 +310,136 @@
 {{-- CHARGEMENT DES BIBLIOTHÈQUES (LIENS COMPLETS) --}}
 <!-- 1. JQUERY -->
 <!-- 1. Importations réelles (INDISPENSABLE) -->
+<!-- Liens CDN Corrects (Bootstrap 5 nécessite bootstrap.bundle.min.js) -->
 <script src="https://jquery.com"></script>
 <script src="https://jsdelivr.net"></script>
-<!-- Fichiers réels indispensables -->
-
 
 <script>
 $(document).ready(function () {
-    console.log("Système prêt.");
+    console.log("Système GestCourrier prêt.");
 
-    // GESTION DU MODAL
-    var modalEl = document.getElementById('modalAutresReunions');
-    if (modalEl) {
-        var myModal = new bootstrap.Modal(modalEl);
+    // Initialisation manuelle des Modals si nécessaire
+    const modalAutres = document.getElementById('modalAutresReunions');
+    if (modalAutres) {
+        const myModalAutres = new bootstrap.Modal(modalAutres);
         $('[data-bs-target="#modalAutresReunions"]').on('click', function(e) {
             e.preventDefault();
-            myModal.show();
+            myModalAutres.show();
+        });
+    }
+
+    const modalMois = document.getElementById('modalReunionsMois');
+    if (modalMois) {
+        const myModalMois = new bootstrap.Modal(modalMois);
+        $('[data-bs-target="#modalReunionsMois"]').on('click', function(e) {
+            e.preventDefault();
+            myModalMois.show();
         });
     }
 });
 
-// FONCTION DE PARTAGE DU TABLEAU
-function shareProgram() {
-    let message = "*🗓️ PROGRAMME DES RÉUNIONS*\n\n";
-    const rows = document.querySelectorAll('table tbody tr');
-
-    if (rows.length === 0) {
-        alert("Aucune réunion à partager.");
+/**
+ * COPIER LE PROGRAMME DANS LE PRESSE-PAPIER
+ * Cible uniquement le tableau de la semaine (id="tableauHebdo")
+ */
+function copyProgramToClipboard() {
+    const table = document.getElementById('tableauHebdo');
+    if (!table) {
+        alert("Erreur : Le tableau principal est introuvable.");
         return;
     }
 
-    rows.forEach((row) => {
-        // On vérifie que la ligne a assez de colonnes
-        if (row.cells.length >= 3) {
-            const date = row.cells[0]?.innerText.trim() || "";
-            const objet = row.cells[1]?.innerText.trim() || "";
-            const lieu = row.cells[2]?.innerText.trim() || "";
+    const rows = table.querySelectorAll('tbody tr');
+    let text = "*🗓️ PROGRAMME HEBDOMADAIRE DES RÉUNIONS*\n";
+    text += "------------------------------------------\n\n";
 
-            if (objet && objet !== "" && objet !== "Aucune réunion trouvée") {
-                message += `🔹 *${date}*\n📌 ${objet}\n📍 ${lieu}\n\n`;
-            }
+    let hasData = false;
+
+    rows.forEach((row) => {
+        // Extraction des 3 premières colonnes (Date, Objet, Lieu)
+        const date = row.cells[0]?.innerText.trim() || "";
+        const objet = row.cells[1]?.innerText.trim() || "";
+        const lieu = row.cells[2]?.innerText.trim() || "";
+
+        // Filtrage des lignes vides ou messages "Aucune réunion"
+        if (objet && !objet.toLowerCase().includes("aucune")) {
+            hasData = true;
+            // Nettoyage des espaces et retours à la ligne pour WhatsApp
+            const cleanDate = date.replace(/\s+/g, " ");
+            const cleanObjet = objet.replace(/\s+/g, " ");
+            const cleanLieu = lieu.replace(/\s+/g, " ");
+
+            text += `🔹 *${cleanDate}*\n📌 *OBJET :* ${cleanObjet}\n📍 *LIEU :* ${cleanLieu}\n\n`;
         }
     });
 
-    message += "--------------------------\n_Généré via GestCourrier_";
+    if (!hasData) {
+        alert("Aucune réunion valide à copier.");
+        return;
+    }
 
-    // URL OFFICIELLE : Correction de l'adresse WhatsApp
+    text += "------------------------------------------\n_Généré via GestCourrier_";
+
+    // API Clipboard
+    navigator.clipboard.writeText(text).then(() => {
+        const status = document.getElementById('copy-status');
+        if (status) {
+            status.classList.remove('d-none');
+            setTimeout(() => status.classList.add('d-none'), 4000);
+        }
+        alert("✅ Programme de la semaine copié !\n\nVous pouvez maintenant le coller (Ctrl+V) sur WhatsApp pour envoie.");
+    }).catch(err => {
+        alert("Erreur lors de la copie. Vérifiez les permissions de votre navigateur.");
+    });
+}
+
+/**
+ * PARTAGE DIRECT SUR WHATSAPP
+ */
+function shareDirectWA() {
+    const table = document.getElementById('tableauHebdo');
+    if (!table) return;
+
+    let message = "*🗓️ PROGRAMME DES RÉUNIONS*\n\n";
+    const rows = table.querySelectorAll('tbody tr');
+
+    rows.forEach((row) => {
+        const date = row.cells[0]?.innerText.trim() || "";
+        const objet = row.cells[1]?.innerText.trim() || "";
+        if (objet && !objet.toLowerCase().includes("aucune")) {
+            message += `🔹 *${date.replace(/\s+/g, " ")}*\n📌 ${objet.replace(/\s+/g, " ")}\n\n`;
+        }
+    });
+
+    message += "_Généré via GestCourrier_";
+
+    // Correction de l'URL API WhatsApp
     const waUrl = "https://whatsapp.com" + encodeURIComponent(message);
-
-    // Navigation directe pour éviter le blocage "about:blank"
-    window.location.href = waUrl;
+    window.open(waUrl, '_blank');
 }
 </script>
 
-<script>
-function copyProgramToClipboard() {
-        // 1. Construction du texte à partir du tableau
-        let text = "*🗓️ PROGRAMME HEBDOMADAIRE DES RÉUNIONS*\n";
-        text += "------------------------------------------\n\n";
-
-        const rows = document.querySelectorAll('table tbody tr');
-
-        if (rows.length === 0) {
-            alert("Aucune réunion à copier.");
-            return;
-        }
-
-        rows.forEach((row) => {
-            const date = row.cells[0]?.innerText.trim() || "";
-            const objet = row.cells[1]?.innerText.trim() || "";
-            const lieu = row.cells[2]?.innerText.trim() || "";
-
-            if (objet && objet !== "" && objet !== "Aucune réunion") {
-                text += `🔹 *${date}*\n📌 *OBJET :* ${objet}\n📍 *LIEU :* ${lieu}\n\n`;
-            }
-        });
-
-        text += "------------------------------------------\n_Généré via GestCourrier_";
-
-        // 2. Commande de copie au presse-papier (Inbloquable par about:blank)
-        navigator.clipboard.writeText(text).then(() => {
-            // Affichage de la petite bulle de confirmation
-            const status = document.getElementById('copy-status');
-            status.classList.remove('d-none');
-            setTimeout(() => status.classList.add('d-none'), 4000);
-
-            // Alerte classique en cas de doute
-            alert("Le programme a été copié ! Allez sur WhatsApp et faites 'Coller' (Ctrl+V) dans la discussion du Directeur.");
-        }).catch(err => {
-            alert("Erreur lors de la copie. Essayez de sélectionner le texte manuellement.");
-        });
-    }
-    function shareDirect(plateforme) {
-        const urlCourante = window.location.href;
-        const texteBase = "*🗓️ PROGRAMME HEBDOMADAIRE DES RÉUNIONS*\n\nVoici le planning de la semaine : " + urlCourante;
-
-        let targetUrl = "";
-
-        if (plateforme === 'WA') {
-            // Lien de partage WhatsApp (Texte + Lien)
-            targetUrl = "https://whatsapp.com" + encodeURIComponent(texteBase);
-        } else {
-            // Lien de partage Messenger/Facebook (URL brute pour l'aperçu)
-            targetUrl = "https://facebook.com" + encodeURIComponent(urlCourante);
-        }
-
-        // Ouverture en mode "Prod" (Fonctionnera sans blocage en HTTPS)
-        window.open(targetUrl, '_blank');
-    }
-
-</script>
-
-
 <style>
     .fw-black { font-weight: 900; }
+
+    /* Effet au survol des boutons */
     .btn:hover {
         transform: translateY(-2px);
-        transition: transform 0.2s;
+        transition: all 0.2s ease-in-out;
     }
-    /* Correction pour l'affichage du modal sur mobile */
+
+    /* Ajustement des z-index pour éviter que le menu cache le modal */
     .modal-backdrop { z-index: 1040 !important; }
     .modal { z-index: 1050 !important; }
-</style>
 
-<style>
+    /* Styles pour l'impression */
     @media print {
-        /* Masquer tout sauf le contenu principal */
-        .no-print,
-        .sidebar,
-        .navbar,
-        .btn,
-        .alert,
-        .modal-trigger,
-        footer {
+        .no-print, .btn, .sidebar, .navbar, .alert, footer, .modal {
             display: none !important;
         }
 
-        /* Étendre le tableau sur toute la largeur de la page */
+        body { background-color: white !important; }
+
         .container-fluid, .card, .card-body {
             padding: 0 !important;
             margin: 0 !important;
@@ -454,31 +448,25 @@ function copyProgramToClipboard() {
             box-shadow: none !important;
         }
 
-        /* Forcer l'affichage des couleurs des badges à l'impression */
-        .badge {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-            border: 1px solid #ccc !important;
-        }
-
-        h1 {
-            font-size: 18pt !important;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
         table {
+            width: 100% !important;
+            border: 1px solid #000 !important;
             font-size: 10pt !important;
-            border-collapse: collapse !important;
+        }
+
+        th, td {
+            border: 1px solid #ddd !important;
+            padding: 8px !important;
+        }
+
+        .badge {
+            color: black !important;
+            border: 1px solid #000 !important;
+            background: none !important;
+            -webkit-print-color-adjust: exact;
         }
     }
 </style>
-<style>
-@media print {
-    .no-print { display: none !important; }
-}
-</style>
-
 
 
 @endsection
