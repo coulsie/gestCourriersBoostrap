@@ -26,9 +26,14 @@ Route::prefix('presences')->name('presences.')->group(function () {
     Route::get('/mon-historique', [PresenceController::class, 'monHistorique'])->name('monHistorique');
     Route::get('/liste-filtree', [PresenceController::class, 'listeFiltree'])->name('listeFiltree');
     Route::get('/validation-hebdo', [PresenceController::class, 'indexValidationHebdo'])->name('validation-hebdo');
+    
+    // 1. Route pour AFFICHER (Votre fonction actuelle)
     Route::get('/validation-periode', [PresenceController::class, 'StoreValidationPeriode'])->name('validation-periode');
-    // AJOUTEZ CETTE LIGNE (La route manquante pour enregistrer)
-    Route::post('/store-validation-periode', [PresenceController::class, 'storeValidationPeriode'])->name('storeValidationPeriode');
+
+    // 2. Route pour ENREGISTRER (Celle qui manque ou qui est mal dirigée)
+    Route::post('/store-validation-periode', [PresenceController::class, 'storeValidationHebdo'])->name('storeValidationPeriode');
+
+
     Route::post('/valider-hebdo', [PresenceController::class, 'storeValidationHebdo'])->name('valider-hebdo');
     Route::get('/etat', [PresenceController::class, 'statsPresences'])->name('etat');
     Route::get('/stats', [PresenceController::class, 'stats'])->name('etatperiodique');
