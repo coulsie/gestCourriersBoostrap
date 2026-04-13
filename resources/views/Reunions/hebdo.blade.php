@@ -40,6 +40,11 @@
                     data-bs-toggle="modal" data-bs-target="#modalAutresReunions">
                 <i class="fas fa-calendar-alt me-1 text-primary"></i> Hors-semaine
             </button>
+            <!-- Bouton pour ouvrir le modal -->
+            <button type="button" class="btn btn-info shadow-sm rounded-pill px-4 fw-bold" data-bs-toggle="modal" data-bs-target="#modalReunionsMois">
+                <i class="fas fa-calendar-alt me-2"></i> Réunions du Mois
+            </button>
+
 
             <a href="{{ route('reunions.create') }}" class="btn shadow-lg px-4 py-2 rounded-pill border-0 text-white fw-bold no-print" style="background: linear-gradient(45deg, #6366f1, #a855f7);">
                 <i class="fas fa-plus-circle me-1"></i> Nouvelle Réunion
@@ -197,7 +202,7 @@
                                     @elseif($reunion->status == 'terminee')
                                         {{-- Badge si la réunion est terminée mais le rapport manque --}}
                                         <span class="badge bg-soft-danger text-danger border border-danger px-2 py-1" style="font-size: 0.7rem;">
-                                            <i class="fas fa-exclamation-triangle me-1"></i> EN ATTENTE DU CR 
+                                            <i class="fas fa-exclamation-triangle me-1"></i> EN ATTENTE DU CR
                                         </span>
                                     @else
                                         {{-- État pour les réunions planifiées ou en cours --}}
@@ -239,69 +244,146 @@
 
     {{-- STRUCTURE DU MODAL --}}
     <div class="modal fade" id="modalAutresReunions" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header bg-dark text-white">
-                <h5 class="modal-title fw-bold"><i class="fas fa-history me-2 text-warning"></i> HORS-SEMAINE</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-0">
-                {{-- Vérification de sécurité --}}
-                @if(isset($autresReunions) && $autresReunions->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="bg-light">
-                                <tr class="small fw-bold text-uppercase">
-                                    <th class="ps-4">Date</th>
-                                    <th>Objet & Lieu</th>
-                                    <th>Animateur</th>
-                                    <th class="text-center">Statut</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($autresReunions as $r)
-                                <tr>
-                                    <td class="ps-4">
-                                        <span class="fw-bold">{{ \Carbon\Carbon::parse($r->date_heure)->format('d/m/Y') }}</span><br>
-                                        <small class="text-danger fw-bold">{{ \Carbon\Carbon::parse($r->date_heure)->format('H:i') }}</small>
-                                    </td>
-                                    <td>
-                                        <div class="fw-bold text-dark">{{ $r->objet }}</div>
-                                        <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>{{ $r->lieu }}</small>
-                                    </td>
-                                    <td>
-                                        <span class="small">{{ strtoupper($r->animateur->last_name ?? 'N/A') }}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        {{-- Style blanc sur couleur vive pour le statut --}}
-                                        @if($r->status == 'terminee')
-                                            <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #10b981; font-size: 0.7rem;">EXÉCUTÉE</span>
-                                        @else
-                                            <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #3b82f6; font-size: 0.7rem;">PROGRAMMÉE</span>
-                                        @endif
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="p-5 text-center">
-                        <i class="fas fa-folder-open fa-3x text-light mb-3"></i>
-                        <p class="text-muted fw-bold">Aucune réunion archivée ou hors-semaine.</p>
-                    </div>
-                @endif
-            </div>
-            <div class="modal-footer bg-light p-3">
-                {{-- On utilise data-bs-dismiss pour FERMER --}}
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold"><i class="fas fa-history me-2 text-warning"></i> HORS-SEMAINE</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-0">
+                    {{-- Vérification de sécurité --}}
+                    @if(isset($autresReunions) && $autresReunions->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr class="small fw-bold text-uppercase">
+                                        <th class="ps-4">Date</th>
+                                        <th>Objet & Lieu</th>
+                                        <th>Animateur</th>
+                                        <th class="text-center">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($autresReunions as $r)
+                                    <tr>
+                                        <td class="ps-4">
+                                            <span class="fw-bold">{{ \Carbon\Carbon::parse($r->date_heure)->format('d/m/Y') }}</span><br>
+                                            <small class="text-danger fw-bold">{{ \Carbon\Carbon::parse($r->date_heure)->format('H:i') }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-dark">{{ $r->objet }}</div>
+                                            <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>{{ $r->lieu }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="small">{{ strtoupper($r->animateur->last_name ?? 'N/A') }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            {{-- Style blanc sur couleur vive pour le statut --}}
+                                            @if($r->status == 'terminee')
+                                                <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #10b981; font-size: 0.7rem;">EXÉCUTÉE</span>
+                                            @else
+                                                <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #3b82f6; font-size: 0.7rem;">PROGRAMMÉE</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="p-5 text-center">
+                            <i class="fas fa-folder-open fa-3x text-light mb-3"></i>
+                            <p class="text-muted fw-bold">Aucune réunion archivée ou hors-semaine.</p>
+                        </div>
+                    @endif
+                </div>
+                <div class="modal-footer bg-light p-3">
+                    {{-- On utilise data-bs-dismiss pour FERMER --}}
 
-                <button type="button" class="btn btn-secondary fw-bold shadow-sm" data-bs-dismiss="modal" data-dismiss="modal">FERMER</button>
-            </div>
+                    <button type="button" class="btn btn-secondary fw-bold shadow-sm" data-bs-dismiss="modal" data-dismiss="modal">FERMER</button>
+                </div>
 
+            </div>
         </div>
     </div>
-</div>
+     {{-- STRUCTURE DU MODAL : RÉUNIONS MENSUELLES --}}
+{{-- STRUCTURE DU MODAL : RÉUNIONS MENSUELLES --}}
+    <div class="modal fade" id="modalReunionsMois" tabindex="-1" aria-labelledby="modalReunionsMoisLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="modalReunionsMoisLabel">
+                        <i class="fas fa-calendar-check me-2 text-warning"></i>
+                        RÉUNIONS DE {{ Str::upper(now()->translatedFormat('F Y')) }}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    @php
+                        // Fusion sécurisée des deux collections existantes dans votre contrôleur
+                        $sourceComplete = collect();
+                        if(isset($reunions)) $sourceComplete = $sourceComplete->concat($reunions);
+                        if(isset($autresReunions)) $sourceComplete = $sourceComplete->concat($autresReunions);
 
+                        $mensuelles = $sourceComplete->filter(function($r) {
+                            $date = \Carbon\Carbon::parse($r->date_heure);
+                            return $date->isCurrentMonth() && $date->isCurrentYear();
+                        })->sortBy('date_heure');
+                    @endphp
+
+                    @if($mensuelles->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light">
+                                    <tr class="small fw-bold text-uppercase text-secondary">
+                                        <th class="ps-4">Date</th>
+                                        <th>Objet & Lieu</th>
+                                        <th>Animateur</th>
+                                        <th class="text-center">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($mensuelles as $r)
+                                    <tr>
+                                        <td class="ps-4">
+                                            <span class="fw-bold">{{ \Carbon\Carbon::parse($r->date_heure)->format('d/m/Y') }}</span><br>
+                                            <small class="text-primary fw-bold">{{ \Carbon\Carbon::parse($r->date_heure)->format('H:i') }}</small>
+                                        </td>
+                                        <td>
+                                            <div class="fw-bold text-dark">{{ $r->objet }}</div>
+                                            <small class="text-muted"><i class="fas fa-map-marker-alt me-1"></i>{{ $r->lieu }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="small">{{ strtoupper($r->animateur->last_name ?? 'N/A') }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            @if($r->status == 'terminee')
+                                                <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #10b981; font-size: 0.7rem;">EXÉCUTÉE</span>
+                                            @else
+                                                <span class="badge shadow-sm text-white px-2 py-1" style="background-color: #3b82f6; font-size: 0.7rem;">PROGRAMMÉE</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <div class="p-5 text-center">
+                            <i class="fas fa-calendar-times fa-3x text-light mb-3"></i>
+                            <p class="text-muted fw-bold">Aucune réunion enregistrée pour ce mois-ci.</p>
+                            <small class="text-secondary">(Total analysé : {{ $sourceComplete->count() }} réunions)</small>
+                        </div>
+                    @endif
+                </div>
+                <div class="modal-footer bg-light p-3">
+                    <button type="button" class="btn btn-secondary fw-bold shadow-sm rounded-pill px-4" data-bs-dismiss="modal">FERMER</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </div>
 
 </div>
 {{-- Fermeture du container-fluid --}}
