@@ -347,6 +347,11 @@
                                 <i class="fas fa-tasks me-2"></i> Validation hebdomadaire de présences
                             </a>
 
+                            <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mt-1"
+                                href="{{ route('presences.validation-periode') }}"
+                                style="background-color: #27ae60;">
+                                <i class="fas fa-tasks me-2"></i> Validation périodique de présences
+                            </a>
 
 
                             {{-- RAPPORTS : BLEU NUIT --}}

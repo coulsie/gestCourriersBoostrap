@@ -15,8 +15,8 @@ use App\Models\Absence;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Service;
-use App\Models\Holiday; // N'oubliez pas d'importer le modèle
-
+use App\Models\Holiday;
+use Carbon\CarbonPeriod;
 
 class PresenceController extends Controller
 {
@@ -628,5 +628,48 @@ public function listeFiltree(Request $request)
     ));
 }
 
+// Affiche le formulaire de sélection de période
+    public function StoreValidationPeriode(Request $request)
+    {
+        $dateDebut = $request->input('date_debut');
+        $dateFin = $request->input('date_fin');
+        $agentsAbsents = [];
+        $periode = [];
 
+        if ($dateDebut && $dateFin) {
+            $start = Carbon::parse($dateDebut);
+            $end = Carbon::parse($dateFin);
+            $period = CarbonPeriod::create($start, $end);
+
+
+            $agents = Agent::all();
+            $holidays = Holiday::pluck('holiday_date')->toArray();
+
+            foreach ($period as $date) {
+                $dateStr = $date->format('Y-m-d');
+
+                // On saute les weekends et jours fériés
+                if ($date->isWeekend() || in_array($dateStr, $holidays)) continue;
+
+                foreach ($agents as $agent) {
+                    // On vérifie si une présence existe déjà
+                    $exists = Presence::where('agent_id', $agent->id)
+                                      ->whereDate('heure_arrivee', $dateStr)
+                                      ->exists();
+
+                    if (!$exists) {
+                        $agentsAbsents[] = [
+                            'agent_id' => $agent->id,
+                            'nom' => $agent->last_name . ' ' . $agent->first_name,
+                            'date' => $dateStr,
+                            'jour' => $date->translatedFormat('l d F')
+                        ];
+                    }
+                }
+            }
+        }
+
+        return view('presences.validation-periode', compact('agentsAbsents', 'dateDebut', 'dateFin'));
+        
+    }
 }

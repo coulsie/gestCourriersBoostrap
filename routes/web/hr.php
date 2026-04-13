@@ -26,6 +26,9 @@ Route::prefix('presences')->name('presences.')->group(function () {
     Route::get('/mon-historique', [PresenceController::class, 'monHistorique'])->name('monHistorique');
     Route::get('/liste-filtree', [PresenceController::class, 'listeFiltree'])->name('listeFiltree');
     Route::get('/validation-hebdo', [PresenceController::class, 'indexValidationHebdo'])->name('validation-hebdo');
+    Route::get('/validation-periode', [PresenceController::class, 'StoreValidationPeriode'])->name('validation-periode');
+    // AJOUTEZ CETTE LIGNE (La route manquante pour enregistrer)
+    Route::post('/store-validation-periode', [PresenceController::class, 'storeValidationPeriode'])->name('storeValidationPeriode');
     Route::post('/valider-hebdo', [PresenceController::class, 'storeValidationHebdo'])->name('valider-hebdo');
     Route::get('/etat', [PresenceController::class, 'statsPresences'])->name('etat');
     Route::get('/stats', [PresenceController::class, 'stats'])->name('etatperiodique');
@@ -57,10 +60,11 @@ Route::middleware(['role:admin|rh|Superviseur'])->group(function () {
     Route::post('/chef/valider/{absence}', [AbsenceController::class, 'valider'])->name('chef.absences.valider');
     Route::post('/absences/rejeter/{id}', [AbsenceController::class, 'rejeter'])->name('chef.absences.rejeter');
 });
-// Gardez uniquement ceci (propre) 
+// Gardez uniquement ceci (propre)
 Route::resource('absences', AbsenceController::class)->except(['store']);
 
 Route::resource('typeabsences', TypeAbsenceController::class);
 Route::resource('holidays', HolidayController::class);
 Route::patch('/interims/{interim}/stop', [InterimController::class, 'stop'])->name('interims.stop');
 Route::resource('interims', InterimController::class);
+
