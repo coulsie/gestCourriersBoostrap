@@ -628,48 +628,60 @@ public function listeFiltree(Request $request)
     ));
 }
 
-// Affiche le formulaire de sélection de période
-    public function StoreValidationPeriode(Request $request)
-    {
-        $dateDebut = $request->input('date_debut');
-        $dateFin = $request->input('date_fin');
-        $agentsAbsents = [];
-        $periode = [];
+public function StoreValidationPeriode(Request $request)
+{
+    $dateDebut = $request->input('date_debut');
+    $dateFin = $request->input('date_fin');
+    $agentsAbsents = [];
 
-        if ($dateDebut && $dateFin) {
-            $start = Carbon::parse($dateDebut);
-            $end = Carbon::parse($dateFin);
-            $period = CarbonPeriod::create($start, $end);
+    if ($dateDebut && $dateFin) {
+        $start = \Carbon\Carbon::parse($dateDebut);
+        $end = \Carbon\Carbon::parse($dateFin);
+        $period = \Carbon\CarbonPeriod::create($start, $end);
 
+        $agents = \App\Models\Agent::all();
 
-            $agents = Agent::all();
-            $holidays = Holiday::pluck('holiday_date')->toArray();
+        // CORRECTION : On force le formatage en texte pour chaque date récupérée
+        $holidays = \App\Models\Holiday::all()->pluck('holiday_date')->map(function($date) {
+            return \Carbon\Carbon::parse($date)->format('Y-m-d');
+        })->toArray();
 
-            foreach ($period as $date) {
-                $dateStr = $date->format('Y-m-d');
+        foreach ($period as $date) {
+            $dateStr = $date->format('Y-m-d');
 
-                // On saute les weekends et jours fériés
-                if ($date->isWeekend() || in_array($dateStr, $holidays)) continue;
+            // 1. VÉRIFICATION STRICTE (Debug : on vérifie les weekends et fériés)
+            if ($date->isWeekend() || in_array($dateStr, $holidays)) {
+                continue; // On passe au jour suivant, on n'entre pas dans la boucle des agents
+            }
 
-                foreach ($agents as $agent) {
-                    // On vérifie si une présence existe déjà
-                    $exists = Presence::where('agent_id', $agent->id)
-                                      ->whereDate('heure_arrivee', $dateStr)
-                                      ->exists();
+            foreach ($agents as $agent) {
+                // 2. VÉRIFICATION POINTAGE
+                $exists = \App\Models\Presence::where('agent_id', $agent->id)
+                                  ->whereDate('heure_arrivee', $dateStr)
+                                  ->exists();
 
-                    if (!$exists) {
-                        $agentsAbsents[] = [
-                            'agent_id' => $agent->id,
-                            'nom' => $agent->last_name . ' ' . $agent->first_name,
-                            'date' => $dateStr,
-                            'jour' => $date->translatedFormat('l d F')
-                        ];
-                    }
+                if (!$exists) {
+                    // 3. VÉRIFICATION JUSTIFICATIF
+                    $justificatif = \App\Models\Absence::where('agent_id', $agent->id)
+                        ->whereDate('date_debut', '<=', $dateStr)
+                        ->whereDate('date_fin', '>=', $dateStr)
+                        ->first();
+
+                    $agentsAbsents[] = [
+                        'agent_id' => $agent->id,
+                        'nom'      => $agent->last_name . ' ' . $agent->first_name,
+                        'date'     => $dateStr,
+                        'jour'     => $date->translatedFormat('l d F'),
+                        'justifiée' => $justificatif ? true : false,
+                        'motif'    => $justificatif ? "Justifiée: " . $justificatif->motif : "Absence injustifiée"
+                    ];
                 }
             }
         }
-
-        return view('presences.validation-periode', compact('agentsAbsents', 'dateDebut', 'dateFin'));
-        
     }
+
+    return view('presences.validation-periode', compact('agentsAbsents', 'dateDebut', 'dateFin'));
+}
+
+
 }
