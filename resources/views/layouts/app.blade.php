@@ -347,10 +347,11 @@
                                 <i class="fas fa-tasks me-2"></i> Validation hebdomadaire de présences
                             </a>
 
-                            <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mt-1"
+                            <a class="collapse-item fw-bold text-white shadow-sm rounded mx-2 mt-1 px-3 py-2"
                                 href="{{ route('presences.validation-periode') }}"
-                                style="background-color: #27ae60;">
-                                <i class="fas fa-tasks me-2"></i> Validation périodique de présences
+                                style="background: linear-gradient(45deg, #8e44ad, #a855f7); border: none; letter-spacing: 0.3px;">
+                                <i class="fas fa-tasks me-2 text-warning"></i>
+                                <span style="text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">Validation périodique de présences</span>
                             </a>
 
 
