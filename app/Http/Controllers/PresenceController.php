@@ -343,7 +343,9 @@ public function storeValidationHebdo(Request $request)
             }
         }
     }
-    return redirect()->route('presences.index')->with('success', 'Traitement terminé.');
+    
+    return back()->with('success', 'Traitement terminé.');
+
 }
 
 public function rapport(Request $request)
