@@ -98,13 +98,55 @@
                     </div>
 
                     <!-- Participants Externes -->
+                    <!-- Participants Externes (Modifié pour la table meeting_externes) -->
+                    <!-- Participants Externes -->
                     <div class="col-md-6">
-                        <label class="form-label fw-bold text-warning"><i class="fas fa-user-plus me-2"></i> Personnes Extérieures</label>
-                        @php
-                            $externesArray = is_string($reunion->externes) ? json_decode($reunion->externes, true) : $reunion->externes;
-                            $externesString = is_array($externesArray) ? implode(', ', $externesArray) : '';
-                        @endphp
-                        <input type="text" name="externes_simple" class="form-control border-0 bg-light" value="{{ $externesString }}" placeholder="Nom1, Nom2...">
+                        <label class="form-label fw-bold text-warning d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-user-plus me-2"></i> Participants Externes</span>
+                            <button type="button" class="btn btn-sm btn-warning rounded-pill text-white px-3" onclick="addExterneRow()">
+                                <i class="fas fa-plus-circle me-1"></i> Ajouter
+                            </button>
+                        </label>
+
+                        <div id="externes-container" class="p-3 rounded-4 bg-light shadow-sm" style="max-height: 400px; overflow-y: auto;">
+                        @foreach($reunion->listeExternes as $index => $externe)
+                            <div class="row g-2 mb-3 externe-row border-bottom pb-3">
+                                {{-- ID caché CRUCIAL --}}
+                                <input type="hidden" name="externes[{{ $index }}][id]" value="{{ $externe->id }}">
+
+                                <!-- Ligne 1 : Identité et Origine -->
+                                <div class="col-md-4">
+                                    <label class="small fw-bold text-muted">Nom complet</label>
+                                    <input type="text" name="externes[{{ $index }}][nom_complet]" value="{{ $externe->nom_complet }}" class="form-control form-control-sm border-0 shadow-sm" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="small fw-bold text-muted">Structure / Origine</label>
+                                    <input type="text" name="externes[{{ $index }}][origine]" value="{{ $externe->origine }}" class="form-control form-control-sm border-0 shadow-sm" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="small fw-bold text-muted">Fonction</label>
+                                    <input type="text" name="externes[{{ $index }}][fonction]" value="{{ $externe->fonction }}" class="form-control form-control-sm border-0 shadow-sm">
+                                </div>
+
+                                <!-- Ligne 2 : Contacts -->
+                                <div class="col-md-5">
+                                    <label class="small fw-bold text-muted">Email</label>
+                                    <input type="email" name="externes[{{ $index }}][email]" value="{{ $externe->email }}" class="form-control form-control-sm border-0 shadow-sm" placeholder="exemple@mail.com">
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="small fw-bold text-muted">Téléphone</label>
+                                    <input type="text" name="externes[{{ $index }}][telephone]" value="{{ $externe->telephone }}" class="form-control form-control-sm border-0 shadow-sm" placeholder="+225...">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end justify-content-end">
+                                    <button type="button" class="btn btn-sm btn-outline-danger border-0 mb-1" onclick="this.closest('.externe-row').remove()" title="Supprimer ce participant">
+                                        <i class="fas fa-trash-alt"></i> Supprimer
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+
                     </div>
 
                     <!-- Ordre du jour -->
@@ -154,6 +196,100 @@
         </div>
     </div>
 </div>
+<script>
+// On commence le compteur après les éléments déjà existants
+let externeCount = {{ $reunion->listeExternes->count() }};
+
+function addExterneRow() {
+    const container = document.getElementById('externes-container');
+    const html = `
+        <div class="row g-2 mb-2 externe-row border-bottom pb-2 animate__animated animate__fadeIn">
+            <input type="hidden" name="externes[${externeCount}][id]" value="">
+            <div class="col-md-6">
+                <input type="text" name="externes[${externeCount}][nom_complet]" class="form-control form-control-sm" placeholder="Nom complet" required>
+            </div>
+            <div class="col-md-6">
+                <input type="text" name="externes[${externeCount}][origine]" class="form-control form-control-sm" placeholder="Structure" required>
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="externes[${externeCount}][fonction]" class="form-control form-control-sm" placeholder="Fonction">
+            </div>
+            <div class="col-md-4">
+                <input type="text" name="externes[${externeCount}][telephone]" class="form-control form-control-sm" placeholder="Téléphone">
+            </div>
+            <div class="col-md-4 d-flex align-items-center">
+                <input type="email" name="externes[${externeCount}][email]" class="form-control form-control-sm me-1" placeholder="Email">
+                <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="this.closest('.externe-row').remove()">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    externeCount++;
+}
+</script>
+
+<script>
+function addExterneRow() {
+    const container = document.getElementById('externes-container');
+    const emptyMsg = container.querySelector('.empty-msg');
+    if (emptyMsg) emptyMsg.remove();
+
+    const div = document.createElement('div');
+    div.className = 'input-group mb-2 externe-row';
+    div.innerHTML = `
+        <input type="text" name="externes_noms[]" class="form-control form-control-sm" placeholder="Nom" required>
+        <input type="text" name="externes_organismes[]" class="form-control form-control-sm" placeholder="Organisme">
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.externe-row').remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    container.appendChild(div);
+}
+</script>
+<script>
+// On initialise le compteur avec le nombre actuel d'externes
+let externeCount = {{ $reunion->listeExternes->count() }};
+
+function addExterneRow() {
+    const container = document.getElementById('externes-container');
+    const html = `
+        <div class="row g-2 mb-3 externe-row border-bottom pb-3 animate__animated animate__fadeIn">
+            <input type="hidden" name="externes[${externeCount}][id]" value="">
+
+            <div class="col-md-4">
+                <label class="small fw-bold text-muted">Nom complet</label>
+                <input type="text" name="externes[${externeCount}][nom_complet]" class="form-control form-control-sm border-0 shadow-sm" required>
+            </div>
+            <div class="col-md-4">
+                <label class="small fw-bold text-muted">Structure / Origine</label>
+                <input type="text" name="externes[${externeCount}][origine]" class="form-control form-control-sm border-0 shadow-sm" required>
+            </div>
+            <div class="col-md-4">
+                <label class="small fw-bold text-muted">Fonction</label>
+                <input type="text" name="externes[${externeCount}][fonction]" class="form-control form-control-sm border-0 shadow-sm">
+            </div>
+
+            <div class="col-md-5">
+                <label class="small fw-bold text-muted">Email</label>
+                <input type="email" name="externes[${externeCount}][email]" class="form-control form-control-sm border-0 shadow-sm">
+            </div>
+            <div class="col-md-5">
+                <label class="small fw-bold text-muted">Téléphone</label>
+                <input type="text" name="externes[${externeCount}][telephone]" class="form-control form-control-sm border-0 shadow-sm">
+            </div>
+            <div class="col-md-2 d-flex align-items-end justify-content-end">
+                <button type="button" class="btn btn-sm btn-outline-danger border-0 mb-1" onclick="this.closest('.externe-row').remove()">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    externeCount++;
+}
+</script>
 
 @push('scripts')
 <script>

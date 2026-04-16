@@ -490,6 +490,50 @@ namespace App\Models{
 namespace App\Models{
 /**
  * @property int $id
+ * @property int $meeting_id
+ * @property string $nom_complet
+ * @property string $origine
+ * @property string|null $fonction
+ * @property string|null $email
+ * @property string|null $telephone
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne whereEmail($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne whereFonction($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne whereMeetingId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne whereNomComplet($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne whereOrigine($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne whereTelephone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne whereUpdatedAt($value)
+ */
+	class MeetingExterne extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
+ * @property int $meeting_id
+ * @property int $agent_id
+ * @property-read \App\Models\Agent|null $agent
+ * @property-read \App\Models\Meeting|null $meeting
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant whereAgentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant whereMeetingId($value)
+ */
+	class MeetingParticipant extends \Eloquent {}
+}
+
+namespace App\Models{
+/**
+ * @property int $id
  * @property string $name
  * @property string $guard_name
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -678,6 +722,8 @@ namespace App\Models{
  * @property-read int|null $agents_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SeminaireDocument> $documents
  * @property-read int|null $documents_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SeminaireParticipant> $participants
+ * @property-read int|null $participants_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\SeminaireParticipant> $participations
  * @property-read int|null $participations_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Seminaire newModelQuery()

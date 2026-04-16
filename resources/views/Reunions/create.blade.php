@@ -101,14 +101,42 @@
                         </div>
                     </div>
 
-                    <!-- Participants Externes -->
-                    <div class="col-md-6">
-                        <label class="form-label fw-bold text-warning"><i class="fas fa-user-plus me-2"></i> Personnes Extérieures</label>
-                        <div class="input-group shadow-sm rounded-3 overflow-hidden">
-                            <input type="text" name="externes_simple" class="form-control border-0 bg-light" placeholder="Nom1, Nom2, Nom3...">
-                            <span class="input-group-text bg-warning text-white border-0"><i class="fas fa-external-link-alt"></i></span>
+                    <!-- Participants Externes Dynamiques -->
+                    <div class="col-md-12">
+                        <div class="p-3 rounded-4" style="background-color: #fffbeb; border-left: 5px solid #f59e0b;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <label class="form-label fw-bold text-warning mb-0">
+                                    <i class="fas fa-user-plus me-2"></i> PERSONNES EXTÉRIEURES (PARTENAIRES)
+                                </label>
+                                <button type="button" class="btn btn-warning btn-sm rounded-pill fw-bold text-white px-3" onclick="addExterneRow()">
+                                    <i class="fas fa-plus me-1"></i> Ajouter un externe
+                                </button>
+                            </div>
+
+                            <div id="externes-container">
+                                <!-- Les lignes apparaîtront ici -->
+                                <div class="row g-2 mb-2 externe-row">
+                                    <div class="col-md-3">
+                                        <input type="text" name="externes[0][nom_complet]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Nom complet" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" name="externes[0][origine]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Structure (ex: Ministère)">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="text" name="externes[0][fonction]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Fonction">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="text" name="externes[0][telephone]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Téléphone">
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-center">
+                                        <input type="email" name="externes[0][email]" class="form-control form-control-sm border-0 shadow-sm me-2" placeholder="Email">
+                                        <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="removeExterneRow(this)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <small class="text-muted italic">Séparez les noms par une virgule.</small>
                     </div>
 
                     <!-- Ordre du jour -->
@@ -197,6 +225,46 @@
 
     // Lancer l'initialisation au chargement de la page
     google.maps.event.addDomListener(window, 'load', initAutocomplete);
+</script>
+<script>
+let externeCount = 1;
+
+function addExterneRow() {
+    const container = document.getElementById('externes-container');
+    const html = `
+        <div class="row g-2 mb-2 externe-row animate__animated animate__fadeIn">
+            <div class="col-md-3">
+                <input type="text" name="externes[${externeCount}][nom_complet]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Nom complet" required>
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="externes[${externeCount}][origine]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Structure">
+            </div>
+            <div class="col-md-2">
+                <input type="text" name="externes[${externeCount}][fonction]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Fonction">
+            </div>
+            <div class="col-md-2">
+                <input type="text" name="externes[${externeCount}][telephone]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Téléphone">
+            </div>
+            <div class="col-md-2 d-flex align-items-center">
+                <input type="email" name="externes[${externeCount}][email]" class="form-control form-control-sm border-0 shadow-sm me-2" placeholder="Email">
+                <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="removeExterneRow(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+    externeCount++;
+}
+
+function removeExterneRow(btn) {
+    const rows = document.querySelectorAll('.externe-row');
+    if (rows.length > 1) {
+        btn.closest('.externe-row').remove();
+    } else {
+        alert("Il faut au moins un emplacement ou vider les champs.");
+    }
+}
 </script>
 
 @endsection

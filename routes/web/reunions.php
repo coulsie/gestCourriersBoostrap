@@ -14,4 +14,7 @@ Route::middleware(['auth'])->group(function () {
 
     // 3. Ressources standards (index, create, store, show, edit, update, destroy)
     Route::resource('reunions', MeetingController::class);
+    // Ajoutez cette ligne
+    Route::get('/reunions/{reunion}/liste-presence', [MeetingController::class, 'listePresence'])->name('reunions.liste_presence');
+
 });

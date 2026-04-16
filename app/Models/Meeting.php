@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Meeting extends Model
 {
-   
+
 protected $fillable = [
     'objet', 'date_heure', 'lieu', 'animateur_id', 'redacteur_id',
     'participants', 'externes', 'ordre_du_jour',
@@ -50,10 +50,21 @@ protected $fillable = [
     /**
      * Les agents participants (via la table pivot meeting_participants).
      */
-    public function participants(): BelongsToMany
+
+    public function participants()
     {
-        return $this->belongsToMany(Agent::class, 'meeting_participants');
+        // Relation vers le modèle MeetingParticipant
+        return $this->hasMany(MeetingParticipant::class, 'meeting_id');
     }
+
+
+
+// App/Models/Meeting.php
+
+
+public function listeExternes() {
+    return $this->hasMany(MeetingExterne::class, 'meeting_id');
+}
 
 
 }

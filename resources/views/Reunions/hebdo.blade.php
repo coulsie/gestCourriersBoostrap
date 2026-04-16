@@ -139,38 +139,40 @@
 
                             {{-- 4. ÉQUIPE ET DOCUMENTS --}}
                             <td>
-                                {{-- 1. Participants Internes (Blanc sur Vert Éclatant) --}}
-                                <div class="mb-2">
-                                    @foreach($reunion->participants as $participant)
-                                        <span class="badge shadow-sm text-white mb-1 px-2 py-1"
-                                            style="background-color: #10b981; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.2);">
-                                            <i class="fas fa-user-tie fa-xs me-1"></i>
-                                            {{ strtoupper(substr($participant->last_name, 0, 1)) }}. {{ $participant->first_name }}
-                                        </span>
+                                                                {{-- 1. Participants Internes (Corrigé pour utiliser la relation agent) --}}
+                                <div class="mb-2 d-flex flex-wrap gap-1">
+                                    @foreach($reunion->participants as $p)
+                                        @if($p->agent) {{-- Sécurité pour éviter un crash si l'agent est supprimé --}}
+                                            <span class="badge shadow-sm text-white mb-1 px-2 py-1"
+                                                style="background-color: #10b981; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.2);">
+                                                <i class="fas fa-user-tie fa-xs me-1"></i>
+                                                {{ strtoupper(substr($p->agent->last_name, 0, 1)) }}. {{ $p->agent->first_name }}
+                                            </span>
+                                        @endif
                                     @endforeach
                                 </div>
 
-                                {{-- 2. Participants Externes (Affichage de tous les noms - Blanc sur Orange) --}}
-                                @if($reunion->externes)
-                                    @php
-                                        $externes = is_string($reunion->externes) ? json_decode($reunion->externes, true) : $reunion->externes;
-                                    @endphp
-                                    @if(is_array($externes) && count($externes) > 0)
+                                {{-- 2. NOUVEAU : Participants Externes (Nouvelle Table - Blanc sur Orange) --}}
+
+                                    {{-- 2. On utilise 'listeExternes' au lieu de 'externes' --}}
+                                    @if($reunion->listeExternes->count() > 0)
                                         <div class="border-top pt-2 mt-1 d-flex flex-wrap gap-1">
-                                            @foreach($externes as $externe)
+                                            @foreach($reunion->listeExternes as $ext)
                                                 <span class="badge shadow-sm text-white mb-1 px-2 py-1"
-                                                    style="background-color: #f59e0b; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.2);">
-                                                    <i class="fas fa-external-link-alt fa-xs me-1"></i> {{ $externe }}
+                                                    style="background-color: #f59e0b; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.2);"
+                                                    title="{{ $ext->fonction }} - {{ $ext->origine }}">
+                                                    <i class="fas fa-external-link-alt fa-xs me-1"></i>
+                                                    {{ $ext->nom_complet }}
+                                                    <small class="opacity-75">({{ $ext->origine }})</small>
                                                 </span>
                                             @endforeach
                                         </div>
                                     @endif
-                                @endif
+
 
                                 {{-- 3. Fichiers joints (Archives) --}}
-                                <div class="d-flex align-items-center gap-2 mt-2">
+                                <div class="d-flex align-items-center flex-wrap gap-2 mt-2">
                                     @if($reunion->presence_file)
-                                        {{-- Bouton si le fichier existe --}}
                                         <a href="{{ asset('Rapport_Reunions/' . $reunion->presence_file) }}"
                                         target="_blank"
                                         class="btn btn-sm btn-outline-primary shadow-sm fw-bold px-3"
@@ -178,17 +180,12 @@
                                             <i class="fas fa-file-download me-1"></i> PRÉSENCE
                                         </a>
                                     @elseif($reunion->status == 'terminee')
-                                        {{-- Badge discret si la réunion est finie mais sans fichier --}}
                                         <span class="badge bg-soft-warning text-warning border border-warning px-2 py-1" style="font-size: 0.7rem;">
-                                            <i class="fas fa-clock me-1"></i> EN ATTENTE LISTE DE PRESENCE
+                                            <i class="fas fa-clock me-1"></i> EN ATTENTE LISTE
                                         </span>
-                                    @else
-                                        {{-- Optionnel : Texte si la réunion n'est pas encore terminée --}}
-                                        <span class="text-muted small italic">Aucun document</span>
                                     @endif
 
                                     @if($reunion->report_file)
-                                        {{-- Bouton si le compte-rendu existe --}}
                                         <a href="{{ asset('Rapport_Reunions/' . $reunion->report_file) }}"
                                         target="_blank"
                                         class="btn btn-sm btn-outline-success shadow-sm fw-bold px-3"
@@ -196,22 +193,30 @@
                                             <i class="fas fa-file-pdf me-1"></i> COMPTE-RENDU
                                         </a>
                                     @elseif($reunion->status == 'terminee')
-                                        {{-- Badge si la réunion est terminée mais le rapport manque --}}
                                         <span class="badge bg-soft-danger text-danger border border-danger px-2 py-1" style="font-size: 0.7rem;">
                                             <i class="fas fa-exclamation-triangle me-1"></i> EN ATTENTE DU CR
                                         </span>
-                                    @else
-                                        {{-- État pour les réunions planifiées ou en cours --}}
-                                        <span class="text-muted small fst-italic">  Aucun document</span>
                                     @endif
 
+                                    @if(!$reunion->presence_file && !$reunion->report_file && $reunion->status != 'terminee')
+                                        <span class="text-muted small fst-italic">Aucun document</span>
+                                    @endif
                                 </div>
                             </td>
 
 
+
                             {{-- 5. ACTIONS --}}
                             <td class="text-center pe-4">
+
                                 <div class="btn-group shadow-sm rounded-pill border bg-white overflow-hidden">
+                                    <a href="{{ route('reunions.liste_presence', $reunion->id) }}"
+                                        target="_blank"
+                                        class="btn btn-sm text-info px-2"
+                                        title="Imprimer la liste d'émargement">
+                                            <i class="fas fa-print fa-lg"></i>
+                                    </a>
+
                                     <a href="{{ route('reunions.show', $reunion->id) }}" class="btn btn-sm text-primary px-2" title="Voir"><i class="fas fa-eye"></i></a>
                                     <a href="{{ route('reunions.edit', $reunion->id) }}" class="btn btn-sm text-warning px-2" title="Traiter-Modifier/Clôturer">
                                         <i class="fas fa-check-double"></i>
