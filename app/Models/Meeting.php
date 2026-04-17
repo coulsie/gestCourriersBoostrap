@@ -51,18 +51,20 @@ protected $fillable = [
      * Les agents participants (via la table pivot meeting_participants).
      */
 
+
+   
     public function participants()
     {
-        // Relation vers le modèle MeetingParticipant
-        return $this->hasMany(MeetingParticipant::class, 'meeting_id');
+        return $this->belongsToMany(Agent::class, 'meeting_participants', 'meeting_id', 'agent_id')
+            ->withTimestamps(); // Indispensable pour vos nouvelles colonnes
     }
 
 
 
-// App/Models/Meeting.php
+    // App/Models/Meeting.php
 
 
-public function listeExternes() {
+    public function listeExternes() {
     return $this->hasMany(MeetingExterne::class, 'meeting_id');
 }
 

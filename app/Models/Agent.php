@@ -114,17 +114,7 @@ class Agent extends Model
     {
         return $this->hasMany(Affectation::class);
     }
-        public function notificationtache()
-        {
-            // S'il s'agit d'une relation (ex: HasMany)
-            return $this->hasMany(NotificationTache::class);
-        }
-
-
-        public function notificationtaches() {
-            return $this->hasMany(NotificationTache::class);
-        }
-
+        
                 public function imputations()
         {
             return $this->belongsToMany(Imputation::class, 'agent_imputation');
@@ -183,7 +173,7 @@ public function getStatutActuelAttribute()
     {
         return $this->belongsToMany(Meeting::class, 'meeting_participants');
     }
-    
+
     public function getNomCompletAttribute()
     {
         return "{$this->last_name} {$this->first_name}";

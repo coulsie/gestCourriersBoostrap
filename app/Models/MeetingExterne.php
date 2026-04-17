@@ -21,6 +21,7 @@ class MeetingExterne extends Model
         'email',
         'telephone'
     ];
+    
 
     /**
      * Relation vers la Réunion (Meeting).

@@ -40,10 +40,11 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($listeParticipants as $index => $p)
+           @foreach($listeParticipants as $index => $p)
             <tr style="height: 60px;">
                 <td class="text-center fw-bold">{{ $index + 1 }}</td>
                 <td class="ps-3 fw-bold">{{ strtoupper($p->nom) }}</td>
+                {{-- Cette cellule affichera désormais : Fonction | Email | Téléphone --}}
                 <td class="text-center small">{{ $p->fonction }}</td>
                 <td class="text-center">
                     <span class="{{ $p->origine == 'DSESF' ? 'fw-bold' : '' }}">{{ $p->origine }}</span>

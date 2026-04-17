@@ -13,13 +13,13 @@ class MeetingParticipant extends Model
     protected $table = 'meeting_participants';
     public $timestamps = false;
 
-    
+
     // Autoriser l'assignation de masse
     protected $fillable = [
         'meeting_id',
         'agent_id'
     ];
-
+    
     /**
      * Relation vers l'Agent.
      * Permet d'accéder à $participant->agent->email et $participant->agent->phone_number

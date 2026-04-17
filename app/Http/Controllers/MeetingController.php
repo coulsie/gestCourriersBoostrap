@@ -17,13 +17,16 @@ class MeetingController extends Controller
 
     // 1. Réunions de la semaine en cours
     // On charge 'participants.agent' pour les internes et 'listeExternes' pour les invités
-    $reunions = Meeting::with(['animateur', 'redacteur', 'participants.agent', 'listeExternes'])
-        ->whereBetween('date_heure', [$debutSemaine, $finSemaine])
-        ->orderBy('date_heure', 'asc')
-        ->get();
 
-    // 2. Réunions hors-semaine (Historique complet)
-    $autresReunions = Meeting::with(['animateur', 'redacteur', 'participants.agent', 'listeExternes'])
+        // Modifiez la ligne 20 comme ceci :
+        $reunions = Meeting::with(['animateur', 'redacteur', 'participants', 'listeExternes'])
+            ->whereBetween('date_heure', [$debutSemaine, $finSemaine])
+            ->orderBy('date_heure', 'asc')
+            ->get();
+
+
+        // 2. Réunions hors-semaine (Historique complet)
+        $autresReunions = Meeting::with(['animateur', 'redacteur', 'participants', 'listeExternes'])
         ->whereNotBetween('date_heure', [$debutSemaine, $finSemaine])
         ->orderBy('date_heure', 'desc')
         ->get();
@@ -131,106 +134,92 @@ public function store(Request $request)
     /**
      * Mise à jour
      */
-public function update(Request $request, Meeting $reunion)
-{
-    // 1. Validation rigoureuse
-    $validated = $request->validate([
-        'objet' => 'required|string|max:255',
-        'date_heure' => 'required',
-        'animateur_id' => 'required|exists:agents,id',
-        'redacteur_id' => 'required|exists:agents,id',
-        'lieu' => 'nullable|string|max:255',
-        'ordre_du_jour' => 'nullable|string',
-        'status' => 'required|in:programmee,terminee,annulee',
-        'presence_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-        'report_file' => 'nullable|file|mimes:pdf,doc,docx,odt|max:5120',
+    public function update(Request $request, $id)
+    {
+        // 1. Récupération de la réunion ou erreur 404
+        $reunion = Meeting::findOrFail($id);
 
-        // Internes
-        'participants' => 'nullable|array',
-        'participants.*' => 'exists:agents,id',
+        \DB::transaction(function () use ($request, $reunion, $id) {
 
-        // Externes
-        'externes' => 'nullable|array',
-        'externes.*.id' => 'nullable|exists:meeting_externes,id',
-        'externes.*.nom_complet' => 'required_with:externes|string|max:255',
-        'externes.*.origine' => 'required_with:externes|string|max:255',
-        'externes.*.fonction' => 'nullable|string|max:255',
-        'externes.*.email' => 'nullable|email|max:255',
-        'externes.*.telephone' => 'nullable|string|max:255',
-    ]);
+            // --- GESTION DES FICHIERS (Avant l'update groupé) ---
 
-    // 2. Données de base
-    $data = $request->only(['objet', 'date_heure', 'animateur_id', 'redacteur_id', 'ordre_du_jour', 'lieu', 'status']);
+            // On récupère les données de base
+            $data = $request->only([
+                'objet',
+                'date_heure',
+                'lieu',
+                'animateur_id',
+                'redacteur_id',
+                'status',
+                'ordre_du_jour'
+            ]);
 
-    // 3. Gestion des fichiers (Archives)
-    if ($request->hasFile('presence_file')) {
-        $fileP = $request->file('presence_file');
-        $fileNameP = time() . '_presence_' . $fileP->getClientOriginalName();
-        $fileP->move(public_path('Rapport_Reunions'), $fileNameP);
-        $data['presence_file'] = $fileNameP;
+            // Vérification et stockage de la liste de présence
+            if ($request->hasFile('presence_file')) {
+                // On récupère le fichier
+                $file = $request->file('presence_file');
+                // On lui donne un nom unique propre
+                $fileName = 'presence_' . time() . '_' . $file->getClientOriginalName();
+                // On le déplace directement dans public/Rapport_Reunions
+                $file->move(public_path('Rapport_Reunions'), $fileName);
+                // On enregistre le chemin simple en base de données
+                $data['presence_file'] = 'Rapport_Reunions/' . $fileName;
+            }
+
+            // Vérification et stockage du rapport
+            if ($request->hasFile('report_file')) {
+                $file = $request->file('report_file');
+                $fileName = 'rapport_' . time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('Rapport_Reunions'), $fileName);
+                $data['report_file'] = 'Rapport_Reunions/' . $fileName;
+            }
+
+            // 2. Mise à jour des informations de base et des fichiers
+            $reunion->update($data);
+
+            // 3. GESTION DES PARTICIPANTS INTERNES (Agents)
+            \DB::table('meeting_participants')->where('meeting_id', $id)->delete();
+
+            if ($request->has('participants') && is_array($request->participants)) {
+                $dataInternes = [];
+                $now = now();
+
+                foreach ($request->participants as $agent_id) {
+                    if (!empty($agent_id)) {
+                        $dataInternes[] = [
+                            'meeting_id' => $id,
+                            'agent_id'   => $agent_id,
+                            'created_at' => $now,
+                            'updated_at' => $now
+                        ];
+                    }
+                }
+
+                if (!empty($dataInternes)) {
+                    \DB::table('meeting_participants')->insert($dataInternes);
+                }
+            }
+
+            // 4. GESTION DES PARTICIPANTS EXTERNES (Invités)
+            $reunion->listeExternes()->delete();
+
+            if ($request->has('externes') && is_array($request->externes)) {
+                foreach ($request->externes as $dataExterne) {
+                    if (!empty($dataExterne['nom_complet'])) {
+                        $reunion->listeExternes()->create([
+                            'nom_complet' => $dataExterne['nom_complet'],
+                            'origine'     => $dataExterne['origine'] ?? 'N/A',
+                            'fonction'    => $dataExterne['fonction'] ?? null,
+                            'email'       => $dataExterne['email'] ?? null,
+                            'telephone'   => $dataExterne['telephone'] ?? null,
+                        ]);
+                    }
+                }
+            }
+        });
+
+        return redirect()->route('reunions.hebdo')->with('success', 'La réunion et ses documents ont été mis à jour avec succès.');
     }
-
-    if ($request->hasFile('report_file')) {
-        $fileR = $request->file('report_file');
-        $fileNameR = time() . '_rapport_' . $fileR->getClientOriginalName();
-        $fileR->move(public_path('Rapport_Reunions'), $fileNameR);
-        $data['report_file'] = $fileNameR;
-    }
-
-    // 4. Mise à jour de la réunion principale
-    $reunion->update($data);
-
-    // 5. SYNCHRONISATION DES INTERNES (Agents DSESF)
-    // On ne traite la suppression que si le champ participants existe dans la requête
-    if ($request->has('participants')) {
-        $newInternalIds = $request->input('participants', []);
-
-        // Supprimer ceux qui ont été décochés
-        $reunion->participants()->whereNotIn('agent_id', $newInternalIds)->delete();
-
-        // Maintenir ou ajouter les autres
-        foreach ($newInternalIds as $agentId) {
-            $reunion->participants()->updateOrCreate(
-                ['agent_id' => $agentId],
-                ['meeting_id' => $reunion->id]
-            );
-        }
-    } else {
-        // Si le champ n'existe pas du tout (aucune case cochée), on vide tout par sécurité
-        $reunion->participants()->delete();
-    }
-
-    // 6. SYNCHRONISATION DES EXTERNES
-    $externesInput = $request->input('externes', []);
-    $keptExternalIds = [];
-
-    // On boucle pour créer ou mettre à jour
-    foreach ($externesInput as $exData) {
-        if (!empty($exData['nom_complet'])) {
-            $externe = $reunion->listeExternes()->updateOrCreate(
-                ['id' => $exData['id'] ?? null], // Utilise l'ID pour l'update
-                [
-                    'nom_complet' => $exData['nom_complet'],
-                    'origine'     => $exData['origine'],
-                    'fonction'    => $exData['fonction'] ?? null,
-                    'email'       => $exData['email'] ?? null,
-                    'telephone'   => $exData['telephone'] ?? null,
-                ]
-            );
-            $keptExternalIds[] = $externe->id;
-        }
-    }
-
-    // Suppression des lignes qui ne sont plus dans le formulaire
-    // Uniquement si le tableau externe est envoyé (évite les bugs de vidage)
-    if ($request->has('externes')) {
-        $reunion->listeExternes()->whereNotIn('id', $keptExternalIds)->delete();
-    }
-
-    return redirect()->route('reunions.hebdo')->with('success', 'Réunion mise à jour avec succès !');
-}
-
-
 
     /**
      * Supprimer la réunion
@@ -270,26 +259,27 @@ public function update(Request $request, Meeting $reunion)
 
     public function listePresence($id)
     {
-        // On charge la réunion avec ses deux types de participants
-        $reunion = Meeting::with(['participants.agent', 'listeExternes'])->findOrFail($id);
+        // 1. On charge la réunion
+        $reunion = Meeting::with(['participants', 'listeExternes'])->findOrFail($id);
 
-        // 1. Préparation des Internes (DSESF)
-        $internes = $reunion->participants->map(function($p) {
+        // 2. Préparation des Internes
+        $internes = $reunion->participants->map(function ($agent) {
             return (object)[
-                'nom' => $p->agent->last_name . ' ' . $p->agent->first_name,
+                'nom' => strtoupper($agent->last_name) . ' ' . $agent->first_name,
                 'origine' => 'DSESF',
-                'fonction' => $p->agent->status,
-                'contact' => ($p->telephone ?? $p->agent->phone_number) . ' / ' . ($p->email ?? $p->agent->email)
+                // Remplacement de $p par $agent ici
+                'fonction' => ($agent->status ?? 'Agent') . " | " . $agent->email_professionnel . " | " . $agent->phone_number,
+                'contact' => $agent->phone_number,
             ];
         });
 
-        // 2. Préparation des Externes
-        $externes = $reunion->listeExternes->map(function($e) {
+        // 3. Préparation des Externes
+        $externes = $reunion->listeExternes->map(function ($e) {
             return (object)[
-                'nom' => $e->nom_complet,
+                'nom' => strtoupper($e->nom_complet),
                 'origine' => $e->origine,
-                'fonction' => $e->fonction ?? '---',
-                'contact' => ($e->telephone ?? '---') . ' / ' . ($e->email ?? '---')
+                'fonction' => ($e->fonction) . " | " . $e->email . " | " . $e->telephone,
+                'contact' => $e->telephone . ' / ' . $e->email
             ];
         });
 
@@ -298,6 +288,4 @@ public function update(Request $request, Meeting $reunion)
 
         return view('Reunions.print_presence', compact('reunion', 'listeParticipants'));
     }
-
-
 }

@@ -88,21 +88,52 @@
                         </div>
                     </div>
 
-                    <!-- Participants Internes -->
+                    <!-- Participants Internes (Version Colorée) -->
                     <div class="col-md-6">
-                        <label class="form-label fw-bold text-primary"><i class="fas fa-users me-2"></i> Participants Internes</label>
-                        <select name="participants[]" class="form-control select2 shadow-sm border-light" multiple="multiple" data-placeholder="Cliquer pour ajouter">
-                            @foreach($agents as $agent)
-                                <option value="{{ $agent->id }}">{{ strtoupper($agent->last_name) }} {{ $agent->first_name }}</option>
-                            @endforeach
-                        </select>
-                        <div class="mt-2 ps-1">
-                            <span class="badge bg-soft-primary text-primary" style="background: #e0e7ff;">Maintenez Ctrl pour en choisir plusieurs</span>
+                        <label class="form-label fw-bold text-primary">
+                            <i class="fas fa-users-cog me-2"></i> Participants Internes
+                        </label>
+                        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                            {{-- Header du petit panneau --}}
+                            <div class="card-header border-0 py-2" style="background: linear-gradient(45deg, #6366f1, #818cf8);">
+                                <input type="text" id="searchAgent" class="form-control form-control-sm border-0 shadow-sm"
+                                    style="border-radius: 20px;" placeholder="🔍 Rechercher un collaborateur...">
+                            </div>
+
+                            <div class="card-body p-3 bg-white">
+                                <div id="agents-list" style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
+                                    @foreach($agents->sortBy('last_name') as $agent)
+                                        <div class="form-check mb-2 agent-item d-flex align-items-center p-2 rounded-3 transition-all"
+                                            style="background-color: #f8fafc; border-left: 4px solid #6366f1;">
+
+                                            <input class="form-check-input agent-checkbox" type="checkbox" name="participants[]"
+                                                value="{{ $agent->id }}" id="agent_{{ $agent->id }}"
+                                                style="width: 1.3em; height: 1.3em; cursor: pointer; border: 2px solid #6366f1;">
+
+                                            <label class="form-check-label ms-3 fw-medium" for="agent_{{ $agent->id }}" style="cursor: pointer; flex-grow: 1;">
+                                                <span class="text-indigo fw-bold">{{ strtoupper($agent->last_name) }}</span>
+                                                <span class="text-dark">{{ $agent->first_name }}</span>
+                                            </label>
+
+                                            <i class="fas fa-user-circle text-light fs-5"></i>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            {{-- Footer avec total (STRICTEMENT Blanc sur Rouge en gras) --}}
+                            <div class="card-footer bg-dark border-0 py-2 d-flex justify-content-between align-items-center">
+                                <span class="small fw-bold text-white-50 text-uppercase">Total sélectionnés</span>
+                                <span id="total-agents-count" class="badge rounded-pill px-3 py-2 fw-bold shadow-lg"
+                                    style="background-color: #ef4444; color: white; font-size: 1.1rem; min-width: 50px; border: 2px solid white;">
+                                    0
+                                </span>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Participants Externes Dynamiques -->
-                    <div class="col-md-12">
+                    <div class="col-md-6">
                         <div class="p-3 rounded-4" style="background-color: #fffbeb; border-left: 5px solid #f59e0b;">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <label class="form-label fw-bold text-warning mb-0">
@@ -161,109 +192,139 @@
 
 <style>
     .fw-black { font-weight: 900; }
-    .form-control:focus, .form-select:focus {
-        border-color: #6366f1;
-        box-shadow: 0 0 0 0.25 red; /* Invisible but triggers transition */
+    .btn:hover { transform: scale(1.05); transition: all 0.2s; }
+
+    /* Style pour la liste des agents */
+    .hover-bg-light:hover { background-color: #f8f9fa; }
+    #agents-list::-webkit-scrollbar { width: 5px; }
+    #agents-list::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
+
+    .agent-checkbox {
+        width: 1.2em;
+        height: 1.2em;
+        cursor: pointer;
+        border: 2px solid #6366f1 !important;
     }
-    .btn:hover { transform: scale(1.05); }
-    kbd { font-family: sans-serif; padding: 3px 6px; }
-    .select2-container--bootstrap-5 .select2-selection {
-        border-radius: 10px;
-    }
+</style>
+<style>
+    .text-indigo { color: #4f46e5; }
+    .transition-all { transition: all 0.2s ease; }
+    .agent-item:hover { background-color: #eef2ff !important; transform: translateX(5px); }
+
+    /* Custom Scrollbar colorée */
+    #agents-list::-webkit-scrollbar { width: 6px; }
+    #agents-list::-webkit-scrollbar-track { background: #f1f1f1; }
+    #agents-list::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
 </style>
 
 <script>
-    function openGoogleMaps() {
-        const input = document.getElementById('lieu_reunion');
-
-        if (input && input.value.trim() !== "") {
-            // URL OFFICIELLE : Notez le "/maps/search/" et le "?api=1&query="
-            const url = "https://google.com/maps/search/?api=1&query=" + encodeURIComponent(input.value);
-
-            window.open(url, '_blank');
-        } else {
-            alert("Veuillez saisir un lieu (ex: Bouaké Belleville) avant de cliquer sur Maps.");
-        }
+// --- GESTION DES AGENTS INTERNES ---
+$(document).ready(function() {
+    function updateAgentCount() {
+        const checkedCount = $('.agent-checkbox:checked').length;
+        const display = $('#total-agents-count');
+        display.text(checkedCount);
+        // Rouge si 0, Vert si > 0 (optionnel, selon ta préférence)
+        display.css('background-color', checkedCount > 0 ? '#ef4444' : '#64748b');
     }
-</script>
-<script>
-    function initAutocomplete() {
-        const input = document.getElementById('lieu_reunion');
 
-        // Options pour limiter la recherche (ex: Côte d'Ivoire)
-        const options = {
-            componentRestrictions: { country: "CI" },
-            fields: ["name", "address_components", "formatted_address"],
-        };
-
-        const autocomplete = new google.maps.places.Autocomplete(input, options);
-
-        // Se déclenche quand l'utilisateur clique sur une suggestion
-        autocomplete.addListener("place_changed", () => {
-            const place = autocomplete.getPlace();
-
-            if (!place.name) return;
-
-            // Extraire la ville des composants de l'adresse
-            let city = "";
-            if (place.address_components) {
-                for (const component of place.address_components) {
-                    if (component.types.includes("locality")) {
-                        city = component.long_name;
-                        break;
-                    }
-                }
-            }
-
-            // Formater le texte final : "Nom du lieu, Ville"
-            const finalAddress = city ? `${place.name}, ${city}` : place.name;
-
-            // Remplir le champ avec le résultat
-            input.value = finalAddress;
+    // Recherche instantanée d'agents
+    $('#searchAgent').on('keyup', function() {
+        const val = $(this).val().toLowerCase();
+        $('.agent-item').each(function() {
+            const text = $(this).text().toLowerCase();
+            $(this).toggle(text.indexOf(val) > -1);
         });
-    }
+    });
 
-    // Lancer l'initialisation au chargement de la page
-    google.maps.event.addDomListener(window, 'load', initAutocomplete);
-</script>
-<script>
-let externeCount = 1;
+    // Écouteur sur les cases à cocher
+    $(document).on('change', '.agent-checkbox', function() {
+        updateAgentCount();
+    });
+
+    updateAgentCount(); // Initialisation
+});
+
+// --- GESTION DES PARTICIPANTS EXTERNES ---
+let externeCount = Date.now(); // Utilise un timestamp pour des IDs uniques
 
 function addExterneRow() {
     const container = document.getElementById('externes-container');
+    const id = externeCount++;
     const html = `
-        <div class="row g-2 mb-2 externe-row animate__animated animate__fadeIn">
-            <div class="col-md-3">
-                <input type="text" name="externes[${externeCount}][nom_complet]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Nom complet" required>
+        <div class="row g-2 mb-3 externe-row border-bottom pb-3 animate__animated animate__fadeIn">
+            <div class="col-md-4">
+                <label class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Nom complet</label>
+                <input type="text" name="externes[${id}][nom_complet]" class="form-control form-control-sm border-0 shadow-sm" required>
             </div>
-            <div class="col-md-3">
-                <input type="text" name="externes[${externeCount}][origine]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Structure">
+            <div class="col-md-4">
+                <label class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Structure</label>
+                <input type="text" name="externes[${id}][origine]" class="form-control form-control-sm border-0 shadow-sm" required>
             </div>
-            <div class="col-md-2">
-                <input type="text" name="externes[${externeCount}][fonction]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Fonction">
+            <div class="col-md-4">
+                <label class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Fonction</label>
+                <input type="text" name="externes[${id}][fonction]" class="form-control form-control-sm border-0 shadow-sm">
             </div>
-            <div class="col-md-2">
-                <input type="text" name="externes[${externeCount}][telephone]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Téléphone">
+            <div class="col-md-5">
+                <label class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Email</label>
+                <input type="email" name="externes[${id}][email]" class="form-control form-control-sm border-0 shadow-sm">
             </div>
-            <div class="col-md-2 d-flex align-items-center">
-                <input type="email" name="externes[${externeCount}][email]" class="form-control form-control-sm border-0 shadow-sm me-2" placeholder="Email">
-                <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="removeExterneRow(this)">
-                    <i class="fas fa-times"></i>
+            <div class="col-md-5">
+                <label class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Téléphone</label>
+                <input type="text" name="externes[${id}][telephone]" class="form-control form-control-sm border-0 shadow-sm">
+            </div>
+            <div class="col-md-2 d-flex align-items-end justify-content-end">
+                <button type="button" class="btn btn-sm btn-outline-danger border-0 mb-1" onclick="this.closest('.externe-row').remove()">
+                    <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
         </div>
     `;
     container.insertAdjacentHTML('beforeend', html);
-    externeCount++;
+    container.scrollTop = container.scrollHeight;
 }
 
-function removeExterneRow(btn) {
-    const rows = document.querySelectorAll('.externe-row');
-    if (rows.length > 1) {
-        btn.closest('.externe-row').remove();
+// --- GOOGLE MAPS & AUTOCOMPLETE ---
+function openGoogleMaps() {
+    const input = document.getElementById('input-lieu-edit'); // Vérifie bien cet ID
+    if (input && input.value.trim() !== "") {
+        const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(input.value);
+        window.open(url, '_blank');
     } else {
-        alert("Il faut au moins un emplacement ou vider les champs.");
+        alert("Veuillez saisir un lieu avant de consulter la carte.");
     }
+}
+
+function initAutocomplete() {
+    const input = document.getElementById('input-lieu-edit');
+    if(!input) return;
+
+    const options = {
+        componentRestrictions: { country: "CI" },
+        fields: ["name", "address_components", "formatted_address"],
+    };
+
+    const autocomplete = new google.maps.places.Autocomplete(input, options);
+
+    autocomplete.addListener("place_changed", () => {
+        const place = autocomplete.getPlace();
+        if (!place.name) return;
+
+        let city = "";
+        if (place.address_components) {
+            for (const component of place.address_components) {
+                if (component.types.includes("locality")) {
+                    city = component.long_name;
+                    break;
+                }
+            }
+        }
+        input.value = city ? `${place.name}, ${city}` : place.name;
+    });
+}
+// Chargement Google Maps
+if (typeof google !== 'undefined') {
+    google.maps.event.addDomListener(window, 'load', initAutocomplete);
 }
 </script>
 
