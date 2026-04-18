@@ -89,40 +89,44 @@
                     </div>
 
                     <!-- Participants Internes (Version Colorée) -->
+                    <!-- Participants Internes (Version Colorée & Centrée) -->
+                    <!-- Participants Internes (Correction Débordement) -->
                     <div class="col-md-6">
                         <label class="form-label fw-bold text-primary">
                             <i class="fas fa-users-cog me-2"></i> Participants Internes
                         </label>
-                        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                            {{-- Header du petit panneau --}}
-                            <div class="card-header border-0 py-2" style="background: linear-gradient(45deg, #6366f1, #818cf8);">
+                        <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="position: relative;">
+                            <div class="card-header border-0 py-2" style="background: linear-gradient(45deg, #6366f1, #818cf8); z-index: 10;">
                                 <input type="text" id="searchAgent" class="form-control form-control-sm border-0 shadow-sm"
                                     style="border-radius: 20px;" placeholder="🔍 Rechercher un collaborateur...">
                             </div>
 
-                            <div class="card-body p-3 bg-white">
-                                <div id="agents-list" style="max-height: 250px; overflow-y: auto; padding-right: 5px;">
-                                    @foreach($agents->sortBy('last_name') as $agent)
-                                        <div class="form-check mb-2 agent-item d-flex align-items-center p-2 rounded-3 transition-all"
+                            <div class="card-body p-3 bg-white" style="position: relative; z-index: 1;">
+                                {{-- Le secret est ici : overflow-y auto ET position relative --}}
+                                <div id="agents-list" style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding-right: 8px; position: relative;">
+                                    @foreach($agents as $agent)
+                                        <div class="agent-item d-flex align-items-center p-2 mb-2 rounded-3 transition-all w-100"
                                             style="background-color: #f8fafc; border-left: 4px solid #6366f1;">
 
-                                            <input class="form-check-input agent-checkbox" type="checkbox" name="participants[]"
-                                                value="{{ $agent->id }}" id="agent_{{ $agent->id }}"
-                                                style="width: 1.3em; height: 1.3em; cursor: pointer; border: 2px solid #6366f1;">
+                                            <div style="min-width: 35px; width: 35px; display: flex; align-items: center; justify-content: center;">
+                                                <input class="form-check-input agent-checkbox" type="checkbox" name="participants[]"
+                                                    value="{{ $agent->id }}" id="agent_{{ $agent->id }}"
+                                                    style="width: 1.2em; height: 1.2em; cursor: pointer; border: 2px solid #6366f1; margin: 0;">
+                                            </div>
 
-                                            <label class="form-check-label ms-3 fw-medium" for="agent_{{ $agent->id }}" style="cursor: pointer; flex-grow: 1;">
+                                            <label class="ms-2 fw-medium mb-0 text-truncate" for="agent_{{ $agent->id }}" style="cursor: pointer; flex-grow: 1;">
                                                 <span class="text-indigo fw-bold">{{ strtoupper($agent->last_name) }}</span>
                                                 <span class="text-dark">{{ $agent->first_name }}</span>
                                             </label>
 
-                                            <i class="fas fa-user-circle text-light fs-5"></i>
+                                            <i class="fas fa-user-circle text-muted opacity-25 fs-5 ms-auto"></i>
                                         </div>
                                     @endforeach
                                 </div>
                             </div>
 
-                            {{-- Footer avec total (STRICTEMENT Blanc sur Rouge en gras) --}}
-                            <div class="card-footer bg-dark border-0 py-2 d-flex justify-content-between align-items-center">
+                            {{-- On force le footer à être au-dessus de la liste avec z-index --}}
+                            <div class="card-footer bg-dark border-0 py-2 d-flex justify-content-between align-items-center" style="position: relative; z-index: 10;">
                                 <span class="small fw-bold text-white-50 text-uppercase">Total sélectionnés</span>
                                 <span id="total-agents-count" class="badge rounded-pill px-3 py-2 fw-bold shadow-lg"
                                     style="background-color: #ef4444; color: white; font-size: 1.1rem; min-width: 50px; border: 2px solid white;">
@@ -131,6 +135,8 @@
                             </div>
                         </div>
                     </div>
+
+
 
                     <!-- Participants Externes Dynamiques -->
                     <div class="col-md-6">

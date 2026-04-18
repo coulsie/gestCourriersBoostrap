@@ -94,7 +94,7 @@ public function store(Request $request)
         foreach ($request->externes as $externe) {
             // On vérifie que le nom n'est pas vide (sécurité JS)
             if (!empty($externe['nom_complet'])) {
-                $reunion->externes()->create([
+                    $reunion->listeExternes()->create([
                     'nom_complet' => $externe['nom_complet'],
                     'origine'     => $externe['origine'] ?? 'INCONNUE',
                     'fonction'    => $externe['fonction'] ?? null,
