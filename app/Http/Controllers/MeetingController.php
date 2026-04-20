@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Agent;
 use Illuminate\Http\Request;
 use App\Models\Meeting;
+use App\Mail\ReunionProgrammee;
+use Illuminate\Support\Facades\Mail;
 
 
 class MeetingController extends Controller
@@ -50,63 +52,54 @@ class MeetingController extends Controller
 }
 
 
-public function store(Request $request)
-{
-    // 1. Validation étendue
-    $validated = $request->validate([
-        'objet' => 'required|string|max:255',
-        'date_heure' => 'required|date',
-        'animateur_id' => 'required|exists:agents,id',
-        'redacteur_id' => 'required|exists:agents,id',
-        'lieu' => 'nullable|string|max:255',
-        'ordre_du_jour' => 'nullable|string',
+    public function store(Request $request)
+    {
+        // 1. Validation
+        $request->validate([
+            'objet' => 'required|string|max:255',
+            'date_heure' => 'required|date',
+            'animateur_id' => 'required|exists:agents,id',
+            'redacteur_id' => 'required|exists:agents,id',
+            'participants' => 'nullable|array',
+            'externes' => 'nullable|array',
+        ]);
 
-        // Participants Internes (Table agents)
-        'participants' => 'nullable|array',
-        'participants.*' => 'exists:agents,id',
+        $reunion = \DB::transaction(function () use ($request) {
+            // 2. Création réunion
+            $reunion = \App\Models\Meeting::create($request->only([
+                'objet',
+                'date_heure',
+                'animateur_id',
+                'redacteur_id',
+                'lieu',
+                'ordre_du_jour'
+            ]));
 
-        // Participants Externes (Table meeting_externes)
-        'externes' => 'nullable|array',
-        'externes.*.nom_complet' => 'required_with:externes|string|max:255',
-        'externes.*.origine' => 'required_with:externes|string|max:255',
-        'externes.*.fonction' => 'nullable|string|max:255',
-        'externes.*.email' => 'nullable|email|max:255',
-        'externes.*.telephone' => 'nullable|string|max:255',
-    ]);
-
-    // 2. Préparation des données pour la table 'meetings'
-    // On ne garde que les colonnes qui existent réellement dans la table meetings
-    $meetingData = $request->only([
-        'objet', 'date_heure', 'animateur_id', 'redacteur_id', 'lieu', 'ordre_du_jour'
-    ]);
-
-    // 3. Création de la réunion
-    $reunion = \App\Models\Meeting::create($meetingData);
-
-    // 4. Enregistrement des participants internes (DSESF)
-    // On utilise attach() pour la table pivot meeting_participants
-    if ($request->has('participants')) {
-        $reunion->participants()->attach($request->participants);
-    }
-
-    // 5. Enregistrement des participants externes (Table meeting_externes)
-    if ($request->has('externes')) {
-        foreach ($request->externes as $externe) {
-            // On vérifie que le nom n'est pas vide (sécurité JS)
-            if (!empty($externe['nom_complet'])) {
-                    $reunion->listeExternes()->create([
-                    'nom_complet' => $externe['nom_complet'],
-                    'origine'     => $externe['origine'] ?? 'INCONNUE',
-                    'fonction'    => $externe['fonction'] ?? null,
-                    'email'       => $externe['email'] ?? null,
-                    'telephone'   => $externe['telephone'] ?? null,
-                ]);
+            // 3. Internes (avec timestamps pour ta table pivot)
+            if ($request->has('participants')) {
+                $now = now();
+                $participants = collect($request->participants)->mapWithKeys(function ($id) use ($now) {
+                    return [$id => ['created_at' => $now, 'updated_at' => $now]];
+                });
+                $reunion->participants()->attach($participants);
             }
-        }
-    }
 
-    return redirect()->route('reunions.hebdo')->with('success', 'Réunion et participants enregistrés avec succès !');
-}
+            // 4. Externes
+            if ($request->has('externes')) {
+                foreach ($request->externes as $externe) {
+                    if (!empty($externe['nom_complet'])) {
+                        $reunion->listeExternes()->create($externe);
+                    }
+                }
+            }
+            return $reunion;
+        });
+
+        // 5. ENVOI DES EMAILS
+        $this->envoyerNotifications($reunion);
+
+        return redirect()->route('reunions.hebdo')->with('success', 'Réunion enregistrée et invitations envoyées !');
+    }
 
 
     /**
@@ -136,89 +129,77 @@ public function store(Request $request)
      */
     public function update(Request $request, $id)
     {
-        // 1. Récupération de la réunion ou erreur 404
         $reunion = Meeting::findOrFail($id);
 
         \DB::transaction(function () use ($request, $reunion, $id) {
+            $data = $request->only(['objet', 'date_heure', 'lieu', 'animateur_id', 'redacteur_id', 'status', 'ordre_du_jour']);
 
-            // --- GESTION DES FICHIERS (Avant l'update groupé) ---
-
-            // On récupère les données de base
-            $data = $request->only([
-                'objet',
-                'date_heure',
-                'lieu',
-                'animateur_id',
-                'redacteur_id',
-                'status',
-                'ordre_du_jour'
-            ]);
-
-            // Vérification et stockage de la liste de présence
+            // Gestion fichiers
             if ($request->hasFile('presence_file')) {
-                // On récupère le fichier
-                $file = $request->file('presence_file');
-                // On lui donne un nom unique propre
-                $fileName = 'presence_' . time() . '_' . $file->getClientOriginalName();
-                // On le déplace directement dans public/Rapport_Reunions
-                $file->move(public_path('Rapport_Reunions'), $fileName);
-                // On enregistre le chemin simple en base de données
+                $fileName = 'presence_' . time() . '_' . $request->file('presence_file')->getClientOriginalName();
+                $request->file('presence_file')->move(public_path('Rapport_Reunions'), $fileName);
                 $data['presence_file'] = 'Rapport_Reunions/' . $fileName;
             }
 
-            // Vérification et stockage du rapport
             if ($request->hasFile('report_file')) {
-                $file = $request->file('report_file');
-                $fileName = 'rapport_' . time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('Rapport_Reunions'), $fileName);
+                $fileName = 'rapport_' . time() . '_' . $request->file('report_file')->getClientOriginalName();
+                $request->file('report_file')->move(public_path('Rapport_Reunions'), $fileName);
                 $data['report_file'] = 'Rapport_Reunions/' . $fileName;
             }
 
-            // 2. Mise à jour des informations de base et des fichiers
             $reunion->update($data);
 
-            // 3. GESTION DES PARTICIPANTS INTERNES (Agents)
+            // Mise à jour Internes
             \DB::table('meeting_participants')->where('meeting_id', $id)->delete();
-
-            if ($request->has('participants') && is_array($request->participants)) {
-                $dataInternes = [];
+            if ($request->has('participants')) {
                 $now = now();
-
-                foreach ($request->participants as $agent_id) {
-                    if (!empty($agent_id)) {
-                        $dataInternes[] = [
-                            'meeting_id' => $id,
-                            'agent_id'   => $agent_id,
-                            'created_at' => $now,
-                            'updated_at' => $now
-                        ];
-                    }
-                }
-
-                if (!empty($dataInternes)) {
-                    \DB::table('meeting_participants')->insert($dataInternes);
-                }
+                $dataInternes = collect($request->participants)->map(fn($agent_id) => [
+                    'meeting_id' => $id,
+                    'agent_id' => $agent_id,
+                    'created_at' => $now,
+                    'updated_at' => $now
+                ])->toArray();
+                \DB::table('meeting_participants')->insert($dataInternes);
             }
 
-            // 4. GESTION DES PARTICIPANTS EXTERNES (Invités)
+            // Mise à jour Externes
             $reunion->listeExternes()->delete();
-
-            if ($request->has('externes') && is_array($request->externes)) {
-                foreach ($request->externes as $dataExterne) {
-                    if (!empty($dataExterne['nom_complet'])) {
-                        $reunion->listeExternes()->create([
-                            'nom_complet' => $dataExterne['nom_complet'],
-                            'origine'     => $dataExterne['origine'] ?? 'N/A',
-                            'fonction'    => $dataExterne['fonction'] ?? null,
-                            'email'       => $dataExterne['email'] ?? null,
-                            'telephone'   => $dataExterne['telephone'] ?? null,
-                        ]);
-                    }
+            if ($request->has('externes')) {
+                foreach ($request->externes as $ex) {
+                    if (!empty($ex['nom_complet'])) $reunion->listeExternes()->create($ex);
                 }
             }
         });
 
-        return redirect()->route('reunions.hebdo')->with('success', 'La réunion et ses documents ont été mis à jour avec succès.');
+        // ENVOI DES EMAILS (si la réunion est modifiée)
+        $this->envoyerNotifications($reunion->fresh());
+
+        return redirect()->route('reunions.hebdo')->with('success', 'Mise à jour réussie et notifications envoyées.');
+    }
+
+    /**
+     * Fonction privée pour centraliser l'envoi des emails
+     */
+    private function envoyerNotifications(Meeting $meeting)
+    {
+        // Récupération des destinataires
+        $emailsInternes = $meeting->participants->pluck('email_professionnel')->filter()->toArray();
+        $emailsExternes = $meeting->listeExternes->pluck('email')->filter()->toArray();
+        $destinataires = array_unique(array_merge($emailsInternes, $emailsExternes));
+
+        if (empty($destinataires)) return;
+
+        if ($meeting->status !== 'terminee') {
+            // CAS 1 : Convocation / Mise à jour de programme
+            foreach ($destinataires as $email) {
+                Mail::to($email)->queue(new \App\Mail\ReunionProgrammee($meeting));
+            }
+        } elseif ($meeting->status === 'terminee' && ($meeting->report_file || $meeting->presence_file)) {
+            // CAS 2 : Envoi des PV et Listes de présence
+            foreach ($destinataires as $email) {
+                Mail::to($email)->queue(new \App\Mail\ReunionTerminee($meeting));
+            }
+        }
     }
 
     /**

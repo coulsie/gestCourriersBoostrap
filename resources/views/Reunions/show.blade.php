@@ -79,21 +79,25 @@
                 <div class="card-body">
                     <div class="row">
                         <!-- Internes (Relation participants.agent) -->
-                        <div class="col-md-6 mb-4">
-                            <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Agents Internes DSESF</label>
-                            <div class="d-flex flex-wrap gap-2">
-                                @forelse($reunion->participants as $p)
-                                    @if($p->agent)
-                                    <span class="badge rounded-pill px-3 py-2 border text-dark bg-white shadow-sm" title="Tel: {{ $p->telephone ?? $p->agent->phone_number }}">
-                                        <i class="fas fa-user-circle me-1 text-danger"></i>
-                                        {{ strtoupper($p->agent->last_name) }} {{ $p->agent->first_name }}
-                                    </span>
-                                    @endif
-                                @empty
-                                    <span class="text-muted italic small">Aucun agent interne listé.</span>
-                                @endforelse
-                            </div>
-                        </div>
+                        <!-- Internes (Relation directe BelongsToMany) -->
+<!-- Internes (Style Vert et Blanc) -->
+<div class="col-md-6 mb-4">
+    <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Agents Internes DSESF</label>
+    <div class="d-flex flex-wrap gap-2">
+        @forelse($reunion->participants as $agent)
+            {{-- bg-success pour le vert, text-white pour l'écriture blanche --}}
+            <span class="badge rounded-pill px-3 py-2 text-white bg-success shadow-sm border-0"
+                  title="Tel: {{ $agent->phone_number ?? 'N/A' }}">
+                <i class="fas fa-user-circle me-1"></i>
+                {{ strtoupper($agent->last_name) }} {{ $agent->first_name }}
+            </span>
+        @empty
+            <span class="text-muted italic small">Aucun agent interne listé.</span>
+        @endforelse
+    </div>
+</div>
+
+
                         <!-- Externes (Relation listeExternes) -->
                         <div class="col-md-6 mb-4">
                             <label class="text-muted small fw-bold text-uppercase mb-2 d-block">Personnes Externes</label>
