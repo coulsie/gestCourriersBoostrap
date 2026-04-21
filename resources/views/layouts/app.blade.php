@@ -154,6 +154,8 @@
                             <div class="px-3 py-1">
                                 <a class="collapse-item fw-bold small text-indigo p-0" href="{{ route('agents.nouveau') }}"><i class="fas fa-plus-circle me-1"></i> Nouveau Compte</a>
                                 <a class="collapse-item fw-bold small text-success p-0" href="{{ route('agents.index') }}"><i class="fas fa-user-tie me-1"></i> Ressources Humaines</a>
+                                <a class="collapse-item fw-bold small text-success p-0" href="{{ route('services.index') }}"><i class="fas fa-user-tie me-1"></i> Services Rattachés</a>
+                                <a class="collapse-item fw-bold small text-success p-0" href="{{ route('directions.index') }}"><i class="fas fa-user-tie me-1"></i> Directions</a>
 
                                 <!-- AJOUT DU SUIVI DES RÉUNIONS ICI -->
                                 <a class="collapse-item fw-bold small text-primary p-0" href="{{ route('reunions.hebdo') }}">
