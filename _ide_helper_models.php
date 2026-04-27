@@ -463,6 +463,8 @@ namespace App\Models{
  * @property string|null $presence_file
  * @property string|null $report_file
  * @property-read \App\Models\Agent|null $animateur
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\MeetingExterne> $listeExternes
+ * @property-read int|null $liste_externes_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Agent> $participants
  * @property-read int|null $participants_count
  * @property-read \App\Models\Agent|null $redacteur
@@ -498,6 +500,7 @@ namespace App\Models{
  * @property string|null $telephone
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Meeting|null $meeting
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingExterne query()
@@ -519,14 +522,18 @@ namespace App\Models{
  * @property int $id
  * @property int $meeting_id
  * @property int $agent_id
+ * @property string|null $created_at
+ * @property string|null $updated_at
  * @property-read \App\Models\Agent|null $agent
  * @property-read \App\Models\Meeting|null $meeting
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant whereAgentId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant whereMeetingId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|MeetingParticipant whereUpdatedAt($value)
  */
 	class MeetingParticipant extends \Eloquent {}
 }
@@ -644,16 +651,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Reponse whereValidation($value)
  */
 	class Reponse extends \Eloquent {}
-}
-
-namespace App\Models{
-/**
- * @property-read \App\Models\User|null $agent
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReponseNotification newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReponseNotification newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|ReponseNotification query()
- */
-	class ReponseNotification extends \Eloquent {}
 }
 
 namespace App\Models{

@@ -185,53 +185,48 @@ public function store(Request $request)
      */
 
 
-  public function update(Request $request, Presence $presence): RedirectResponse
+public function update(Request $request, Presence $presence): RedirectResponse
 {
-    $validatedData = $request->validate([
-        'agent_id'      => 'required|integer|exists:agents,id',
-        'heure_arrivee' => 'required|date',
-        'heure_depart'  => 'nullable|date|after:heure_arrivee',
-        'notes'         => 'nullable|string|max:1000',
-    ], [
-        'agent_id.required'      => 'L\'agent est obligatoire.',
-        'heure_arrivee.required' => 'L\'heure d\'arrivée est requise.',
-        'heure_depart.after'     => 'L\'heure de départ doit être après l\'heure d\'arrivée.',
+    $request->validate([
+        'agent_id'      => 'required',
+        'heure_arrivee' => 'required',
     ]);
 
     try {
-        // 1. Récupération de l'horaire (ex: lié à l'agent ou au service)
+        // 1. Récupération de l'horaire et de la tolérance
         $horaire = \App\Models\Horaire::first();
+        $arrivee = \Carbon\Carbon::parse($request->heure_arrivee);
 
-        if ($horaire && !empty($horaire->heure_debut)) {
-            // Conversion sécurisée en objet Carbon pour la comparaison
-            $arrivee = \Carbon\Carbon::parse($validatedData['heure_arrivee']);
+        $statut = 'Présent';
 
-            // Nettoyage de l'heure de référence (ex: "08:00:00") pour éviter l'erreur de "Separation symbol"
-            $reference = \Carbon\Carbon::parse($horaire->heure_debut);
+        if ($horaire && $horaire->heure_debut) {
+            // On crée l'heure limite : Heure Début + Tolérance (ex: 07:30 + 15min = 07:45)
+            $heureLimite = \Carbon\Carbon::parse($horaire->heure_debut)
+                            ->addMinutes($horaire->tolerance_retard);
 
-            // 2. Comparaison des heures uniquement (H:i:s)
-            if ($arrivee->format('H:i:s') > $reference->format('H:i:s')) {
-                $validatedData['statut'] = 'En Retard';
-            } else {
-                $validatedData['statut'] = 'Présent';
+            // Comparaison H:i pour ignorer les dates
+            if ($arrivee->format('H:i') > $heureLimite->format('H:i')) {
+                $statut = 'En Retard';
             }
-        } else {
-            // Statut par défaut si aucun horaire n'est défini
-            $validatedData['statut'] = 'Présent';
         }
 
-        $presence->update($validatedData);
+        // 2. Mise à jour manuelle des données
+        $presence->agent_id = $request->agent_id;
+        $presence->heure_arrivee = $request->heure_arrivee;
+        $presence->heure_depart = $request->heure_depart;
+        $presence->notes = $request->notes;
+        $presence->statut = $statut;
+
+        $presence->save();
 
         return redirect()->route('presences.index')
-                         ->with('success', 'Présence et statut mis à jour avec succès.');
+                         ->with('success', "Mis à jour. Statut : $statut (Limite : " . $heureLimite->format('H:i') . ")");
 
     } catch (\Exception $e) {
-        // Log de l'erreur réelle pour le développeur
-        \Illuminate\Support\Facades\Log::error("Erreur Format Heure: " . $e->getMessage());
-
-        return back()->with('error', 'Erreur de format de l\'heure de référence dans la table horaires.');
+        return back()->with('error', "Erreur : " . $e->getMessage());
     }
 }
+
 
     /**
      * Supprime la ressource (présence) spécifiée de la base de données.
@@ -343,7 +338,7 @@ public function storeValidationHebdo(Request $request)
             }
         }
     }
-    
+
     return back()->with('success', 'Traitement terminé.');
 
 }

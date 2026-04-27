@@ -45,6 +45,8 @@ class Presence extends Model
         'heure_depart',
     ];
 
+      
+
     // --- Relations Eloquent ---
 
     /**
