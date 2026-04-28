@@ -165,7 +165,7 @@
 
                 <div class="card-footer bg-white border-0 py-4 text-center">
                     <p class="text-muted small mb-0 text-uppercase fw-bold" style="letter-spacing: 3px;">
-                        Département de la Stratégie et de l'Innovation - DSESF
+                        Direction de la Stratégie, des Etudes et des Statistiques Fiscales - DSESF
                     </p>
                 </div>
             </div>

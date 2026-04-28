@@ -134,12 +134,13 @@ public function store(Request $request)
         'documents_annexes' => 'nullable|file|mimes:pdf,jpg,png,doc,docx,xls,xlsx,ppt,pptx|max:819200',
         'echeancier'        => 'nullable|date',
         'observations'      => 'nullable|string',
-        'statut'            => 'required|string',
         'courrier_id'       => 'required|exists:courriers,id',
         'date_imputation'   => 'required|date',
-        'niveau'            => 'required|string',
         'suivi_par'         => 'nullable|exists:users,id',
         'user_id'           => 'required|exists:users,id',
+        'statut'            => 'nullable|string', // Changez required en nullable
+        'niveau'            => 'nullable|string', // Changez required en nullable
+
     ], [
         // Messages pour les champs 'required' (requis)
         'agent_ids.required'       => 'Veuillez sélectionner au moins un **agent** pour l\'imputation.',
@@ -169,15 +170,19 @@ public function store(Request $request)
         $cheminFichierOriginal = $courrier->fichier_chemin;
 
         // 3. Détermination du Niveau Hiérarchique
-        $statusAgent = $user->agent?->status ?? '';
-        $roleName = mb_strtolower((string)$statusAgent, 'UTF-8');
+        // 3. Détermination du Niveau Hiérarchique
+            $statusAgent = $user->agent?->status ?? '';
+            $roleName = mb_strtolower((string)$statusAgent, 'UTF-8');
 
-        $niveau = match(true) {
-            str_contains($roleName, 'chef de service') => 'tertiaire',
-            str_contains($roleName, 'sous-directeur') || str_contains($roleName, 'conseiller technique') => 'secondaire',
-            str_contains($roleName, 'directeur') && !str_contains($roleName, 'sous') => 'primaire',
-            default => 'autre',
-        };
+            if (str_contains($roleName, 'chef de service')) {
+                $niveau = 'tertiaire';
+            } elseif (str_contains($roleName, 'sous-directeur') || str_contains($roleName, 'conseiller technique')) {
+                $niveau = 'secondaire';
+            } elseif (str_contains($roleName, 'directeur')) {
+                $niveau = 'primaire';
+            } else {
+                $niveau = 'autre'; // Assurez-vous que 'autre' est bien dans votre ENUM sans les points
+            }
 
         // 4. Gestion du document annexe
         $annexePath = null;
@@ -195,18 +200,22 @@ public function store(Request $request)
         }
 
         // 5. Création de l'Imputation (Initiale)
-        $imputation = new Imputation();
-        $imputation->courrier_id       = $request->courrier_id;
-        $imputation->user_id           = $user->id;
-        $imputation->niveau            = $niveau;
-        $imputation->instructions      = $request->instructions;
-        $imputation->observations      = $request->observations;
-        $imputation->documents_annexes  = $annexePath;
-        $imputation->chemin_fichier     = $cheminFichierOriginal;
-        $imputation->date_imputation    = $request->date_imputation;
-        $imputation->echeancier         = $request->echeancier;
-        $imputation->statut             = $request->statut;
-        $imputation->save();
+       // 5. Création de l'Imputation (Initiale)
+            $imputation = new Imputation();
+            $imputation->courrier_id       = $request->courrier_id;
+            $imputation->user_id           = $user->id;
+            $imputation->niveau            = $niveau; // Assurez-vous que c'est 'primaire', 'secondaire' ou 'tertiaire'
+            $imputation->instructions      = $request->instructions;
+            $imputation->observations      = $request->observations;
+            $imputation->documents_annexes  = $annexePath;
+            $imputation->chemin_fichier     = $cheminFichierOriginal;
+            $imputation->date_imputation    = $request->date_imputation;
+            $imputation->echeancier         = $request->echeancier;
+
+            // FORCE la valeur exacte attendue par votre ENUM MariaDB
+            $imputation->statut             = 'en_attente';
+
+            $imputation->save();
 
         // 6. Gestion dynamique des Agents (Absences & Intérims)
        // 6. Gestion dynamique des Agents (Priorité à l'Intérim Actif)
