@@ -246,23 +246,15 @@
                                         </div>
 
                                         {{-- Rappel du fichier principal --}}
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-bold small text-muted text-uppercase">Fichier Principal</label>
-                                            <div class="p-2 bg-light border rounded small">
-                                                <i class="fas fa-file-pdf text-danger me-1"></i>
-                                                @if(request('chemin_fichier'))
-                                                    Fichier lié : <a href="{{ asset(request('chemin_fichier')) }}" target="_blank" class="fw-bold">Voir le document original</a>
-                                                @else
-                                                    <span class="text-muted">Aucun fichier principal détecté</span>
-                                                @endif
-                                            </div>
-                                        </div>
+                                        {{-- Rappel du fichier principal --}}
+                                        
+
                                     </div>
                                 </div>
                             </div>
                         </div>
                             {{-- Définit le statut par défaut à 'En attente' pour valider le store --}}
-                            
+
                             {{-- Utilisez la valeur exacte définie dans votre ENUM (minuscules et underscore) --}}
                             <input type="hidden" name="statut" value="en_attente">
 
