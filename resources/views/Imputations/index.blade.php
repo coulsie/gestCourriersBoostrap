@@ -92,14 +92,19 @@
 
     <!-- 2. En Attente (Nouveau) -->
     <!-- En Attente (Sécurisé) -->
+    <!-- En Attente (Style Cyan Éclatant) -->
     <div class="col">
-        <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeIn" style="border-left: 5px solid #64748b !important;">
+        <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeIn" style="border-left: 5px solid #06b6d4 !important;">
             <div class="card-body p-4">
                 <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div class="p-3 rounded-3" style="background-color: #e2e8f0;">
-                        <i class="fas fa-clock fa-2x text-secondary"></i>
+                    {{-- Fond de l'icône en cyan doux avec icône cyan intense --}}
+                    <div class="p-3 rounded-3" style="background-color: #ecfeff;">
+                        <i class="fas fa-clock fa-2x" style="color: #06b6d4;"></i>
                     </div>
-                    <span class="badge rounded-pill px-3 py-2 fw-bold fs-6" style="background-color: #e2e8f0; color: #475569;">EN ATTENTE</span>
+                    {{-- Badge en cyan contrasté --}}
+                    <span class="badge rounded-pill px-3 py-2 fw-black fs-6" style="background-color: #ecfeff; color: #0891b2; border: 1px solid #cffafe;">
+                        EN ATTENTE
+                    </span>
                 </div>
                 <h2 class="display-5 fw-black text-dark mb-0">
                     {{ $stats['en_attente'] ?? 0 }}
@@ -108,7 +113,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- 3. En Cours -->
     <div class="col">
