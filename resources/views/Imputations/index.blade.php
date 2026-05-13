@@ -69,82 +69,102 @@
         </div>
     </div>
 
-    <!-- SECTION STATISTIQUES - CARTES DE SCORE -->
-    <div class="row g-4 mb-4">
-        <!-- Total Imputations -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100" style="border-left: 5px solid #4338ca !important;">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="bg-indigo-subtle p-3 rounded-3">
-                            <i class="fas fa-file-invoice fa-2x text-indigo" style="color: #4338ca;"></i>
-                        </div>
-                        <span class="badge bg-indigo-subtle text-indigo rounded-pill px-3 py-2 fw-bold fs-6">TOTAL</span>
+    <!-- SECTION STATISTIQUES - CARTES DE SCORE COMPLÈTES (HORS PAGINATION) -->
+<div class="row g-4 mb-4 row-cols-1 row-cols-md-2 row-cols-xl-5 justify-content-center">
+
+    <!-- 1. Total Imputations -->
+    <div class="col">
+        <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeIn" style="border-left: 5px solid #4338ca !important;">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="bg-indigo-subtle p-3 rounded-3">
+                        <i class="fas fa-file-invoice fa-2x text-indigo" style="color: #4338ca;"></i>
                     </div>
-
-                    <h2 class="display-5 fw-black text-dark mb-0">
-                        {{ $imputations instanceof \Illuminate\Pagination\LengthAwarePaginator ? $imputations->total() : $imputations->count() }}
-                    </h2>
-
-                    <p class="text-muted fw-bold mb-0 mt-2">Dossiers imputés</p>
+                    <span class="badge bg-indigo-subtle text-indigo rounded-pill px-3 py-2 fw-bold fs-6">TOTAL</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- En Cours -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100" style="border-left: 5px solid #f59e0b !important;">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="bg-warning-subtle p-3 rounded-3">
-                            <i class="fas fa-spinner fa-2x text-warning"></i>
-                        </div>
-                        <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2 fw-bold fs-6">EN COURS</span>
-                    </div>
-                    <h2 class="display-5 fw-black text-dark mb-0">
-                        {{ $imputations->where('statut', 'en_cours')->count() }}
-                    </h2>
-                    <p class="text-muted fw-bold mb-0 mt-2">Actions actives</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Terminées -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100" style="border-left: 5px solid #10b981 !important;">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="bg-success-subtle p-3 rounded-3">
-                            <i class="fas fa-check-double fa-2x text-success"></i>
-                        </div>
-                        <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 fw-bold fs-6">TERMINÉES</span>
-                    </div>
-                    <h2 class="display-5 fw-black text-dark mb-0">
-                        {{ $imputations->where('statut', 'termine')->count() }}
-                    </h2>
-                    <p class="text-muted fw-bold mb-0 mt-2">Dossiers bouclés</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Retards (Alertes) -->
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm rounded-4 h-100" style="border-left: 5px solid #ef4444 !important;">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="bg-danger-subtle p-3 rounded-3">
-                            <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
-                        </div>
-                        <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2 fw-bold fs-6">HORS DÉLAI</span>
-                    </div>
-                    <h2 class="display-5 fw-black text-danger mb-0">
-                        {{ $imputations->filter(fn($i) => \Carbon\Carbon::parse($i->echeancier)->isPast() && $i->statut != 'termine')->count() }}
-                    </h2>
-                    <p class="text-muted fw-bold mb-0 mt-2">Dossiers en retard</p>
-                </div>
+                <h2 class="display-5 fw-black text-dark mb-0">
+                    {{ $stats['total'] }}
+                </h2>
+                <p class="text-muted fw-bold mb-0 mt-2">Dossiers imputés</p>
             </div>
         </div>
     </div>
+
+    <!-- 2. En Attente (Nouveau) -->
+    <!-- En Attente (Sécurisé) -->
+    <div class="col">
+        <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeIn" style="border-left: 5px solid #64748b !important;">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="p-3 rounded-3" style="background-color: #e2e8f0;">
+                        <i class="fas fa-clock fa-2x text-secondary"></i>
+                    </div>
+                    <span class="badge rounded-pill px-3 py-2 fw-bold fs-6" style="background-color: #e2e8f0; color: #475569;">EN ATTENTE</span>
+                </div>
+                <h2 class="display-5 fw-black text-dark mb-0">
+                    {{ $stats['en_attente'] ?? 0 }}
+                </h2>
+                <p class="text-muted fw-bold mb-0 mt-2">Dossiers non débutés</p>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 3. En Cours -->
+    <div class="col">
+        <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeIn" style="border-left: 5px solid #f59e0b !important;">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="bg-warning-subtle p-3 rounded-3">
+                        <i class="fas fa-spinner fa-2x text-warning fa-spin" style="animation-duration: 4s;"></i>
+                    </div>
+                    <span class="badge bg-warning-subtle text-warning rounded-pill px-3 py-2 fw-bold fs-6">EN COURS</span>
+                </div>
+                <h2 class="display-5 fw-black text-dark mb-0">
+                    {{ $stats['en_cours'] }}
+                </h2>
+                <p class="text-muted fw-bold mb-0 mt-2">Traitements actifs</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Terminées -->
+    <div class="col">
+        <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeIn" style="border-left: 5px solid #10b981 !important;">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="bg-success-subtle p-3 rounded-3">
+                        <i class="fas fa-check-double fa-2x text-success"></i>
+                    </div>
+                    <span class="badge bg-success-subtle text-success rounded-pill px-3 py-2 fw-bold fs-6">TERMINÉES</span>
+                </div>
+                <h2 class="display-5 fw-black text-dark mb-0">
+                    {{ $stats['termine'] }}
+                </h2>
+                <p class="text-muted fw-bold mb-0 mt-2">Dossiers bouclés</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Retards / Hors Délai -->
+    <div class="col">
+        <div class="card border-0 shadow-sm rounded-4 h-100 animate__animated animate__fadeIn" style="border-left: 5px solid #ef4444 !important;">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <div class="bg-danger-subtle p-3 rounded-3">
+                        <i class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                    </div>
+                    <span class="badge bg-danger-subtle text-danger rounded-pill px-3 py-2 fw-bold fs-6">HORS DÉLAI</span>
+                </div>
+                <h2 class="display-5 fw-black text-danger mb-0">
+                    {{ $stats['en_retard'] }}
+                </h2>
+                <p class="text-muted fw-bold mb-0 mt-2">Dossiers en retard</p>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 
 

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Meeting extends Model
 {
 
+
 protected $fillable = [
     'objet', 'date_heure', 'lieu', 'animateur_id', 'redacteur_id',
     'participants', 'externes', 'ordre_du_jour',
@@ -52,7 +53,7 @@ protected $fillable = [
      */
 
 
-   
+
     public function participants()
     {
         return $this->belongsToMany(Agent::class, 'meeting_participants', 'meeting_id', 'agent_id')

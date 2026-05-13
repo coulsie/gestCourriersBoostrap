@@ -18,12 +18,32 @@ use Illuminate\Support\Facades\File;  // <--- INDISPENSABLE pour File::exists
 
 class ImputationController extends Controller
 {
+
+
 public function index(Request $request)
 {
-    // 1. Initialisation de la requête
+    // 1. Initialisation de la requête principale pour la table (eager loading)
     $query = Imputation::with(['courrier', 'agents.service', 'auteur']);
 
-    // 2. Application des filtres (Recherche, Niveau, Statut, Agent)
+    // 2. Requête isolée pour les statistiques globales (indépendante du statut et de la recherche)
+    $statsQuery = Imputation::query();
+
+    // 3. Application des filtres de structure (Niveau et Agent) sur les DEUX requêtes
+    if ($request->filled('niveau')) {
+        $query->where('niveau', $request->niveau);
+        $statsQuery->where('niveau', $request->niveau);
+    }
+
+    if ($request->filled('agent_id')) {
+        $query->whereHas('agents', function($q) use ($request) {
+            $q->where('agents.id', $request->agent_id);
+        });
+        $statsQuery->whereHas('agents', function($q) use ($request) {
+            $q->where('agents.id', $request->agent_id);
+        });
+    }
+
+    // 4. Application du filtre de recherche textuelle uniquement sur le tableau final
     if ($request->filled('search')) {
         $query->whereHas('courrier', function($q) use ($request) {
             $q->where('reference', 'like', "%{$request->search}%")
@@ -31,44 +51,36 @@ public function index(Request $request)
         });
     }
 
-    if ($request->filled('niveau')) {
-        $query->where('niveau', $request->niveau);
-    }
+    // --- CALCUL DES STATISTIQUES COMPLÈTES ET GLOBALISÉES ---
+    // Cette partie est exécutée AVANT le filtrage final par statut pour garder les vrais totaux
+    $stats = [
+        'total'      => (clone $statsQuery)->count(),
+        'en_attente' => (clone $statsQuery)->where('statut', 'en_attente')->count(), // AJOUTÉ : Résout l'erreur 500
+        'en_cours'   => (clone $statsQuery)->where('statut', 'en_cours')->count(),
+        'termine'    => (clone $statsQuery)->where('statut', 'termine')->count(),
+        'en_retard'  => (clone $statsQuery)->where('statut', '!=', 'termine')
+                                           ->whereDate('echeancier', '<', \Carbon\Carbon::today())
+                                           ->count(),
+    ];
 
+    // 5. Application du filtre de Statut UNIQUEMENT sur la liste finale du tableau
     if ($request->filled('statut')) {
         $query->where('statut', $request->statut);
     }
 
-    if ($request->filled('agent_id')) {
-        $query->whereHas('agents', function($q) use ($request) {
-            $q->where('agents.id', $request->agent_id);
-        });
-    }
-
-    // --- CALCUL DES STATISTIQUES ---
-    $statsQuery = clone $query;
-    $stats = [
-        'total'      => $statsQuery->count(),
-        'en_cours'   => (clone $statsQuery)->where('statut', 'en_cours')->count(),
-        'termine'    => (clone $statsQuery)->where('statut', 'termine')->count(),
-        'en_retard'  => (clone $statsQuery)->where('statut', '!=', 'termine')
-                                           ->whereDate('echeancier', '<', now())
-                                           ->count(),
-    ];
-
-    // 3. GESTION DE L'IMPRESSION vs PAGINATION
-    // Si le paramètre 'print' est présent, on récupère tout sans limite
+    // 6. GESTION DE L'IMPRESSION vs PAGINATION
     if ($request->has('print')) {
         $imputations = $query->latest()->get();
     } else {
         $imputations = $query->latest()->paginate(25)->appends($request->query());
     }
 
-    // 4. Données pour les menus déroulants
+    // 7. Données pour les menus déroulants
     $allAgents = Agent::orderBy('last_name')->get();
 
     return view('Imputations.index', compact('imputations', 'allAgents', 'stats'));
 }
+
 
 
 

@@ -1,24 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid py-4" style="background-color: #f4f7fe;">
+<div class="container-fluid py-4" style="background-color: #f4f7fe; min-height: 100vh;">
 
-    {{-- Bulle d'info Flashy --}}
-    <div class="alert border-0 shadow-sm rounded-4 d-flex align-items-center mb-4" style="background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white;">
-        <div class="bg-white rounded-circle p-2 d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-            <i class="fas fa-mouse-pointer text-primary"></i>
+    {{-- Affichage des erreurs de validation --}}
+    @if ($errors->any())
+        <div class="alert border-0 shadow-sm rounded-4 mb-4" style="background-color: #fef2f2; color: #dc2626; border-left: 6px solid #dc2626 !important;">
+            <div class="fw-bold mb-2"><i class="fas fa-exclamation-triangle me-2"></i> Veuillez corriger les erreurs suivantes :</div>
+            <ul class="mb-0 ps-3">
+                @foreach ($errors->all() as $error)
+                    <li>{!! $error !!}</li>
+                @endforeach
+            </ul>
         </div>
-        <div>
-            <span class="fw-bold">Astuce Multi-sélection :</span> Pour les participants, maintenez la touche <kbd class="bg-white text-dark shadow-sm fw-bold border-0">Ctrl</kbd> (ou <kbd class="bg-white text-dark shadow-sm fw-bold border-0">Cmd</kbd>) enfoncée pour choisir plusieurs agents rapidement.
-        </div>
-    </div>
+    @endif
 
-    <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-        <div class="card-header py-3 d-flex align-items-center justify-content-between" style="background: linear-gradient(45deg, #1e293b, #334155);">
-            <h6 class="m-0 font-weight-bold text-white fs-5">
+    <div class="card shadow-lg border-0 rounded-4 overflow-hidden animate__animated animate__fadeIn">
+        <div class="card-header py-4 d-flex align-items-center justify-content-between" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);">
+            <h5 class="m-0 text-white fw-900 text-uppercase" style="letter-spacing: 1px;">
                 <i class="fas fa-calendar-plus me-2 text-info"></i> Programmer une nouvelle réunion
-            </h6>
-            <span class="badge bg-info text-dark rounded-pill px-3">Nouveau</span>
+            </h5>
+            <span class="badge bg-info text-dark rounded-pill px-4 py-2 fw-bold shadow-sm">SESSION DE PLANIFICATION</span>
         </div>
 
         <div class="card-body p-4 bg-white">
@@ -27,49 +29,41 @@
                 <div class="row g-4">
                     <!-- Objet -->
                     <div class="col-md-8">
-                        <label class="form-label fw-black text-dark text-uppercase small">Objet de la réunion</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-light border-end-0 text-primary"><i class="fas fa-tag"></i></span>
-                            <input type="text" name="objet" class="form-control border-start-0 ps-0 bg-light fw-bold" placeholder="ex: Comité de Direction" required style="border-radius: 0 8px 8px 0;">
+                        <label class="form-label fw-black text-dark text-uppercase small"><i class="fas fa-tag me-1 text-primary"></i> Objet de la réunion *</label>
+                        <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                            <span class="input-group-text bg-light border-0 text-primary"><i class="fas fa-quote-left"></i></span>
+                            <input type="text" name="objet" class="form-control border-0 bg-light fw-bold text-dark p-3" value="{{ old('objet') }}" placeholder="ex: Comité de Direction Annuel" required>
                         </div>
                     </div>
+
                     <!-- Date et Heure -->
                     <div class="col-md-4">
-                        <label class="form-label fw-black text-danger text-uppercase small">Date et Heure</label>
-                        <input type="datetime-local" name="date_heure" class="form-control border-0 shadow-sm text-danger fw-bold" required style="background-color: #fff1f2;">
+                        <label class="form-label fw-black text-danger text-uppercase small"><i class="fas fa-clock me-1"></i> Date et Heure *</label>
+                        <input type="datetime-local" name="date_heure" class="form-control border-0 shadow-sm text-danger fw-bold p-3" value="{{ old('date_heure') }}" required style="background-color: #fff1f2; border-radius: 8px;">
                     </div>
 
                     <!-- Lieu de la réunion -->
                     <div class="col-12">
-                        <label class="form-label fw-black text-dark text-uppercase small">Lieu de la réunion</label>
-                        <div class="input-group shadow-sm">
-                            <span class="input-group-text bg-light border-end-0 text-secondary">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </span>
-
-                            <input type="text" name="lieu" id="lieu_reunion"
-                                class="form-control border-start-0 ps-0 bg-light fw-bold"
-                                placeholder="ex: Bouaké Belleville..." required>
-
-                            <!-- UTILISATION D'UN SPAN (INBLOQUABLE) AU LIEU D'UN BUTTON -->
-                            <span class="btn btn-outline-danger bg-white border-start-0 d-flex align-items-center"
-                                style="cursor: pointer !important; opacity: 1 !important; pointer-events: auto !important;"
-                                onclick="openGoogleMaps()">
-                                <i class="fab fa-google text-danger me-1"></i> Maps
+                        <label class="form-label fw-black text-dark text-uppercase small"><i class="fas fa-map-marker-alt me-1 text-secondary"></i> Lieu de la réunion *</label>
+                        <div class="input-group shadow-sm rounded-3 overflow-hidden">
+                            <span class="input-group-text bg-light border-0 text-secondary"><i class="fas fa-building"></i></span>
+                            <input type="text" name="lieu" id="lieu_reunion" class="form-control border-0 bg-light fw-bold text-dark p-3" value="{{ old('lieu') }}" placeholder="ex: Salle de conférence principale ou Bouaké Belleville..." required>
+                            <span class="btn btn-outline-danger bg-white border-0 d-flex align-items-center px-4" style="cursor: pointer !important;" onclick="openGoogleMaps()">
+                                <i class="fab fa-google text-danger me-2"></i> Maps
                             </span>
                         </div>
                     </div>
 
-
-
                     <!-- Animateur -->
                     <div class="col-md-6">
-                        <div class="p-3 rounded-4" style="background-color: #eef2ff; border-left: 5px solid #6366f1;">
-                            <label class="form-label fw-bold text-indigo"><i class="fas fa-microphone me-2"></i> Animateur</label>
-                            <select name="animateur_id" class="form-select select2 shadow-none border-0" required>
-                                <option value="">Sélectionner...</option>
-                                @foreach($agents as $agent)
-                                    <option value="{{ $agent->id }}">{{ strtoupper($agent->last_name) }} {{ $agent->first_name }}</option>
+                        <div class="p-4 rounded-4 shadow-sm h-100" style="background-color: #eef2ff; border-left: 6px solid #6366f1;">
+                            <label class="form-label fw-black text-indigo text-uppercase small"><i class="fas fa-microphone me-2"></i> Animateur Principal *</label>
+                            <select name="animateur_id" class="form-select select2 border-0 bg-white fw-bold shadow-sm" required style="border-radius: 8px;">
+                                <option value="">-- Choisir un collaborateur --</option>
+                                @foreach($agents->sortBy('last_name') as $agent)
+                                    <option value="{{ $agent->id }}" {{ old('animateur_id') == $agent->id ? 'selected' : '' }}>
+                                        {{ strtoupper($agent->last_name) }} {{ $agent->first_name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -77,133 +71,209 @@
 
                     <!-- Rédacteur -->
                     <div class="col-md-6">
-                        <div class="p-3 rounded-4" style="background-color: #ecfdf5; border-left: 5px solid #10b981;">
-                            <label class="form-label fw-bold text-success"><i class="fas fa-pen-nib me-2"></i> Rédacteur du rapport</label>
-                            <select name="redacteur_id" class="form-select select2 shadow-none border-0" required>
-                                <option value="">Sélectionner...</option>
-                                @foreach($agents as $agent)
-                                    <option value="{{ $agent->id }}">{{ strtoupper($agent->last_name) }} {{ $agent->first_name }}</option>
+                        <div class="p-4 rounded-4 shadow-sm h-100" style="background-color: #ecfdf5; border-left: 6px solid #10b981;">
+                            <label class="form-label fw-black text-success text-uppercase small"><i class="fas fa-pen-nib me-2"></i> Rédacteur du Secrétariat *</label>
+                            <select name="redacteur_id" class="form-select select2 border-0 bg-white fw-bold shadow-sm" required style="border-radius: 8px;">
+                                <option value="">-- Choisir le rapporteur --</option>
+                                @foreach($agents->sortBy('last_name') as $agent)
+                                    <option value="{{ $agent->id }}" {{ old('redacteur_id') == $agent->id ? 'selected' : '' }}>
+                                        {{ strtoupper($agent->last_name) }} {{ $agent->first_name }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
 
-                    <!-- Participants Internes (Version Colorée) -->
-                    <!-- Participants Internes (Version Colorée & Centrée) -->
-                    <!-- Participants Internes (Correction Débordement) -->
+                    <!-- Ordre du jour -->
+                    <div class="col-12">
+                        <label class="form-label fw-black text-dark text-uppercase small"><i class="fas fa-list-ol me-1 text-warning"></i> Ordre du jour / Contexte</label>
+                        <textarea name="ordre_du_jour" class="form-control border-2 shadow-sm p-3" rows="3" placeholder="Saisissez les différents points à aborder..." style="border-radius: 12px; border-color: #e2e8f0;">{{ old('ordre_du_jour') }}</textarea>
+                    </div>
+
+                    <!-- Participants Internes -->
                     <div class="col-md-6">
-                        <label class="form-label fw-bold text-primary">
-                            <i class="fas fa-users-cog me-2"></i> Participants Internes
-                        </label>
-                        <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="position: relative;">
-                            <div class="card-header border-0 py-2" style="background: linear-gradient(45deg, #6366f1, #818cf8); z-index: 10;">
-                                <input type="text" id="searchAgent" class="form-control form-control-sm border-0 shadow-sm"
-                                    style="border-radius: 20px;" placeholder="🔍 Rechercher un collaborateur...">
+                        <div class="p-4 bg-white rounded-4 shadow-sm border border-primary h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <label class="form-label fw-black text-primary text-uppercase small mb-0">
+                                    <i class="fas fa-users-cog me-2"></i> 1. Participants Internes
+                                </label>
+                                <span class="badge bg-primary text-white rounded-pill px-3" id="count-internes">0 sélection</span>
                             </div>
 
-                            <div class="card-body p-3 bg-white" style="position: relative; z-index: 1;">
-                                {{-- Le secret est ici : overflow-y auto ET position relative --}}
-                                <div id="agents-list" style="max-height: 250px; overflow-y: auto; overflow-x: hidden; padding-right: 8px; position: relative;">
-                                    @foreach($agents as $agent)
-                                        <div class="agent-item d-flex align-items-center p-2 mb-2 rounded-3 transition-all w-100"
-                                            style="background-color: #f8fafc; border-left: 4px solid #6366f1;">
-
-                                            <div style="min-width: 35px; width: 35px; display: flex; align-items: center; justify-content: center;">
-                                                <input class="form-check-input agent-checkbox" type="checkbox" name="participants[]"
-                                                    value="{{ $agent->id }}" id="agent_{{ $agent->id }}"
-                                                    style="width: 1.2em; height: 1.2em; cursor: pointer; border: 2px solid #6366f1; margin: 0;">
-                                            </div>
-
-                                            <label class="ms-2 fw-medium mb-0 text-truncate" for="agent_{{ $agent->id }}" style="cursor: pointer; flex-grow: 1;">
-                                                <span class="text-indigo fw-bold">{{ strtoupper($agent->last_name) }}</span>
-                                                <span class="text-dark">{{ $agent->first_name }}</span>
-                                            </label>
-
-                                            <i class="fas fa-user-circle text-muted opacity-25 fs-5 ms-auto"></i>
-                                        </div>
-                                    @endforeach
+                            <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-2">
+                                <div class="card-header border-0 py-2 px-3" style="background: linear-gradient(45deg, #6366f1, #818cf8);">
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-white border-0 text-muted"><i class="fas fa-search"></i></span>
+                                        <input type="text" id="searchAgent" class="form-control border-0" placeholder="Filtrer par nom de collaborateur...">
+                                    </div>
                                 </div>
-                            </div>
-
-                            {{-- On force le footer à être au-dessus de la liste avec z-index --}}
-                            <div class="card-footer bg-dark border-0 py-2 d-flex justify-content-between align-items-center" style="position: relative; z-index: 10;">
-                                <span class="small fw-bold text-white-50 text-uppercase">Total sélectionnés</span>
-                                <span id="total-agents-count" class="badge rounded-pill px-3 py-2 fw-bold shadow-lg"
-                                    style="background-color: #ef4444; color: white; font-size: 1.1rem; min-width: 50px; border: 2px solid white;">
-                                    0
-                                </span>
+                                <div class="card-body p-2 bg-light">
+                                    <div id="agents-list" style="max-height: 250px; overflow-y: auto; padding-right: 4px;">
+                                        @foreach($agents->sortBy('last_name') as $agent)
+                                            <div class="agent-item d-flex align-items-center p-2 mb-2 rounded-3 bg-white border shadow-sm transition-all" style="border-left: 4px solid #6366f1 !important;">
+                                                <div class="form-check m-0 px-3 d-flex align-items-center">
+                                                    <input class="form-check-input agent-checkbox me-2" type="checkbox" name="participants[]" value="{{ $agent->id }}" id="agent_{{ $agent->id }}" {{ (collect(old('participants'))->contains($agent->id)) ? 'checked' : '' }} style="width: 1.25em; height: 1.25em; border: 2px solid #6366f1; cursor: pointer;">
+                                                    <label class="form-check-label fw-bold text-dark cursor-pointer text-truncate" for="agent_{{ $agent->id }}" style="font-size: 0.9rem;">
+                                                        {{ strtoupper($agent->last_name) }} <span class="fw-normal text-secondary">{{ $agent->first_name }}</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-
-
-                    <!-- Participants Externes Dynamiques -->
+                    <!-- Participants Externes Dynamique -->
                     <div class="col-md-6">
-                        <div class="p-3 rounded-4" style="background-color: #fffbeb; border-left: 5px solid #f59e0b;">
+                        <div class="p-4 bg-white rounded-4 shadow-sm border border-danger h-100">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <label class="form-label fw-bold text-warning mb-0">
-                                    <i class="fas fa-user-plus me-2"></i> PERSONNES EXTÉRIEURES (PARTENAIRES)
+                                <label class="form-label fw-black text-danger text-uppercase small mb-0">
+                                    <i class="fas fa-user-plus me-2"></i> 2. Invités Externes (Hors Structure)
                                 </label>
-                                <button type="button" class="btn btn-warning btn-sm rounded-pill fw-bold text-white px-3" onclick="addExterneRow()">
-                                    <i class="fas fa-plus me-1"></i> Ajouter un externe
+                                <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold shadow-sm" id="btn-add-externe">
+                                    <i class="fas fa-plus me-1"></i> Ajouter une ligne
                                 </button>
                             </div>
 
-                            <div id="externes-container">
-                                <!-- Les lignes apparaîtront ici -->
-                                <div class="row g-2 mb-2 externe-row">
-                                    <div class="col-md-3">
-                                        <input type="text" name="externes[0][nom_complet]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Nom complet" required>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input type="text" name="externes[0][origine]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Structure (ex: Ministère)">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <input type="text" name="externes[0][fonction]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Fonction">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <input type="text" name="externes[0][telephone]" class="form-control form-control-sm border-0 shadow-sm" placeholder="Téléphone">
-                                    </div>
-                                    <div class="col-md-2 d-flex align-items-center">
-                                        <input type="email" name="externes[0][email]" class="form-control form-control-sm border-0 shadow-sm me-2" placeholder="Email">
-                                        <button type="button" class="btn btn-sm btn-outline-danger border-0" onclick="removeExterneRow(this)">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
+                            <div id="externes-container" style="max-height: 295px; overflow-y: auto; padding-right: 4px;">
+                                {{-- Conteneur initialisé vide, alimenté par le JavaScript --}}
+                                <div class="text-center py-4 text-muted border border-dashed rounded-3 bg-light shadow-inner" id="empty-externes-msg">
+                                    <i class="fas fa-user-shield fa-2x opacity-25 mb-2"></i>
+                                    <p class="small mb-0 italic">Aucun participant externe renseigné pour le moment.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Ordre du jour -->
-                    <div class="col-12">
-                        <label class="form-label fw-bold text-dark"><i class="fas fa-list-ul me-2 text-secondary"></i> Ordre du jour / Notes</label>
-                        <textarea name="ordre_du_jour" class="form-control border-0 shadow-sm bg-light" rows="4" placeholder="Quels sont les points clés ?"></textarea>
-                    </div>
                 </div>
 
+                <!-- Boutons de soumission -->
                 <div class="d-flex justify-content-between align-items-center mt-5 pt-3 border-top">
-                    <a href="{{ route('reunions.hebdo') }}" class="btn btn-link text-secondary text-decoration-none fw-bold">
-                        <i class="fas fa-arrow-left me-1"></i> Annuler
+                    <a href="{{ route('reunions.hebdo') }}" class="btn btn-outline-secondary rounded-pill px-5 fw-bold">
+                        <i class="fas fa-arrow-left me-2"></i> Retour au calendrier
                     </a>
-                    <button type="submit" class="btn px-5 py-3 rounded-pill shadow-lg text-white fw-black" style="background: linear-gradient(45deg, #10b981, #059669); transition: all 0.3s;">
-                        <i class="fas fa-save me-2"></i> ENREGISTRER LA RÉUNION
+                    <button type="submit" class="btn btn-lg rounded-pill px-5 text-white fw-900 shadow-lg border-0" style="background: linear-gradient(90deg, #1e293b 0%, #0284c7 100%); transition: all 0.3s ease;">
+                        <i class="fas fa-paper-plane me-2"></i> CONFIRMER ET LIER LA RÉUNION
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // === 1. GESTION DES PARTICIPANTS INTERNES ===
+    const searchInput = document.getElementById('searchAgent');
+    const agentItems = document.querySelectorAll('.agent-item');
+    const internesCheckboxes = document.querySelectorAll('.agent-checkbox');
+    const countInternesBadge = document.getElementById('count-internes');
+
+    // Mise à jour du compteur
+    function updateInternesCount() {
+        const count = document.querySelectorAll('.agent-checkbox:checked').length;
+        if(countInternesBadge) {
+            countInternesBadge.textContent = `${count} sélection(s)`;
+            countInternesBadge.style.backgroundColor = count > 0 ? '#ef4444' : '#64748b';
+        }
+    }
+
+    // Recherche instantanée
+    if(searchInput) {
+        searchInput.addEventListener('input', function() {
+            const filter = this.value.toLowerCase().trim();
+            agentItems.forEach(item => {
+                const text = item.textContent.toLowerCase();
+                item.style.display = text.includes(filter) ? 'flex' : 'none';
+            });
+        });
+    }
+
+    // Écouteur changement sur checkbox
+    internesCheckboxes.forEach(cb => cb.addEventListener('change', updateInternesCount));
+    updateInternesCount(); // Initialisation
+
+
+    // === 2. GESTION DES PARTICIPANTS EXTERNES ===
+    const btnAddExterne = document.getElementById('btn-add-externe');
+    const externesContainer = document.getElementById('externes-container');
+    const emptyMsg = document.getElementById('empty-externes-msg');
+    let externeIndex = Date.now(); // ID unique basé sur le temps
+
+    function checkEmptyState() {
+        const rows = externesContainer.querySelectorAll('.externe-row');
+        if(emptyMsg) emptyMsg.style.display = rows.length === 0 ? 'block' : 'none';
+    }
+
+    if(btnAddExterne) {
+        btnAddExterne.addEventListener('click', function() {
+            const htmlRow = `
+                <div class="externe-row card border-0 shadow-sm p-3 mb-3 bg-light rounded-3 position-relative animate__animated animate__fadeIn"
+                     style="border-left: 4px solid #ef4444 !important;" id="externe_block_${externeIndex}">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-2 btn-remove-externe" style="font-size:0.8rem;"></button>
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-dark small mb-1">NOM COMPLET *</label>
+                            <input type="text" name="externes[${externeIndex}][nom_complet]" class="form-control form-control-sm bg-white border-1 fw-bold" placeholder="Nom de l'invité" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-black text-danger small mb-1"><i class="fas fa-university me-1"></i> ORIGINE / ORGANISME *</label>
+                            <input type="text" name="externes[${externeIndex}][origine]" class="form-control form-control-sm bg-white border-danger-subtle fw-bold text-danger" placeholder="Organisme de provenance" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small mb-1">TÉLÉPHONE</label>
+                            <input type="text" name="externes[${externeIndex}][telephone]" class="form-control form-control-sm bg-white border-1" placeholder="Numéro de contact">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold text-muted small mb-1">EMAIL</label>
+                            <input type="email" name="externes[${externeIndex}][email]" class="form-control form-control-sm bg-white border-1" placeholder="exemple@mail.com">
+                        </div>
+                    </div>
+                </div>`;
+
+            if(emptyMsg) emptyMsg.style.display = 'none';
+            externesContainer.insertAdjacentHTML('beforeend', htmlRow);
+            externeIndex++;
+        });
+
+        // Suppression dynamique
+        externesContainer.addEventListener('click', function(e) {
+            if(e.target.classList.contains('btn-remove-externe')) {
+                const row = e.target.closest('.externe-row');
+                row.classList.replace('animate__fadeIn', 'animate__fadeOut');
+                setTimeout(() => {
+                    row.remove();
+                    checkEmptyState();
+                }, 300);
+            }
+        });
+    }
+});
+
+// === 3. UTILITAIRES EXTERNES ===
+function openGoogleMaps() {
+    const lieu = document.getElementById('lieu_reunion').value;
+    if(lieu.trim() !== "") {
+        window.open('https://google.com' + encodeURIComponent(lieu), '_blank');
+    } else {
+        alert("Veuillez d'abord renseigner le libellé du lieu.");
+    }
+}
+</script>
 
 <style>
-    .fw-black { font-weight: 900; }
-    .btn:hover { transform: scale(1.05); transition: all 0.2s; }
+    /* Typographie & Utilitaires */
+    .fw-900 { font-weight: 900; }
+    .fw-black { font-weight: 800; }
+    .text-indigo { color: #4f46e5; }
+    .cursor-pointer { cursor: pointer; }
+    .transition-all { transition: all 0.2s ease; }
+    .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06); }
 
-    /* Style pour la liste des agents */
-    .hover-bg-light:hover { background-color: #f8f9fa; }
-    #agents-list::-webkit-scrollbar { width: 5px; }
-    #agents-list::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
+    /* Interaction Composants */
+    .agent-item:hover { background-color: #eef2ff !important; transform: translateX(5px); }
+    .btn:hover { transform: scale(1.05); transition: all 0.2s; }
 
     .agent-checkbox {
         width: 1.2em;
@@ -211,128 +281,20 @@
         cursor: pointer;
         border: 2px solid #6366f1 !important;
     }
-</style>
-<style>
-    .text-indigo { color: #4f46e5; }
-    .transition-all { transition: all 0.2s ease; }
-    .agent-item:hover { background-color: #eef2ff !important; transform: translateX(5px); }
 
-    /* Custom Scrollbar colorée */
-    #agents-list::-webkit-scrollbar { width: 6px; }
-    #agents-list::-webkit-scrollbar-track { background: #f1f1f1; }
-    #agents-list::-webkit-scrollbar-thumb { background: #6366f1; border-radius: 10px; }
-</style>
-
-<script>
-// --- GESTION DES AGENTS INTERNES ---
-$(document).ready(function() {
-    function updateAgentCount() {
-        const checkedCount = $('.agent-checkbox:checked').length;
-        const display = $('#total-agents-count');
-        display.text(checkedCount);
-        // Rouge si 0, Vert si > 0 (optionnel, selon ta préférence)
-        display.css('background-color', checkedCount > 0 ? '#ef4444' : '#64748b');
+    .form-control:focus, .form-select:focus {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.15) !important;
     }
 
-    // Recherche instantanée d'agents
-    $('#searchAgent').on('keyup', function() {
-        const val = $(this).val().toLowerCase();
-        $('.agent-item').each(function() {
-            const text = $(this).text().toLowerCase();
-            $(this).toggle(text.indexOf(val) > -1);
-        });
-    });
-
-    // Écouteur sur les cases à cocher
-    $(document).on('change', '.agent-checkbox', function() {
-        updateAgentCount();
-    });
-
-    updateAgentCount(); // Initialisation
-});
-
-// --- GESTION DES PARTICIPANTS EXTERNES ---
-let externeCount = Date.now(); // Utilise un timestamp pour des IDs uniques
-
-function addExterneRow() {
-    const container = document.getElementById('externes-container');
-    const id = externeCount++;
-    const html = `
-        <div class="row g-2 mb-3 externe-row border-bottom pb-3 animate__animated animate__fadeIn">
-            <div class="col-md-4">
-                <label class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Nom complet</label>
-                <input type="text" name="externes[${id}][nom_complet]" class="form-control form-control-sm border-0 shadow-sm" required>
-            </div>
-            <div class="col-md-4">
-                <label class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Structure</label>
-                <input type="text" name="externes[${id}][origine]" class="form-control form-control-sm border-0 shadow-sm" required>
-            </div>
-            <div class="col-md-4">
-                <label class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Fonction</label>
-                <input type="text" name="externes[${id}][fonction]" class="form-control form-control-sm border-0 shadow-sm">
-            </div>
-            <div class="col-md-5">
-                <label class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Email</label>
-                <input type="email" name="externes[${id}][email]" class="form-control form-control-sm border-0 shadow-sm">
-            </div>
-            <div class="col-md-5">
-                <label class="small fw-bold text-muted text-uppercase" style="font-size:0.65rem;">Téléphone</label>
-                <input type="text" name="externes[${id}][telephone]" class="form-control form-control-sm border-0 shadow-sm">
-            </div>
-            <div class="col-md-2 d-flex align-items-end justify-content-end">
-                <button type="button" class="btn btn-sm btn-outline-danger border-0 mb-1" onclick="this.closest('.externe-row').remove()">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
-            </div>
-        </div>
-    `;
-    container.insertAdjacentHTML('beforeend', html);
-    container.scrollTop = container.scrollHeight;
-}
-
-// --- GOOGLE MAPS & AUTOCOMPLETE ---
-function openGoogleMaps() {
-    const input = document.getElementById('input-lieu-edit'); // Vérifie bien cet ID
-    if (input && input.value.trim() !== "") {
-        const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(input.value);
-        window.open(url, '_blank');
-    } else {
-        alert("Veuillez saisir un lieu avant de consulter la carte.");
+    /* Scrollbars personnalisées */
+    #agents-list::-webkit-scrollbar, #externes-container::-webkit-scrollbar { width: 6px; }
+    #agents-list::-webkit-scrollbar-track, #externes-container::-webkit-scrollbar-track { background: #f1f1f1; }
+    #agents-list::-webkit-scrollbar-thumb, #externes-container::-webkit-scrollbar-thumb {
+        background: #6366f1;
+        border-radius: 10px;
     }
-}
-
-function initAutocomplete() {
-    const input = document.getElementById('input-lieu-edit');
-    if(!input) return;
-
-    const options = {
-        componentRestrictions: { country: "CI" },
-        fields: ["name", "address_components", "formatted_address"],
-    };
-
-    const autocomplete = new google.maps.places.Autocomplete(input, options);
-
-    autocomplete.addListener("place_changed", () => {
-        const place = autocomplete.getPlace();
-        if (!place.name) return;
-
-        let city = "";
-        if (place.address_components) {
-            for (const component of place.address_components) {
-                if (component.types.includes("locality")) {
-                    city = component.long_name;
-                    break;
-                }
-            }
-        }
-        input.value = city ? `${place.name}, ${city}` : place.name;
-    });
-}
-// Chargement Google Maps
-if (typeof google !== 'undefined') {
-    google.maps.event.addDomListener(window, 'load', initAutocomplete);
-}
-</script>
+</style>
 
 @endsection
 

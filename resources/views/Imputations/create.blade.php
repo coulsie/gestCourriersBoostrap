@@ -55,159 +55,159 @@
                         <div class="row">
                             <!-- SECTION 1 : DOCUMENTS & DATES -->
                             <!-- SECTION 1 : DOCUMENTS & DATES -->
-<div class="col-md-5 mb-4">
-    <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-top border-4 border-primary">
-        <h5 class="text-primary mb-4 border-bottom pb-2 fw-bold">
-            <i class="fas fa-folder-open me-2"></i> 1. Référence & Chronologie
-        </h5>
+                        <div class="col-md-5 mb-4">
+                            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-top border-4 border-primary">
+                                <h5 class="text-primary mb-4 border-bottom pb-2 fw-bold">
+                                    <i class="fas fa-folder-open me-2"></i> 1. Référence & Chronologie
+                                </h5>
 
-        {{-- BLOC INFO COURRIER --}}
-        @if(isset($courrierSelectionne) || request('courrier_id'))
-            @php
-                $cId = request('courrier_id', $courrierSelectionne->id ?? '');
-                $cRef = $courrierSelectionne->reference ?? 'Réimputation';
-            @endphp
-            <div class="mb-4 rounded-4 overflow-hidden border-0 shadow-sm">
-                <div class="bg-primary text-white p-2 px-3 d-flex justify-content-between align-items-center text-uppercase small fw-bold">
-                    <span><i class="fas fa-file-alt me-2"></i>Document Source</span>
-                    <span class="badge bg-white text-primary">Réf: {{ $cRef }}</span>
-                </div>
-                <div class="p-3 bg-light border-start border-end border-bottom rounded-bottom-4">
-                    <label class="small fw-bold text-muted text-uppercase mb-1 d-block">Objet du courrier</label>
-                    <div class="fw-bold text-dark mb-2" style="font-size: 0.95rem; line-height: 1.4;">
-                        {{ $courrierSelectionne->objet ?? 'Chargement du document...' }}
-                    </div>
-                    <input type="hidden" name="courrier_id" value="{{ $cId }}">
+                                {{-- BLOC INFO COURRIER --}}
+                                @if(isset($courrierSelectionne) || request('courrier_id'))
+                                    @php
+                                        $cId = request('courrier_id', $courrierSelectionne->id ?? '');
+                                        $cRef = $courrierSelectionne->reference ?? 'Réimputation';
+                                    @endphp
+                                    <div class="mb-4 rounded-4 overflow-hidden border-0 shadow-sm">
+                                        <div class="bg-primary text-white p-2 px-3 d-flex justify-content-between align-items-center text-uppercase small fw-bold">
+                                            <span><i class="fas fa-file-alt me-2"></i>Document Source</span>
+                                            <span class="badge bg-white text-primary">Réf: {{ $cRef }}</span>
+                                        </div>
+                                        <div class="p-3 bg-light border-start border-end border-bottom rounded-bottom-4">
+                                            <label class="small fw-bold text-muted text-uppercase mb-1 d-block">Objet du courrier</label>
+                                            <div class="fw-bold text-dark mb-2" style="font-size: 0.95rem; line-height: 1.4;">
+                                                {{ $courrierSelectionne->objet ?? 'Chargement du document...' }}
+                                            </div>
+                                            <input type="hidden" name="courrier_id" value="{{ $cId }}">
 
-                    {{-- Action Fichier --}}
-                    @if($fichierAffiche)
-                        <a href="{{ asset($fichierAffiche) }}" target="_blank" class="btn btn-sm btn-danger rounded-pill px-3 shadow-sm mt-1">
-                            <i class="fas fa-file-pdf me-1"></i> Consulter le document
-                        </a>
-                    @else
-                        <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i> Aucun fichier joint</span>
-                    @endif
-                </div>
-            </div>
-        @else
-            <div class="mb-4">
-                <label class="form-label fw-black text-dark small text-uppercase">Sélectionner le Courrier *</label>
-                <select name="courrier_id" class="form-select border-primary shadow-sm @error('courrier_id') is-invalid @enderror select2" required>
-                    <option value="">-- Choisir un dossier --</option>
-                    @foreach($courriers as $courrier)
-                        <option value="{{ $courrier->id }}" {{ old('courrier_id') == $courrier->id ? 'selected' : '' }}>
-                            [{{ $courrier->reference }}] - {{ Str::limit($courrier->objet, 50) }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-        @endif
+                                            {{-- Action Fichier --}}
+                                            @if($fichierAffiche)
+                                                <a href="{{ asset($fichierAffiche) }}" target="_blank" class="btn btn-sm btn-danger rounded-pill px-3 shadow-sm mt-1">
+                                                    <i class="fas fa-file-pdf me-1"></i> Consulter le document
+                                                </a>
+                                            @else
+                                                <span class="badge bg-warning text-dark"><i class="fas fa-exclamation-triangle me-1"></i> Aucun fichier joint</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @else
+                                    <div class="mb-4">
+                                        <label class="form-label fw-black text-dark small text-uppercase">Sélectionner le Courrier *</label>
+                                        <select name="courrier_id" class="form-select border-primary shadow-sm @error('courrier_id') is-invalid @enderror select2" required>
+                                            <option value="">-- Choisir un dossier --</option>
+                                            @foreach($courriers as $courrier)
+                                                <option value="{{ $courrier->id }}" {{ old('courrier_id') == $courrier->id ? 'selected' : '' }}>
+                                                    [{{ $courrier->reference }}] - {{ Str::limit($courrier->objet, 50) }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
 
-        {{-- BLOC DATES & SUPERVISION --}}
-        <div class="row g-3">
-            <div class="col-md-6">
-                <label class="form-label fw-bold small text-muted text-uppercase">Date Imputation *</label>
-                <input type="date" name="date_imputation" class="form-control border-0 bg-light fw-bold" value="{{ date('Y-m-d') }}" required>
-            </div>
+                                {{-- BLOC DATES & SUPERVISION --}}
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small text-muted text-uppercase">Date Imputation *</label>
+                                        <input type="date" name="date_imputation" class="form-control border-0 bg-light fw-bold" value="{{ date('Y-m-d') }}" required>
+                                    </div>
 
-            <div class="col-md-6">
-                <label class="form-label fw-bold small text-danger text-uppercase">Échéancier *</label>
-                @php
-                    $dateHeritee = null;
-                    if(request('parent_id')) {
-                        $parente = \App\Models\Imputation::find(request('parent_id'));
-                        $dateHeritee = $parente ? $parente->echeancier : null;
-                    }
-                    if (!$dateHeritee && isset($courrierSelectionne)) {
-                        $dateHeritee = $courrierSelectionne->echeancier;
-                    }
-                    $finalDate = old('echeancier', $dateHeritee ?? request('echeancier', date('Y-m-d')));
-                    $valueFormatted = \Carbon\Carbon::parse($finalDate)->format('Y-m-d');
-                @endphp
-                <input type="date" name="echeancier"
-                       class="form-control fw-bold {{ request('parent_id') ? 'bg-light border-0 text-muted' : 'border-danger' }}"
-                       value="{{ $valueFormatted }}" required>
-            </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold small text-danger text-uppercase">Échéancier *</label>
+                                        @php
+                                            $dateHeritee = null;
+                                            if(request('parent_id')) {
+                                                $parente = \App\Models\Imputation::find(request('parent_id'));
+                                                $dateHeritee = $parente ? $parente->echeancier : null;
+                                            }
+                                            if (!$dateHeritee && isset($courrierSelectionne)) {
+                                                $dateHeritee = $courrierSelectionne->echeancier;
+                                            }
+                                            $finalDate = old('echeancier', $dateHeritee ?? request('echeancier', date('Y-m-d')));
+                                            $valueFormatted = \Carbon\Carbon::parse($finalDate)->format('Y-m-d');
+                                        @endphp
+                                        <input type="date" name="echeancier"
+                                            class="form-control fw-bold {{ request('parent_id') ? 'bg-light border-0 text-muted' : 'border-danger' }}"
+                                            value="{{ $valueFormatted }}" required>
+                                    </div>
 
-            <div class="col-12 mt-3">
-                <div class="p-3 rounded-3" style="background-color: #f0f7ff; border-left: 4px solid #007bff;">
-                    <label class="form-label fw-bold small text-primary text-uppercase">
-                        <i class="fas fa-user-shield me-1"></i> Supervisé / Suivi par
-                    </label>
-                    <select name="suivi_par" class="form-select border-0 bg-transparent fw-bold @error('suivi_par') is-invalid @enderror select2">
-                        <option value="">-- Responsable du suivi (Optionnel) --</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}" {{ old('suivi_par') == $user->id ? 'selected' : '' }}>
-                                {{ $user->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-                            {{-- Reste du formulaire (Agents et Section 3 Instructions) --}}
-                            <!-- ... -->
-
-                         <!-- SECTION 2 : DESTINATAIRES (AGENTS) -->
-                           <!-- SECTION 2 : ATTRIBUTION AUX AGENTS -->
-<div class="col-md-7 mb-4">
-    <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-top border-4 border-warning">
-        <h5 class="text-warning mb-4 border-bottom pb-2 fw-bold">
-            <i class="fas fa-users me-2"></i> 2. Attribution & Destinataires
-        </h5>
-
-        {{-- FILTRES RAPIDES --}}
-        <div class="row g-2 mb-3 p-2 rounded-3 bg-light">
-            <div class="col-md-6">
-                <select id="filter_direction" class="form-select form-select-sm border-0 shadow-sm">
-                    <option value="">Toutes les Directions</option>
-                    @foreach($directions as $dir)
-                        <option value="{{ $dir->id }}">{{ $dir->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="col-md-6">
-                <select id="filter_service" class="form-select form-select-sm border-0 shadow-sm">
-                    <option value="">Tous les Services</option>
-                    @foreach($services as $ser)
-                        <option value="{{ $ser->id }}" data-dir="{{ $ser->direction_id }}">{{ $ser->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-
-        {{-- LISTE DES AGENTS --}}
-        <div class="mb-0">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-                <label class="form-label fw-black text-dark small text-uppercase mb-0">Choisir les Agents *</label>
-                <span class="badge bg-warning text-dark rounded-pill" id="selected-count">0 sélection</span>
-            </div>
-
-            <div id="agent-checkbox-list" class="border rounded-3 p-2 bg-white" style="max-height: 320px; overflow-y: auto;">
-                @foreach($agents->sortBy('last_name') as $agent)
-                    <div class="agent-item p-2 mb-1 rounded-2 border-bottom transition-all"
-                         data-dir="{{ $agent->service->direction_id ?? '' }}"
-                         data-ser="{{ $agent->service_id ?? '' }}"
-                         style="cursor: pointer;">
-                        <div class="form-check custom-checkbox d-flex align-items-center">
-                            <input class="form-check-input agent-checkbox me-3" type="checkbox"
-                                   name="agent_ids[]" value="{{ $agent->id }}" id="ag_{{ $agent->id }}"
-                                   {{ (collect(old('agent_ids'))->contains($agent->id)) ? 'checked' : '' }}>
-                            <label class="form-check-label w-100 mb-0" for="ag_{{ $agent->id }}" style="cursor: pointer;">
-                                <div class="fw-bold text-dark">{{ strtoupper($agent->last_name) }} {{ $agent->first_name }}</div>
-                                <div class="text-muted small italic">{{ $agent->service->name ?? 'N/A' }}</div>
-                            </label>
+                                    <div class="col-12 mt-3">
+                                        <div class="p-3 rounded-3" style="background-color: #f0f7ff; border-left: 4px solid #007bff;">
+                                            <label class="form-label fw-bold small text-primary text-uppercase">
+                                                <i class="fas fa-user-shield me-1"></i> Supervisé / Suivi par
+                                            </label>
+                                            <select name="suivi_par" class="form-select border-0 bg-transparent fw-bold @error('suivi_par') is-invalid @enderror select2">
+                                                <option value="">-- Responsable du suivi (Optionnel) --</option>
+                                                @foreach($users as $user)
+                                                    <option value="{{ $user->id }}" {{ old('suivi_par') == $user->id ? 'selected' : '' }}>
+                                                        {{ $user->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    </div>
-</div>
+
+
+                                                    {{-- Reste du formulaire (Agents et Section 3 Instructions) --}}
+                                                    <!-- ... -->
+
+                                                <!-- SECTION 2 : DESTINATAIRES (AGENTS) -->
+                                                <!-- SECTION 2 : ATTRIBUTION AUX AGENTS -->
+                        <div class="col-md-7 mb-4">
+                            <div class="p-4 bg-white rounded-4 shadow-sm h-100 border-top border-4 border-warning">
+                                <h5 class="text-warning mb-4 border-bottom pb-2 fw-bold">
+                                    <i class="fas fa-users me-2"></i> 2. Attribution & Destinataires
+                                </h5>
+
+                                {{-- FILTRES RAPIDES --}}
+                                <div class="row g-2 mb-3 p-2 rounded-3 bg-light">
+                                    <div class="col-md-6">
+                                        <select id="filter_direction" class="form-select form-select-sm border-0 shadow-sm">
+                                            <option value="">Toutes les Directions</option>
+                                            @foreach($directions as $dir)
+                                                <option value="{{ $dir->id }}">{{ $dir->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select id="filter_service" class="form-select form-select-sm border-0 shadow-sm">
+                                            <option value="">Tous les Services</option>
+                                            @foreach($services as $ser)
+                                                <option value="{{ $ser->id }}" data-dir="{{ $ser->direction_id }}">{{ $ser->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {{-- LISTE DES AGENTS --}}
+                                <div class="mb-0">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="form-label fw-black text-dark small text-uppercase mb-0">Choisir les Agents *</label>
+                                        <span class="badge bg-warning text-dark rounded-pill" id="selected-count">0 sélection</span>
+                                    </div>
+
+                                    <div id="agent-checkbox-list" class="border rounded-3 p-2 bg-white" style="max-height: 320px; overflow-y: auto;">
+                                        @foreach($agents->sortBy('last_name') as $agent)
+                                            <div class="agent-item p-2 mb-1 rounded-2 border-bottom transition-all"
+                                                data-dir="{{ $agent->service->direction_id ?? '' }}"
+                                                data-ser="{{ $agent->service_id ?? '' }}"
+                                                style="cursor: pointer;">
+                                                <div class="form-check custom-checkbox d-flex align-items-center">
+                                                    <input class="form-check-input agent-checkbox me-3" type="checkbox"
+                                                        name="agent_ids[]" value="{{ $agent->id }}" id="ag_{{ $agent->id }}"
+                                                        {{ (collect(old('agent_ids'))->contains($agent->id)) ? 'checked' : '' }}>
+                                                    <label class="form-check-label w-100 mb-0" for="ag_{{ $agent->id }}" style="cursor: pointer;">
+                                                        <div class="fw-bold text-dark">{{ strtoupper($agent->last_name) }} {{ $agent->first_name }}</div>
+                                                        <div class="text-muted small italic">{{ $agent->service->name ?? 'N/A' }}</div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
 
                         </div>
@@ -247,7 +247,7 @@
 
                                         {{-- Rappel du fichier principal --}}
                                         {{-- Rappel du fichier principal --}}
-                                        
+
 
                                     </div>
                                 </div>
@@ -265,7 +265,7 @@
                             {{-- Champ niveau (sera recalculé dans le store, mais requis pour passer la validation) --}}
                             <input type="hidden" name="niveau" value="autre">
                         <div class="d-flex justify-content-between mt-4 pt-3 border-top">
-                            <a href="{{ route('courriers.index') }}" class="btn btn-outline-secondary px-4 fw-bold">ANNULER</a>
+                            <a href="{{ route('imputations.index') }}" class="btn btn-outline-secondary px-4 fw-bold">ANNULER</a>
 
                             <!-- Nouveau bouton qui déclenche la vérification JavaScript -->
                             <button type="submit" class="btn btn-primary px-5 fw-bold shadow">
