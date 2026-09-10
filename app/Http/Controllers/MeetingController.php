@@ -213,46 +213,50 @@ public function update(Request $request, $id)
     /**
      * Fonction privée pour centraliser l'envoi des emails
      */
-  private function envoyerNotifications(Meeting $meeting)
-{
-    try {
-        // 1. Récupération des destinataires (Correction : utilisation de vos colonnes exactes)
-        $emailsInternes = $meeting->participants->pluck('email_professionnel')->filter()->toArray();
-        $emailsExternes = $meeting->listeExternes->pluck('email')->filter()->toArray();
-        $destinataires = array_unique(array_merge($emailsInternes, $emailsExternes));
+    private function envoyerNotifications(Meeting $meeting)
+    {
+        try {
+            // 🔥 CORRECTION CRITIQUE : Recharger explicitement les relations en base de données
+            $meeting->load(['participants', 'listeExternes']);
 
-        if (empty($destinataires)) {
-            return;
-        }
+            // 1. Récupération des destinataires (Utilisation de vos colonnes exactes)
+            // Correction : On utilise bien 'email_professionnel' pour vos agents internes
+            $emailsInternes = $meeting->participants->pluck('email_professionnel')->filter()->toArray();
+            $emailsExternes = $meeting->listeExternes->pluck('email')->filter()->toArray();
+            $destinataires = array_unique(array_merge($emailsInternes, $emailsExternes));
 
-        // 2. Routage dynamique selon le statut de la réunion
-        // Note : On passe en minuscules pour correspondre aux contraintes ENUM classiques
-        $currentStatus = mb_strtolower((string)$meeting->status, 'UTF-8');
-
-        if ($currentStatus !== 'terminee') {
-            // CAS 1 : Convocation / Programmation initiale ou mise à jour
-            foreach ($destinataires as $email) {
-                Mail::to($email)->queue(new \App\Mail\ReunionProgrammee($meeting));
+            if (empty($destinataires)) {
+                \Log::warning("Aucun destinataire trouvé (email_professionnel ou externe) pour la réunion #{$meeting->id}");
+                return;
             }
-        } else {
-            // CAS 2 : Réunion clôturée avec des fichiers joints (PV, Rapport, Présences)
-            if ($meeting->report_file || $meeting->presence_file) {
+
+            // 2. Routage dynamique selon le statut de la réunion
+            $currentStatus = mb_strtolower((string)$meeting->status, 'UTF-8');
+
+            if ($currentStatus !== 'terminee') {
+                // CAS 1 : Convocation / Programmation initiale ou mise à jour
                 foreach ($destinataires as $email) {
-                    Mail::to($email)->queue(new \App\Mail\ReunionTerminee($meeting));
+                    // Modifié pour correspondre à votre classe de mail : ReunionProgrammee
+                    Mail::to($email)->queue(new \App\Mail\ReunionProgrammee($meeting));
+                }
+            } else {
+                // CAS 2 : Réunion clôturée avec des fichiers joints
+                if ($meeting->report_file || $meeting->presence_file) {
+                    foreach ($destinataires as $email) {
+                        Mail::to($email)->queue(new \App\Mail\ReunionTerminee($meeting));
+                    }
                 }
             }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Erreur de dispatching des mails pour la réunion #" . $meeting->id . " : " . $e->getMessage());
         }
-    } catch (\Exception $e) {
-        // Sécurité pour éviter de bloquer l'utilisateur si le serveur de queue rencontre un problème
-        \Illuminate\Support\Facades\Log::error("Erreur de dispatching des mails pour la réunion #" . $meeting->id . " : " . $e->getMessage());
     }
-}
 
 
     /**
      * Supprimer la réunion
      */
-    
+
 
     public function destroy($id)
     {
