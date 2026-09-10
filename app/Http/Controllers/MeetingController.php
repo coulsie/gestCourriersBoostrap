@@ -232,13 +232,13 @@ public function update(Request $request, $id)
         if ($currentStatus !== 'terminee') {
             // CAS 1 : Convocation / Programmation initiale ou mise à jour
             foreach ($destinataires as $email) {
-                Mail::to($email)->queue(new \App\Mail\ReunionProgrammee($meeting));
+                Mail::to($email)->send(new \App\Mail\ReunionProgrammee($meeting));
             }
         } else {
             // CAS 2 : Réunion clôturée avec des fichiers joints (PV, Rapport, Présences)
             if ($meeting->report_file || $meeting->presence_file) {
                 foreach ($destinataires as $email) {
-                    Mail::to($email)->queue(new \App\Mail\ReunionTerminee($meeting));
+                    Mail::to($email)->send(new \App\Mail\ReunionTerminee($meeting));
                 }
             }
         }
@@ -252,7 +252,7 @@ public function update(Request $request, $id)
     /**
      * Supprimer la réunion
      */
-    
+
 
     public function destroy($id)
     {
