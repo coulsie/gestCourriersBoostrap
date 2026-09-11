@@ -40,7 +40,8 @@
             </tr>
         </thead>
         <tbody>
-           @foreach($listeParticipants as $index => $p)
+           {{-- Modification ici : tri de la collection par le champ 'nom' --}}
+           @foreach($listeParticipants->sortBy('nom') as $index => $p)
             <tr style="height: 60px;">
                 <td class="text-center fw-bold">{{ $index + 1 }}</td>
                 <td class="ps-3 fw-bold">{{ strtoupper($p->nom) }}</td>
@@ -60,6 +61,7 @@
             </tr>
             @endfor
         </tbody>
+
     </table>
 
     {{-- Zone de validation --}}

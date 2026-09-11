@@ -4,6 +4,7 @@
 <div class="container-fluid py-4" style="background-color: #f8fafc;">
 
     <!-- Header avec Actions -->
+    <!-- Header avec Actions (Masqué à l'impression grâce à no-print) -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4 no-print">
         <div>
             <nav aria-label="breadcrumb">
@@ -15,32 +16,24 @@
             <h1 class="h3 mb-0 text-dark fw-bolder">🎓 {{ $seminaire->titre }}</h1>
         </div>
         <div class="d-flex flex-wrap gap-2">
-            <!-- BOUTON QR CODE GLOBAL -->
             <a href="{{ route('seminaires.qrcode', $seminaire->id) }}" target="_blank" class="btn btn-dark shadow-sm rounded-pill px-4 fw-bold">
                 <i class="fas fa-qrcode me-2"></i> QR Code Global
             </a>
-
-            <!-- BOUTON QR CODE QUOTIDIEN (NOUVEAU) -->
             <a href="{{ route('seminaires.qrcodeJournalier', $seminaire->id) }}" target="_blank" class="btn btn-info shadow-sm rounded-pill px-4 fw-bold text-white">
                 <i class="fas fa-qrcode me-2"></i> QR Quotidien
             </a>
-
-            <!-- BOUTON ÉMARGEMENT QUOTIDIEN -->
             <a href="{{ route('seminaires.emargement', $seminaire->id) }}" class="btn btn-primary shadow-sm rounded-pill px-4 fw-bold">
                 <i class="fas fa-clipboard-check me-2"></i> Émargement Quotidien
             </a>
-
-            <!-- AUTRES ACTIONS -->
             <button onclick="window.print()" class="btn btn-outline-secondary shadow-sm rounded-pill px-3">
                 <i class="fas fa-print me-1"></i> Imprimer
             </button>
-
             <a href="{{ route('seminaires.edit', $seminaire->id) }}" class="btn btn-warning shadow-sm rounded-pill px-4 text-white fw-bold">
                 <i class="fas fa-edit me-1"></i> Modifier
             </a>
         </div>
-
     </div>
+
 
     <!-- Titre d'impression (Visible uniquement sur papier) -->
     <div class="d-none d-print-block text-center mb-4">
@@ -88,102 +81,132 @@
                 </div>
             </div>
 
-            <!-- TABLEAU D'ÉMARGEMENT MODIFIÉ -->
-        <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
-            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center border-bottom">
-                <h6 class="m-0 fw-bold text-dark"><i class="fas fa-check-double me-2 text-success"></i>Pointage des Présences</h6>
-                <span class="badge rounded-pill bg-soft-primary text-primary px-3 py-2 no-print">
-                    {{ $seminaire->participations->count() }} Inscrits
-                </span>
-            </div>
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead style="background: #f8fafc;">
-                        <tr class="text-uppercase small fw-bold text-muted">
-                            <th class="ps-4">Participant</th>
-                            <th>Structure</th>
-                            <th class="text-center no-print">Action Rapide</th>
-                            <th class="pe-4" style="min-width: 250px;">Date & Heure d'arrivée</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($seminaire->participations as $p)
-                        <tr>
-                            <td class="ps-4 py-3">
-                                <div class="fw-bold text-dark mb-0">{{ $p->nom_complet }}</div>
-                                @if($p->agent) <small class="text-muted text-uppercase" style="font-size: 0.65rem;">Matricule: {{ $p->agent->matricule }}</small> @endif
-                            </td>
-                            <td>
-                                <span class="badge px-2 py-1 rounded-pill {{ $p->agent_id ? 'bg-soft-info text-info' : 'bg-soft-warning text-warning' }}" style="font-size: 0.7rem;">
-                                    {{ $p->structure }}
-                                </span>
-                            </td>
+       <!-- TABLEAU D'ÉMARGEMENT MODIFIÉ -->
+            <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden">
+                <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center border-bottom">
+                    <h6 class="m-0 fw-bold text-dark"><i class="fas fa-check-double me-2 text-success"></i>Pointage des Présences</h6>
+                    <span class="badge rounded-pill bg-soft-primary text-primary px-3 py-2 no-print">
+                        {{ $seminaire->participations->count() }} Inscrits
+                    </span>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background: #f8fafc;">
+                            <tr class="text-uppercase small fw-bold text-muted">
+                                <th class="ps-4">Participant</th>
+                                <th>Structure</th>
+                                <th class="text-center no-print">Action Rapide</th>
+                                {{-- Retrait du no-print pour que le titre de la colonne s'imprime --}}
+                                <th class="pe-4" style="min-width: 250px;">Date & Heure d'arrivée</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($seminaire->participations as $p)
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="fw-bold text-dark mb-0">{{ $p->nom_complet }}</div>
+                                    @if($p->agent) <small class="text-muted text-uppercase" style="font-size: 0.65rem;">Matricule: {{ $p->agent->matricule }}</small> @endif
+                                </td>
+                                <td>
+                                    <span class="badge px-2 py-1 rounded-pill {{ $p->agent_id ? 'bg-soft-info text-info' : 'bg-soft-warning text-warning' }}" style="font-size: 0.7rem;">
+                                        {{ $p->structure }}
+                                    </span>
+                                </td>
 
-                            <!-- ACTION DE POINTAGE (Caché à l'impression) -->
-                            <!-- ACTION DE POINTAGE (Réorganisée en colonne) -->
-                            <td class="text-center no-print" style="width: 150px;">
-                                <form action="{{ route('seminaires.pointer', [$seminaire->id, $p->id]) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-sm {{ $p->est_present ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3 fw-bold shadow-sm w-100">
-                                        <i class="fas {{ $p->est_present ? 'fa-check-circle' : 'fa-fingerprint' }} me-1"></i>
-                                        {{ $p->est_present ? 'Présent' : 'Pointer' }}
-                                    </button>
-                                </form>
-                                {{-- Affichage de l'heure sous le bouton si déjà pointé --}}
-                                @if($p->heure_pointage)
-                                    <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">
-                                        <i class="far fa-clock me-1"></i>{{ $p->heure_pointage->format('H:i') }}
-                                    </small>
-                                @endif
-                            </td>
+                                <!-- ACTION DE POINTAGE (Caché à l'impression) -->
+                                <td class="text-center no-print" style="width: 150px;">
+                                    @if($seminaire->statut == 'termine' || $seminaire->statut == 'annule')
+                                        {{-- Bouton figé et désactivé si terminé ou annulé --}}
+                                        <button type="button" class="btn btn-sm {{ $p->est_present ? 'btn-success' : 'btn-secondary' }} rounded-pill px-3 fw-bold opacity-75 w-100" disabled>
+                                            <i class="fas {{ $p->est_present ? 'fa-check-circle' : 'fa-lock' }} me-1"></i>
+                                            {{ $p->est_present ? 'Présent' : 'Clos' }}
+                                        </button>
+                                    @else
+                                        {{-- Formulaire actif si le séminaire est en cours --}}
+                                        <form action="{{ route('seminaires.pointer', [$seminaire->id, $p->id]) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm {{ $p->est_present ? 'btn-success' : 'btn-outline-secondary' }} rounded-pill px-3 fw-bold shadow-sm w-100">
+                                                <i class="fas {{ $p->est_present ? 'fa-check-circle' : 'fa-fingerprint' }} me-1"></i>
+                                                {{ $p->est_present ? 'Présent' : 'Pointer' }}
+                                            </button>
+                                        </form>
+                                    @endif
 
+                                    {{-- Affichage de l'heure sous le bouton si déjà pointé --}}
+                                    @if($p->heure_pointage)
+                                        <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">
+                                            <i class="far fa-clock me-1"></i>{{ $p->heure_pointage->format('H:i') }}
+                                        </small>
+                                    @endif
+                                </td>
 
-                            <!-- SAISIE MANUELLE DATE/HEURE -->
-                            <td class="pe-3 no-print" style="min-width: 420px;">
-                                <form action="{{ route('seminaires.update-pointage', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex align-items-center gap-2">
-                                    @csrf
-                                    <input type="hidden" name="est_present" value="1">
+                                <!-- SAISIE MANUELLE ET RENDER D'IMPRESSION (La classe no-print générale est retirée d'ici) -->
+                                <td class="pe-3" style="min-width: 250px;">
 
-                                    <!-- Groupe Date/Heure -->
-                                    <div class="flex-shrink-0">
-                                        <div class="d-flex bg-white rounded-3 border shadow-sm p-1">
-                                            <input type="date" name="date_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('Y-m-d') : date('Y-m-d') }}"
-                                                class="form-control form-control-sm border-0 bg-transparent p-0 px-1" style="font-size: 0.75rem; width: 105px;">
-                                            <div class="vr mx-1"></div>
-                                            <input type="time" name="heure_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('H:i') : date('H:i') }}"
-                                                class="form-control form-control-sm border-0 bg-transparent p-0 px-1" style="font-size: 0.75rem; width: 65px;">
-                                        </div>
+                                    {{-- 1. AFFICHAGE TEXTUEL : Visible UNIQUEMENT à l'impression --}}
+                                    <div class="d-none d-print-block fw-bold text-dark" style="font-size: 0.85rem;">
+                                        @if($p->heure_pointage)
+                                            {{ $p->heure_pointage->format('d/m/Y à H:i') }}
+                                        @else
+                                            <span class="text-muted fw-normal">Absent</span>
+                                        @endif
                                     </div>
 
-                                    <!-- Groupe Contacts -->
-                                    <div class="flex-grow-1">
-                                        <div class="input-group input-group-sm mb-1">
-                                            <span class="input-group-text bg-light border-0" style="font-size: 0.6rem;"><i class="fas fa-envelope"></i></span>
-                                            <input type="email" name="email" placeholder="Email" value="{{ $p->email }}" class="form-control border-light" style="font-size: 0.7rem;">
+                                    {{-- 2. FORMULAIRE : Caché automatiquement à l'impression grâce à no-print --}}
+                                    <form action="{{ route('seminaires.update-pointage', [$seminaire->id, $p->id]) }}" method="POST" class="d-flex align-items-center gap-2 no-print">
+                                        @csrf
+                                        <input type="hidden" name="est_present" value="1">
+
+                                        @php
+                                            $estBloque = ($seminaire->statut == 'termine' || $seminaire->statut == 'annule');
+                                        @endphp
+
+                                        <!-- Groupe Date/Heure -->
+                                        <div class="flex-shrink-0">
+                                            <div class="d-flex bg-light rounded-3 border shadow-sm p-1" style="{{ $estBloque ? 'background-color: #e9ecef !important;' : 'background-color: #fff !important;' }}">
+                                                <input type="date" name="date_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('Y-m-d') : date('Y-m-d') }}"
+                                                    class="form-control form-control-sm border-0 bg-transparent p-0 px-1" style="font-size: 0.75rem; width: 105px;" {{ $estBloque ? 'disabled' : '' }}>
+                                                <div class="vr mx-1"></div>
+                                                <input type="time" name="heure_presence" value="{{ $p->heure_pointage ? $p->heure_pointage->format('H:i') : date('H:i') }}"
+                                                    class="form-control form-control-sm border-0 bg-transparent p-0 px-1" style="font-size: 0.75rem; width: 65px;" {{ $estBloque ? 'disabled' : '' }}>
+                                            </div>
                                         </div>
-                                        <div class="input-group input-group-sm">
-                                            <span class="input-group-text bg-light border-0" style="font-size: 0.6rem;"><i class="fas fa-phone"></i></span>
-                                            <input type="text" name="telephone" placeholder="Téléphone" value="{{ $p->telephone }}" class="form-control border-light" style="font-size: 0.7rem;">
+
+                                        <!-- Groupe Contacts -->
+                                        <div class="flex-grow-1">
+                                            <div class="input-group input-group-sm mb-1">
+                                                <span class="input-group-text bg-light border-0" style="font-size: 0.6rem;"><i class="fas fa-envelope"></i></span>
+                                                <input type="email" name="email" placeholder="Email" value="{{ $p->email }}" class="form-control border-light" style="font-size: 0.7rem;" {{ $estBloque ? 'readonly' : '' }}>
+                                            </div>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text bg-light border-0" style="font-size: 0.6rem;"><i class="fas fa-phone"></i></span>
+                                                <input type="text" name="telephone" placeholder="Téléphone" value="{{ $p->telephone }}" class="form-control border-light" style="font-size: 0.7rem;" {{ $estBloque ? 'readonly' : '' }}>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <!-- Validation -->
-                                    <button type="submit" class="btn btn-primary btn-sm rounded-3 shadow-sm px-2" title="Enregistrer les infos complémentaires">
-                                        <i class="fas fa-save"></i>
-                                    </button>
-                                </form>
-                            </td>
+                                        <!-- Validation -->
+                                        @if(!$estBloque)
+                                            <button type="submit" class="btn btn-primary btn-sm rounded-3 shadow-sm px-2" title="Enregistrer les infos complémentaires">
+                                                <i class="fas fa-save"></i>
+                                            </button>
+                                        @else
+                                            <button type="button" class="btn btn-secondary btn-sm rounded-3 px-2" title="Modification impossible" disabled>
+                                                <i class="fas fa-lock"></i>
+                                            </button>
+                                        @endif
+                                    </form>
+                                </td>
 
-
-                        </tr>
-                        @empty
-                        <tr><td colspan="4" class="text-center py-5 text-muted">Aucun participant inscrit.</td></tr>
-                        @endforelse
-                    </tbody>
-
-                </table>
+                            </tr>
+                            @empty
+                            <tr><td colspan="4" class="text-center py-5 text-muted">Aucun participant inscrit.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+
+
 
         </div>
 
@@ -191,64 +214,82 @@
         <div class="col-lg-4 no-print">
 
             <!-- Inscription Massive (CORRIGÉ) -->
-                <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden text-start">
+            <div class="card shadow-sm border-0 rounded-4 mb-4 overflow-hidden text-start">
                 <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
                     <h6 class="m-0 fw-bold"><i class="fas fa-user-plus me-2"></i>Inscrire des Agents</h6>
-                    <button type="button" class="btn btn-sm btn-light py-0 px-2 fw-bold" onclick="toggleAll()" style="font-size: 0.7rem;">Tout cocher</button>
+                    {{-- On cache le bouton "Tout cocher" si le séminaire est terminé ou annulé --}}
+                    @if($seminaire->statut !== 'termine' && $seminaire->statut !== 'annule')
+                        <button type="button" class="btn btn-sm btn-light py-0 px-2 fw-bold" onclick="toggleAll()" style="font-size: 0.7rem;">Tout cocher</button>
+                    @endif
                 </div>
                 <div class="card-body">
-                    <form action="{{ route('seminaires.add_multiple_agents', $seminaire->id) }}" method="POST">
-                        @csrf
-                        <div class="mb-3">
-                            <!-- Conteneur avec défilement propre -->
-                            <div id="agentList" style="max-height: 400px; overflow-y: auto; border: 1px solid #eef2f7; border-radius: 12px;">
-                                @foreach($agents as $agent)
-                                <!-- Utilisation de label comme conteneur pour que toute la ligne soit cliquable et liée -->
-                                <label class="d-flex align-items-center p-3 border-bottom w-100 m-0" for="ag-{{ $agent->id }}" style="cursor: pointer; transition: background 0.2s;">
-                                    <!-- Case à cocher (fermement ancrée à gauche) -->
-                                    <div class="form-check m-0">
-                                        <input class="form-check-input border-primary agent-checkbox"
-                                            type="checkbox"
-                                            name="agent_ids[]"
-                                            value="{{ $agent->id }}"
-                                            id="ag-{{ $agent->id }}"
-                                            style="width: 1.3rem; height: 1.3rem; margin-top: 0;">
-                                    </div>
-
-                                    <!-- Infos Agent (liées à la case) -->
-                                    <div class="ms-3">
-                                        <span class="small text-dark fw-bold d-block text-uppercase" style="line-height: 1.2;">
-                                            {{ $agent->last_name }} {{ $agent->first_name }}
-                                        </span>
-                                        <span class="fw-bold text-primary" style="font-size: 0.75rem;">
-                                            <i class="fas fa-building me-1"></i>{{ $agent->service->name ?? '---' }}
-                                        </span>
-                                    </div>
-                                </label>
-                                @endforeach
-                            </div>
+                    {{-- Condition stricte basée sur vos statuts --}}
+                    @if($seminaire->statut == 'termine' || $seminaire->statut == 'annule')
+                        <!-- Message d'alerte à la place du formulaire -->
+                        <div class="alert alert-danger border-0 rounded-3 text-center p-4 m-0 shadow-sm" role="alert">
+                            <i class="fas fa-exclamation-triangle fs-3 d-block mb-2"></i>
+                            <span class="fw-bold fs-5">Séminaire achevé</span>
+                            <p class="small text-muted mb-0 mt-1">Il n'est plus possible d'inscrire de nouveaux agents à cet événement.</p>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm py-2">
-                            <i class="fas fa-check-circle me-1"></i> Valider l'inscription
-                        </button>
-                    </form>
+                    @else
+                        <!-- Formulaire normal si actif -->
+                        <form action="{{ route('seminaires.add_multiple_agents', $seminaire->id) }}" method="POST">
+                            @csrf
+                            <div class="mb-3">
+                                <!-- Conteneur avec défilement propre -->
+                                <div id="agentList" style="max-height: 400px; overflow-y: auto; border: 1px solid #eef2f7; border-radius: 12px;">
+                                    @foreach($agents as $agent)
+                                    <!-- Utilisation de label comme conteneur pour que toute la ligne soit cliquable et liée -->
+                                    <label class="d-flex align-items-center p-3 border-bottom w-100 m-0" for="ag-{{ $agent->id }}" style="cursor: pointer; transition: background 0.2s;">
+                                        <!-- Case à cocher (fermement ancrée à gauche) -->
+                                        <div class="form-check m-0">
+                                            <input class="form-check-input border-primary agent-checkbox"
+                                                type="checkbox"
+                                                name="agent_ids[]"
+                                                value="{{ $agent->id }}"
+                                                id="ag-{{ $agent->id }}"
+                                                style="width: 1.3rem; height: 1.3rem; margin-top: 0;">
+                                        </div>
+
+                                        <!-- Infos Agent (liées à la case) -->
+                                        <div class="ms-3">
+                                            <span class="small text-dark fw-bold d-block text-uppercase" style="line-height: 1.2;">
+                                                {{ $agent->last_name }} {{ $agent->first_name }}
+                                            </span>
+                                            <span class="fw-bold text-primary" style="font-size: 0.75rem;">
+                                                <i class="fas fa-building me-1"></i>{{ $agent->service->name ?? '---' }}
+                                            </span>
+                                        </div>
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 rounded-pill fw-bold shadow-sm py-2">
+                                <i class="fas fa-check-circle me-1"></i> Valider l'inscription
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
 
             <!-- Inscription Externe -->
-            <div class="card shadow-sm border-0 rounded-4 mb-4">
-                <div class="card-body p-4">
-                    <h6 class="fw-bold text-dark mb-3"><i class="fas fa-external-link-alt me-2 text-warning"></i>Ajouter un Externe</h6>
-                    <form action="{{ route('seminaires.add_externe', $seminaire->id) }}" method="POST">
-                        @csrf
-                        <input type="text" name="nom_externe" class="form-control mb-2 rounded-3 bg-light border-0" placeholder="Nom complet" required>
-                        <input type="text" name="organisme_externe" class="form-control mb-3 rounded-3 bg-light border-0" placeholder="Organisme / Structure" required>
-                        <button type="submit" class="btn btn-warning w-100 rounded-pill text-white fw-bold">Inscrire l'invité</button>
-                    </form>
+            {{-- On affiche le bloc d'inscription externe uniquement si le séminaire n'est ni terminé ni annulé --}}
+            @if($seminaire->statut !== 'termine' && $seminaire->statut !== 'annule')
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold text-dark mb-3"><i class="fas fa-external-link-alt me-2 text-warning"></i>Ajouter un Externe</h6>
+                        <form action="{{ route('seminaires.add_externe', $seminaire->id) }}" method="POST">
+                            @csrf
+                            <input type="text" name="nom_externe" class="form-control mb-2 rounded-3 bg-light border-0" placeholder="Nom complet" required>
+                            <input type="text" name="organisme_externe" class="form-control mb-3 rounded-3 bg-light border-0" placeholder="Organisme / Structure" required>
+                            <button type="submit" class="btn btn-warning w-100 rounded-pill text-white fw-bold">Inscrire l'invité</button>
+                        </form>
+                    </div>
                 </div>
-            </div>
+            @endif
 
             <!-- Archivage Rapport -->
+            {{-- Ce bloc reste visible en tout temps pour permettre de charger le rapport de clôture --}}
             <div class="card shadow-sm border-0 rounded-4 mb-4">
                 <div class="card-body p-4">
                     <h6 class="fw-bold text-dark mb-3"><i class="fas fa-file-pdf me-2 text-danger"></i>Rapport Final</h6>
@@ -266,9 +307,9 @@
                             <i class="fas fa-file-archive me-2"></i>Archiver le Rapport
                         </button>
                     </form>
-
                 </div>
             </div>
+
         </div>
     </div>
 </div>
