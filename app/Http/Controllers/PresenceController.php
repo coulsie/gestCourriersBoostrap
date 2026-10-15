@@ -526,26 +526,23 @@ public function listeFiltree(Request $request)
     }
 
     // 6. TRI ALPHABÉTIQUE ET SÉLECTION SÉCURISÉE
-    // On utilise join pour le tri, mais select('presences.*') pour que Laravel
-    // puisse reconstruire les relations sans conflit de colonnes 'id'
+    // Spécifier explicitement 'presences.id' évite que Laravel n'écrase l'ID de la présence par celui de l'agent
     $directionTri = $request->get('sort_agent', 'asc');
-
     $query->join('agents', 'presences.agent_id', '=', 'agents.id')
-          ->select('presences.*')
+          ->select('presences.*', 'presences.id as id')
           ->orderBy('agents.last_name', $directionTri);
 
-        // 7. Exécution de la pagination
-        // 7. Gestion de l'affichage (Tout ou Pagination)
-        if ($request->has('print')) {
-            // Si on demande l'impression, on récupère tout (limite haute à 5000 pour sécurité)
-            $resultats = $query->take(5000)->get();
-        } else {
-            // Sinon, pagination classique de 25 par page
-            $resultats = $query->paginate(25)->withQueryString();
-        }
+    // 7. GESTION DE L'AFFICHAGE (Tout pour impression OU Pagination pour l'écran)
+    if ($request->has('print')) {
+        // Si demande d'impression, on récupère tout sans paginer (limite de sécurité à 5000 lignes)
+        $resultats = $query->take(5000)->get();
+    } else {
+        // Sinon, pagination classique de 25 éléments par page avec conservation des filtres
+        $resultats = $query->paginate(25)->withQueryString();
+    }
 
-        // 8. Récupération des listes pour les menus déroulants des filtres
-        $directions = \App\Models\Direction::orderBy('name')->get();
+    // 8. Récupération des listes pour les menus déroulants des filtres
+    $directions = \App\Models\Direction::orderBy('name')->get();
     $services = \App\Models\Service::orderBy('name')->get();
 
     return view('presences.liste_filtree', compact('resultats', 'directions', 'services'));

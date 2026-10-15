@@ -2,6 +2,21 @@
 
 @section('content')
 <style>
+
+    .custom-print-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 35px;
+        background-color: #ffffff !important;
+        border-top: 1px solid #dee2e6 !important;
+        font-size: 0.75rem !important;
+        color: #6c757d !important;
+    }
+
+
     /* --- STYLES ÉCRAN --- */
     .extra-small { font-size: 0.75rem; }
     .table-header-custom { background-color: #000; color: #fff; text-transform: uppercase; font-size: 0.85rem; }
@@ -12,25 +27,19 @@
 
     /* --- STYLES IMPRESSION --- */
     @media print {
-        /* 1. On cache TOUT ce qui est sur la page (menus, barres latérales, filtres) */
-        body * {
-            visibility: hidden;
+        /* Masquer les éléments superflus de l'écran */
+        .no-print, .no-print * {
+            display: none !important;
         }
 
-        /* 2. On réaffiche UNIQUEMENT la zone du tableau (l'ID que tu as mis) */
-        #printableArea, #printableArea * {
-            visibility: visible;
-        }
-
-        /* 3. On repositionne le tableau en haut à gauche de la feuille */
         #printableArea {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
+            border: none !important;
+            box-shadow: none !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
 
-        /* 4. On force les titres de colonnes (Fond noir / Texte blanc) */
         .table-header-custom th {
             background-color: #000 !important;
             color: #fff !important;
@@ -39,21 +48,49 @@
             border: 1px solid #000 !important;
         }
 
-        /* 5. On force les badges en couleur sur le papier */
         .badge-present, .badge-retard, .badge-absent, .badge-justifie {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
 
-        /* 6. Mise en page générale */
-        @page { size: landscape; margin: 1cm; }
-        .table td, .table th { border: 1px solid #dee2e6 !important; padding: 8px !important; }
-        .no-print { display: none !important; }
+        .table {
+            width: 100% !important;
+        }
+
+        .table td, .table th {
+            border: 1px solid #dee2e6 !important;
+            padding: 8px !important;
+        }
+
+        tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
+        /*
+           SOLUTION ULTIME POUR COMPTEUR DYNAMIQUE ET FLUIDE X/Y
+           On configure la mise en page et les compteurs système de l'imprimante
+        */
+        @page {
+            size: landscape;
+            margin: 1cm 1cm 1.5cm 1cm;
+
+            /* Les navigateurs basés sur Chromium gèrent les compteurs directement à l'impression */
+            @bottom-right {
+                content: "Page " counter(page) " / " counter(pages);
+                font-family: Arial, sans-serif;
+                font-size: 0.75rem;
+                color: #6c757d;
+                font-weight: bold;
+            }
+        }
     }
 </style>
 
 
+
 <div class="container-fluid py-4 px-4">
+    <!-- EN-TÊTE -->
     <!-- EN-TÊTE -->
     <div class="d-flex justify-content-between align-items-center mb-4 no-print">
         <div class="d-flex align-items-center">
@@ -63,11 +100,12 @@
             <h3 class="mb-0 fw-bold text-dark text-uppercase">Rapport Global des Présences 2026</h3>
         </div>
 
-        <button type="button" onclick="window.print()" class="btn btn-success shadow-sm px-4 no-print">
-            <i class="fas fa-print me-2"></i> Imprimer
+        <!-- MODIFICATION ICI : On appelle la fonction JS 'imprimerTout' -->
+        <button type="button" onclick="imprimerTout()" class="btn btn-success shadow-sm px-4 no-print">
+            <i class="fas fa-print me-2"></i> Imprimer le rapport complet
         </button>
+    </div>
 
-     </div>
 
     <!-- ZONE DE FILTRAGE (no-print) -->
     <div class="card shadow-sm border-0 mb-4 bg-dark text-white rounded-3 no-print">
@@ -134,9 +172,9 @@
     </div>
 
     <!-- TABLEAU DE RÉSULTATS -->
+    <!-- TABLEAU DE RÉSULTATS -->
     <div id="printableArea" class="card shadow border-0 rounded-3 overflow-hidden">
 
-        <!-- Ce titre sera invisible sur ton site, mais apparaîtra sur l'impression -->
         <!-- EN-TÊTE D'IMPRESSION DYNAMIQUE -->
         <div class="d-none d-print-block p-4 border-bottom mb-4">
             <div class="text-center">
@@ -170,6 +208,7 @@
             </div>
             <hr>
         </div>
+
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -183,6 +222,7 @@
                             <th class="py-3 pe-4 text-end">Observations</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         @forelse($resultats as $p)
                             <tr class="border-bottom">
@@ -226,30 +266,50 @@
                             </tr>
                         @endforelse
                     </tbody>
+
+
+                            <!-- PIED DE PAGE IMPRESSION FLUIDE -->
+                    <div class="d-none d-print-block custom-print-footer">
+                        <div class="d-flex justify-content-between align-items-center px-4 w-100 h-100">
+                            <div>
+                                <strong>Dir. :</strong> <span class="text-uppercase fw-bold">{{ $directions->where('id', request('direction_id'))->first()->name ?? 'Toutes les directions' }}</span>
+                                <span class="mx-1 text-secondary">|</span>
+                                <strong>Serv. :</strong> <span class="fw-bold">{{ $services->where('id', request('service_id'))->first()->name ?? 'Tous les services' }}</span>
+                                <span class="mx-1 text-secondary">|</span>
+                                <strong>Période :</strong>
+                                <span>
+                                    @if(request('date_debut') && request('date_fin'))
+                                        Du {{ date('d/m/2026', strtotime(request('date_debut'))) }} au {{ date('d/m/2026', strtotime(request('date_fin'))) }}
+                                    @else
+                                        Année 2026
+                                    @endif
+                                </span>
+                            </div>
+                            <!-- L'espace de droite reste vide en HTML car injecté nativement par le CSS @page -->
+                            <div class="text-end"></div>
+                        </div>
+                    </div>
+
+
                 </table>
             </div>
         </div>
 
-        <!-- PAGINATION (Suivant / Précédent) -->
-        {{-- On ne vérifie la pagination QUE si on n'est pas en mode impression --}}
-        {{-- On vérifie d'abord si on n'est PAS en mode impression et si l'objet peut paginer --}}
+        <!-- PAGINATION ÉCRAN (Suivant / Précédent) -->
         @if(!request()->has('print') && method_exists($resultats, 'hasPages') && $resultats->hasPages())
         <div class="card-footer bg-white border-top py-3 no-print">
             <div class="d-flex justify-content-between align-items-center">
                 <div class="small text-muted">
-                    {{-- Utilisation de method_exists pour sécuriser les appels aux fonctions de pagination --}}
                     Affichage de {{ $resultats->firstItem() }} à {{ $resultats->lastItem() }} sur {{ $resultats->total() }} résultats
                 </div>
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
-                        {{-- Bouton Précédent --}}
                         @if ($resultats->onFirstPage())
                             <li class="page-item disabled"><span class="page-link shadow-none">Précédent</span></li>
                         @else
                             <li class="page-item"><a class="page-link shadow-none" href="{{ $resultats->previousPageUrl() }}" rel="prev">Précédent</a></li>
                         @endif
 
-                        {{-- Bouton Suivant --}}
                         @if ($resultats->hasMorePages())
                             <li class="page-item"><a class="page-link shadow-none" href="{{ $resultats->nextPageUrl() }}" rel="next">Suivant</a></li>
                         @else
@@ -261,25 +321,66 @@
         </div>
         @endif
 
-
-
     </div>
+
+
+    <!-- PAGINATION ÉCRAN (Suivant / Précédent) -->
+    @if(!request()->has('print') && method_exists($resultats, 'hasPages') && $resultats->hasPages())
+    <div class="card-footer bg-white border-top py-3 no-print">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="small text-muted">
+                Affichage de {{ $resultats->firstItem() }} à {{ $resultats->lastItem() }} sur {{ $resultats->total() }} résultats
+            </div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    @if ($resultats->onFirstPage())
+                        <li class="page-item disabled"><span class="page-link shadow-none">Précédent</span></li>
+                    @else
+                        <li class="page-item"><a class="page-link shadow-none" href="{{ $resultats->previousPageUrl() }}" rel="prev">Précédent</a></li>
+                    @endif
+
+                    @if ($resultats->hasMorePages())
+                        <li class="page-item"><a class="page-link shadow-none" href="{{ $resultats->nextPageUrl() }}" rel="next">Suivant</a></li>
+                    @else
+                        <li class="page-item disabled"><span class="page-link shadow-none">Suivant</span></li>
+                    @endif
+                </ul>
+            </nav>
+        </div>
+    </div>
+    @endif
+
+</div>
+
+
+
 </div>
 
 <script>
-    // Uniquement le filtrage (sans les fonctions d'impression qui buggent)
-    document.getElementById('direction_id')?.addEventListener('change', function() {
-        var dirId = this.value;
-        var serviceSelect = document.getElementById('service_id');
-        var options = serviceSelect.querySelectorAll('option');
-        options.forEach(function(opt) {
-            if (opt.value === "" || dirId === "" || opt.getAttribute('data-direction') === dirId) {
-                opt.style.display = "block";
-            } else {
-                opt.style.display = "none";
-            }
-        });
-        serviceSelect.value = "";
+    function imprimerTout() {
+        // 1. On récupère l'URL actuelle avec ses filtres existants
+        let url = new URL(window.location.href);
+
+        // 2. On ajoute le paramètre print=1
+        url.searchParams.set('print', '1');
+
+        // 3. On redirige vers cette URL pour charger toutes les lignes
+        window.location.href = url.toString();
+    }
+
+    // 4. Dès que la page se recharge AVEC le paramètre print, on lance l'impression automatiquement
+    window.addEventListener('DOMContentLoaded', (event) => {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('print')) {
+            window.print();
+
+            // Optionnel : Retire le paramètre 'print' après l'impression pour remettre la pagination au retour
+            setTimeout(() => {
+                let url = new URL(window.location.href);
+                url.searchParams.delete('print');
+                window.history.replaceState({}, document.title, url.toString());
+            }, 1000);
+        }
     });
 </script>
 
